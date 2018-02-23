@@ -1,0 +1,194 @@
+/* Code from "Section" by Rudy Affandi ### https://github.com/lesaff/statamic-sections */
+.section-header, .section-header label, .nav-tabs a, .nav-tabs label {
+    cursor: pointer !important
+}
+
+.section-fieldtype:hover label {
+  color: #3aa3e3;
+}
+
+.tab-flex, .flex {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -webkit-align-items: stretch;
+    -ms-flex-align: stretch;
+    align-items: stretch;
+}
+
+.tab-flex {
+    padding: 10px;
+}
+
+.section-fieldtype,
+.section-fieldtype:first-of-type {
+    margin-bottom: 0!important;
+}
+
+.tab-content {
+    clear: both;
+    width: 100%;
+    display: block;
+}
+
+.nav-tabs {
+    width: 100%;
+    border-bottom: 0;
+}
+
+.tab-pane .help-block {
+    padding: 10px 16px;
+}
+
+.publish-fields.tabs-wrapper {
+	background: #fff;
+	box-shadow: 0 7px 14px 0 rgba(50,50,93,.1),0 3px 6px 0 rgba(0,0,0,.07)
+}
+
+#publish-fields.naked .nav-tabs {
+	background: #f1f5f9;
+}
+
+#publish-fields.naked .nav-tabs > li > a {
+	border: 1px solid transparent!important;
+}
+
+#publish-fields.naked .nav-tabs > li.active > a {
+	border-left: 1px solid #e0e0e0!important;
+	border-right: 1px solid #e0e0e0!important;
+	border-top: 1px solid #e0e0e0!important;
+}
+
+#publish-fields.naked .nav-tabs > li.first.active > a {
+	border-left-color: transparent!important;
+}
+
+#publish-fields.naked .card {
+	background: none;
+	padding-left: 0;
+	padding-top: 0;
+	box-shadow: none;
+}
+
+#publish-fields.naked .publish-fields.title-field {
+	padding-bottom: 0;
+}
+
+#publish-fields.naked .publish-fields.title-field .form-group {
+	padding: 0;
+}
+
+#publish-fields.naked .publish-fields.title-field input {
+	background: #fff;
+}
+
+#publish-fields.naked .section-fieldtype {
+	margin: 0!important;
+}
+
+.statamify_variants-fieldtype .grid-table .selectize-input {
+    background: #fff;
+    box-shadow: none;
+    padding: 10px;
+    border-radius: 0;
+    height: auto;
+}
+
+.statamify_variants-fieldtype .grid-field {
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+
+.statamify_variants-fieldtype .grid-field tbody tr .selectize-control .item {
+    background-color: #ddd;
+    color: #505050;
+}
+.statamify_variants-fieldtype .grid-field tbody tr:first-child .selectize-control .item {
+    background-color: #cde69c;
+    color: #638421;
+}
+
+.statamify_variants-fieldtype .grid-field tbody tr:nth-child(2) .selectize-control .item {
+    background-color: #9ca7e6;
+    color: #212984;
+}
+
+.statamify_variants-fieldtype .grid-field tbody tr:nth-child(3) .selectize-control .item {
+    background-color: #e6a49c;
+    color: #842121;
+}
+
+.statamify_variants-fieldtype .grid-field tbody tr:nth-child(4) .selectize-control .item {
+    background-color: #e69cdd;
+    color: #822184;
+}
+
+.statamify_variants-fieldtype .table-fieldtype tbody td:first-child {
+    background: #f1f5f9;
+    color: #676767;
+    font-weight:500;
+    padding:10px;
+}
+
+.statamify_variants-fieldtype .table-fieldtype tbody td:first-child span {
+    display: inline-block;
+    vertical-align: top;
+    background: #3aa3e3;
+    border-radius: 2px;
+    margin: 0 8px 0 0;
+    padding: 2px 8px;
+    font-size: 11px;
+}
+
+.statamify_variants-fieldtype .table-fieldtype tbody td:first-child span {
+    background-color: #ddd;
+    color: #505050;
+}
+
+.statamify_variants-fieldtype .table-fieldtype tbody td:first-child span:first-child {
+    background-color: #cde69c;
+    color: #638421;
+}
+
+.statamify_variants-fieldtype .table-fieldtype tbody td:first-child span:nth-child(2) {
+    background-color: #9ca7e6;
+    color: #212984;
+}
+
+.statamify_variants-fieldtype .table-fieldtype tbody td:first-child span:nth-child(3) {
+    background-color: #e6a49c;
+    color: #842121;
+}
+
+.statamify_variants-fieldtype .table-fieldtype tbody td:first-child span:nth-child(4) {
+    background-color: #e69cdd;
+    color: #822184;
+}
+
+.statamify_variants-fieldtype .table-fieldtype tbody td:last-child {
+    padding: 3px 10px;
+}
+
+.inventory-quantity {
+    background: #fffbe9;
+    color: #e85b0f;
+    padding: 2px 3px;
+}
+
+.statamify-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 3px;
+    background-size: cover;
+}
+
+.statamify-link span {
+    font-size: 13px;
+}

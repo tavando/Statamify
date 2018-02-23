@@ -1,0 +1,8 @@
+title: Products
+fieldset: products
+columns:
+  - title
+  - listing_image
+  - listing_inventory
+  - listing_type
+  - listing_vendor

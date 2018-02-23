@@ -1,0 +1,7 @@
+fields:
+  general_setttings:
+    type: section
+    display: General Setttings
+  store_title:
+    type: text
+    display: Store Title
