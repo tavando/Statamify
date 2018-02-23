@@ -12,6 +12,9 @@ Currently it's set of fields for Products, including custom made **Statamify Var
 ### Todos
 
  - Whole Ecommerce Store :)
+ 
+### Disclaimer
+I'm not the pro expert of PHP like guys from Statamic, I hate writing docs and I work alone - that's why everyone who'd like to help is invited.
 
 License
 ----
