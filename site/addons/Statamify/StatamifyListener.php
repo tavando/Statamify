@@ -22,6 +22,7 @@ class StatamifyListener extends Listener
 	];
 
 	public $cp = false;
+	public $original = null;
 
 	public function eventAddToHead() {
 
@@ -80,8 +81,8 @@ class StatamifyListener extends Listener
 		$check = [
 			'listing_inventory' => $this->eventPublishedProductsInventory($entry),
 			'listing_image' => $this->eventPublishedProductsImage($entry),
-			'listing_type' => $this->eventPublishedProductsRelation($entry, 'type', 'types'),
-			'listing_vendor' => $this->eventPublishedProductsRelation($entry, 'vendor', 'vendors'),
+			'listing_type' => $this->eventPublishedProductsRelation($entry, $this->original, 'type', 'types'),
+			'listing_vendor' => $this->eventPublishedProductsRelation($entry, $this->original, 'vendor', 'vendors'),
 		];
 
 		foreach ($check as $key => $value) {
@@ -159,7 +160,7 @@ class StatamifyListener extends Listener
 
 	}
 
-	private function eventPublishedProductsRelation($entry, $field, $collection) {
+	private function eventPublishedProductsRelation($entry, $original, $field, $collection) {
 
 		if ($entry->get($field)) {
 
@@ -175,45 +176,36 @@ class StatamifyListener extends Listener
 
 			}
 
-			$relations = Entry::whereCollection($collection);
-
-			foreach ($relations->toArray() as $v) {
-
-				if (isset($v['products']) && in_array($entry->get('id'), $v['products']) && $v['id'] != $relation->get('id')) {
-
-					$old_relation = Entry::find($v['id']);
-					$old_relation_products = $old_relation->get('products') ?: [];
-					$old_relation_products = array_diff($old_relation_products, [$entry->get('id')]);
-					$old_relation->set('products', $old_relation_products);
-					$this->cp = true;
-					$old_relation->save();
-
-				}
-
-			}
+			$this->eventPublishedProductsRelationOldCheck($entry, $original, $field);
 
 			return $relation->get('title') . ' <a href="' . $relation->toArray()['edit_url'] . '" class="statamify-link"><span class="icon icon-forward"></span></a>';
 
 		} else {
 
-			$relations = Entry::whereCollection($collection);
-
-			foreach ($relations->toArray() as $v) {
-
-				if (isset($v['products']) && in_array($entry->get('id'), $v['products'])) {
-
-					$old_relation = Entry::find($v['id']);
-					$old_relation_products = $old_relation->get('products') ?: [];
-					$old_relation_products = array_diff($old_relation_products, [$entry->get('id')]);
-					$old_relation->set('products', $old_relation_products);
-					$this->cp = true;
-					$old_relation->save();
-
-				}
-
-			}
+			$this->eventPublishedProductsRelationOldCheck($entry, $original, $field);
 
 			return '';
+
+		}
+
+	}
+
+	private function eventPublishedProductsRelationOldCheck($entry, $original, $field) {
+
+		if (isset($original['data'])) {
+
+			$original_data = reset($original['data']);
+
+			if (isset($original_data[$field]) && $entry->get($field) != $original_data[$field]) {
+
+				$old_relation = Entry::find($original_data[$field]);
+				$old_relation_products = $old_relation->get('products') ?: [];
+				$old_relation_products = array_diff($old_relation_products, [$entry->get('id')]);
+				$old_relation->set('products', $old_relation_products);
+				$this->cp = true;
+				$old_relation->save();
+
+			}
 
 		}
 
@@ -223,13 +215,10 @@ class StatamifyListener extends Listener
 
 	public function eventSaved($entry, $original) {
 
+		$this->original = $original;
 		$collection = $entry->toArray()['collection'];
 
 		switch ($collection) {
-
-			/*case 'products':
-				$this->eventPublishedProducts($entry, $original);
-			break;*/
 
 			case 'types':
 			case 'vendors':
