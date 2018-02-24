@@ -1,4 +1,10 @@
 taxonomies:
   tags: true
 title: Vendors
-fields: [ ]
+fields:
+  products:
+    type: collection
+    display: Products
+    collection:
+      - products
+    mode: panes

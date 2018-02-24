@@ -1,4 +1,10 @@
 taxonomies:
   tags: true
 title: Types
-fields: [ ]
+fields:
+  products:
+    type: collection
+    display: Products
+    collection:
+      - products
+    mode: panes

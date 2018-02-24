@@ -166,6 +166,7 @@ class StatamifyListener extends Listener
 
 		if ($entry->get($field)) {
 
+			/********** UPDATE RELATION'S PRODUCTS FIELD IF DOESN'T HAVE PRODUCT'S ID IN IT  ***/
 			$relation = Entry::find($entry->get($field));
 
 			if (!$relation->get('products') || !in_array($entry->get('id'), $relation->get('products'))) {
@@ -196,6 +197,7 @@ class StatamifyListener extends Listener
 
 		if (isset($original['data'])) {
 
+			/********** REMOVE PRODUCT'S ID FROM OLD RELATION'S PRODUCTS FIELD ***/
 			$original_data = reset($original['data']);
 
 			if (isset($original_data[$field]) && $entry->get($field) != $original_data[$field]) {
@@ -219,6 +221,7 @@ class StatamifyListener extends Listener
 
 			$new_collections = array_diff($entry->get('collections'), (isset($original_data['collections']) ? $original_data['collections'] : []));
 
+			/********** UPDATE EVERY COLLECTION WITH PRODUCT ID ***/
 			foreach ($new_collections as $id) {
 
 				$collection = Entry::find($id);
@@ -251,6 +254,7 @@ class StatamifyListener extends Listener
 
 			$original_data = reset($original['data']);
 
+			/********** REMOVE PRODUCT'S ID FROM OLD COLLECTIONS' PRODUCTS FIELD ***/
 			if (isset($original_data['collections']) && $entry->get('collections') != $original_data['collections']) {
 
 				$old_collections = array_diff($original_data['collections'], ($entry->get('collections') ?: []));
@@ -302,6 +306,7 @@ class StatamifyListener extends Listener
 			$products_original = isset($data_original['products']) ? $data_original['products'] : [];
 			$products = $entry->get('products') ?: [];
 
+			/********** UPDATE ALL FROM ARRAYS BELOW. ADD - ADD RELATION TO PRODUCT. REMOVE - REMOVE RELATION FROM PRODUCT ***/
 			$add = array_diff($products, $products_original);
 			$remove = array_diff($products_original, $products);
 
@@ -364,6 +369,7 @@ class StatamifyListener extends Listener
 			$products_original = isset($data_original['products']) ? $data_original['products'] : [];
 			$products = $entry->get('products') ?: [];
 
+			/********** UPDATE ALL FROM ARRAYS BELOW. ADD - ADD COLLECTION TO PRODUCT. REMOVE - REMOVE COLLECTION FROM PRODUCT ***/
 			$add = array_diff($products, $products_original);
 			$remove = array_diff($products_original, $products);
 

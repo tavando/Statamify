@@ -1,3 +1,9 @@
 taxonomies: false
 title: Collections
-fields: [ ]
+fields:
+  products:
+    type: collection
+    display: Products
+    collection:
+      - products
+    mode: panes
