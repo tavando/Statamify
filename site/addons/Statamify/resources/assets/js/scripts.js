@@ -23,13 +23,13 @@ Statamify = {
 	convertListingCells: function() {
 
 		$.each($('[class^="column-listing_"]'), function() {
-			$(this).text($(this).text().replace('Listing ', ''))
+			$(this).attr('data-title', $(this).text().replace('Listing ', '').trim())
 		})
 
 		$.each($('[class^="cell-listing_"]'), function() {
 			$(this).html($(this).text())
 		})
-
+		
 	},
 
 	changeSectionsToTabs: function() {
