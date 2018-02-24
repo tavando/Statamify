@@ -7,8 +7,9 @@ Currently it's not production ready and fully working eCommerce store. It's stil
 **List of contents**
 - [1. Screenshots](#screenshots)
 - [2. Features](#features)
-- [3. Todos](#todos)
-- [4. Disclaimer](#disclaimer)
+- [3. API](#api)
+- [4. Todos](#todos)
+- [5. Disclaimer](#disclaimer)
 
 <a name="screenshots"></a>
 ## 1. Screenshots
@@ -32,13 +33,43 @@ Here is the list of currently implemented features
 
 - **Two-way binding** - setting type, vendor or collections updates respective type of relation and vice versa
 
+<a name="api"></a>
+## 3. API
+Below are API ends to use with Statamify. Remember to use CSRF _token for POST ends
+
+### 3.1. Get cart
+Get cart in JSON. Adding and updating also returns cart;
+
+```
+  GET /!/statamify/cart
+```
+
+### 3.2. Add to cart
+Add new item to cart (if item exists in cart, update function will fire)
+
+```
+  POST /!/statamify/cart_add
+  product: ##PRODUCT_ID##
+  variant: ##VARIANT_ID (if simple, leave "")
+  quantity: 2
+```
+
+### 3.3. Update cart
+Update item in cart (not implemented yet)
+
+```
+  POST /!/statamify/cart_update
+  item_id: ##CART ITEM ID## (cart generates unique id for all cart items)
+  quantity: 1 (if zero, item will be removed from cart)
+```
+
 <a name="todos"></a>
-## 3. Todos
+## 4. Todos
 
  - Whole Ecommerce Store :)
 
 <a name="disclaimer"></a>
-## 4. Disclaimer
+## 5. Disclaimer
 I'm not the pro expert of PHP like guys from Statamic, I hate writing docs and I work alone - that's why everyone who'd like to help is invited.
 
 License
