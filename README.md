@@ -2,7 +2,7 @@
 
 Statamify is **FREE** Shopify-like ecommerce addon for Statamic. Copy the files to your main Statamic folder and you are set to go.
 
-Currently it's set of fields for Products, including custom made **Statamify Variants** for complex products.
+Currently it's set of fields for Products and logic between them (two-way binding with Relation fields), including custom made **Statamify Variants** for complex products.
 
 ### Screenshots
 ![All products](/screenshot-products.jpg?raw=true "All products")
