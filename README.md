@@ -8,6 +8,7 @@ Currently it's not production ready and fully working eCommerce store. It's stil
 - [1. Screenshots](#screenshots)
 - [2. Features](#features)
 - [3. Todos](#todos)
+- [4. Disclaimer](#disclaimer)
 
 <a name="screenshots"></a>
 ## 1. Screenshots
@@ -17,7 +18,7 @@ Currently it's not production ready and fully working eCommerce store. It's stil
 
 <a name="features"></a>
 ## 2. Features
-Here is the list of currenlty implemented features
+Here is the list of currently implemented features
 
 ### 2.1. Products
 - **Listing** - new listing view with the most important details about your product, like image, inventory, relations (with sorting)
@@ -35,8 +36,9 @@ Here is the list of currenlty implemented features
 ## 3. Todos
 
  - Whole Ecommerce Store :)
- 
-## Disclaimer
+
+<a name="disclaimer"></a>
+## 4. Disclaimer
 I'm not the pro expert of PHP like guys from Statamic, I hate writing docs and I work alone - that's why everyone who'd like to help is invited.
 
 License
