@@ -5,9 +5,9 @@ Statamify is **FREE** Shopify-like ecommerce addon for Statamic. Copy the files 
 Currently it's not production ready and fully working eCommerce store. It's still in development.
 
 **List of contents**
-- [Screenshots] (#screenshots)
-- [Features] (#features)
-- [Todos] (#todos)
+- [Screenshots](#screenshots)
+- [Features](#features)
+- [Todos](#todos)
 
 <a name="screenshots"></a>
 ## Screenshots
