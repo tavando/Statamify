@@ -96,6 +96,8 @@ class StatamifyListener extends Listener
 
 		}
 
+		$this->eventPublishedProductsCollections($entry, $this->original);
+
 		if ($change) {
 
 			$entry->save();
@@ -211,6 +213,65 @@ class StatamifyListener extends Listener
 
 	}
 
+	private function eventPublishedProductsCollections($entry, $original) {
+
+		if ($entry->get('collections')) {
+
+			$new_collections = array_diff($entry->get('collections'), (isset($original_data['collections']) ? $original_data['collections'] : []));
+
+			foreach ($new_collections as $id) {
+
+				$collection = Entry::find($id);
+
+				if (!$collection->get('products') || !in_array($entry->get('id'), $collection->get('products'))) {
+
+					$products = $collection->get('products') ?: [];
+					$products[] = $entry->get('id');
+					$collection->set('products', $products);
+					$this->cp = true;
+					$collection->save();
+
+				}
+
+			}
+
+			$this->eventPublishedProductsCollectionsOldCheck($entry, $original);
+
+		} else {
+
+			$this->eventPublishedProductsCollectionsOldCheck($entry, $original);
+
+		}
+
+	}
+
+	private function eventPublishedProductsCollectionsOldCheck($entry, $original) {
+
+		if (isset($original['data'])) {
+
+			$original_data = reset($original['data']);
+
+			if (isset($original_data['collections']) && $entry->get('collections') != $original_data['collections']) {
+
+				$old_collections = array_diff($original_data['collections'], ($entry->get('collections') ?: []));
+
+				foreach ($old_collections as $id) {
+					
+					$old_collection = Entry::find($id);
+					$old_collection_products = $old_collection->get('products') ?: [];
+					$old_collection_products = array_diff($old_collection_products, [$entry->get('id')]);
+					$old_collection->set('products', $old_collection_products);
+					$this->cp = true;
+					$old_collection->save();
+
+				}
+
+			}
+
+		}
+
+	}
+
 	/* EVENT SAVED */
 
 	public function eventSaved($entry, $original) {
@@ -223,6 +284,10 @@ class StatamifyListener extends Listener
 			case 'types':
 			case 'vendors':
 				if (!$this->cp) $this->eventSavedRelation($entry, $original, $collection);
+			break;
+
+			case 'collections':
+				if (!$this->cp) $this->eventSavedCollection($entry, $original);
 			break;
 		}
 
@@ -242,22 +307,80 @@ class StatamifyListener extends Listener
 
 			foreach ($add as $id) {
 
-				$type = substr($collection, 0, -1);
-				$product = Entry::find($id);
+				if ($id) {
 
-				if ($product->get($type)) {
-					$old_relation = Entry::find($product->get($type));
-					$old_relation_products = $old_relation->get('products') ?: [];
-					$old_relation_products = array_diff($old_relation_products, [$id]);
-					$old_relation->set('products', $old_relation_products);
-					$old_relation->save();
+					$type = substr($collection, 0, -1);
+					$product = Entry::find($id);
+
+					if ($product->get($type)) {
+						$old_relation = Entry::find($product->get($type));
+						$old_relation_products = $old_relation->get('products') ?: [];
+						$old_relation_products = array_diff($old_relation_products, [$id]);
+						$old_relation->set('products', $old_relation_products);
+						$old_relation->save();
+					}
+
+					if ($product->get($type) != $entry->get('id')) {
+
+						$product->set($type, $entry->get('id'));
+						$product->set('listing_' . $type, $entry->get('title') . ' <a href="' . $entry->toArray()['edit_url'] . '" class="statamify-link"><span class="icon icon-forward"></span></a>');
+						$product->save();
+
+					}
+					
 				}
 
-				if ($product->get($type) != $entry->get('id')) {
+			}
 
-					$product->set($type, $entry->get('id'));
-					$product->set('listing_' . $type, $entry->get('title') . ' <a href="' . $entry->toArray()['edit_url'] . '" class="statamify-link"><span class="icon icon-forward"></span></a>');
-					$product->save();
+			foreach ($remove as $id) {
+
+				if ($id) {
+
+					$product = Entry::find($id);
+					$type = substr($collection, 0, -1);
+
+					if ($product->get($type) == $entry->get('id')) {
+						$product->set($type, '');
+						$product->set('listing_' . $type, '');
+						$product->save();
+					}
+
+				}
+
+			}
+
+			Stache::update();
+
+		}
+
+	}
+
+	private function eventSavedCollection($entry, $original) {
+
+		$data_original = reset($original['data']);
+
+		if ($entry->get('products') != @$data_original['products']) {
+
+			$products_original = isset($data_original['products']) ? $data_original['products'] : [];
+			$products = $entry->get('products') ?: [];
+
+			$add = array_diff($products, $products_original);
+			$remove = array_diff($products_original, $products);
+
+			foreach ($add as $id) {
+
+				if ($id) {
+
+					$product = Entry::find($id);
+
+					if (!$product->get('collections') || !in_array($entry->get('id'), $product->get('collections'))) {
+
+						$products = $product->get('collections') ?: [];
+						$products[] = $entry->get('id');
+						$product->set('collections', $products);
+						$product->save();
+
+					}
 
 				}
 
@@ -265,13 +388,16 @@ class StatamifyListener extends Listener
 
 			foreach ($remove as $id) {
 
-				$product = Entry::find($id);
-				$type = substr($collection, 0, -1);
+				if ($id) {
 
-				if ($product->get($type) == $entry->get('id')) {
-					$product->set($type, '');
-					$product->set('listing_' . $type, '');
-					$product->save();
+					$product = Entry::find($id);
+
+					if ($product->get('collections') && in_array($entry->get('id'), $product->get('collections'))) {
+						$products = array_diff($product->get('collections'), [$entry->get('id')]);
+						$product->set('collections', $products);
+						$product->save();
+					}
+
 				}
 
 			}
