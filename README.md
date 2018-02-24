@@ -5,19 +5,21 @@ Statamify is **FREE** Shopify-like ecommerce addon for Statamic. Copy the files 
 Currently it's not production ready and fully working eCommerce store. It's still in development.
 
 **List of contents**
-- [Screenshots](#screenshots)
-- [Features](#features)
-- [Todos](#todos)
+- [1. Screenshots](#screenshots)
+- [2. Features](#features)
+- [3. Todos](#todos)
 
 <a name="screenshots"></a>
-## Screenshots
+## 1. Screenshots
 ![All products](/screenshot-products.jpg?raw=true "All products")
 ![General Settings for Product](/screenshot-product-new-general.jpg?raw=true "General Settings for Product")
 ![Relation Settings for Product](/screenshot-product-new-relation.jpg?raw=true "Relation Settings for Product")
 
 <a name="features"></a>
-## Features
-### Products
+## 2. Features
+Here is the list of currenlty implemented features
+
+### 2.1. Products
 - **Listing** - new listing view with the most important details about your product, like image, inventory, relations (with sorting)
 
 - **Catalog** - three different relation types to categorize products
@@ -30,7 +32,7 @@ Currently it's not production ready and fully working eCommerce store. It's stil
 - **Two-way binding** - setting type, vendor or collections updates respective type of relation and vice versa
 
 <a name="todos"></a>
-## Todos
+## 3. Todos
 
  - Whole Ecommerce Store :)
  
