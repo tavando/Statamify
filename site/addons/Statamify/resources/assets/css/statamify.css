@@ -206,3 +206,12 @@
 	content: attr(data-title);
 	display: inline-block;
 }
+
+.statamify_countries-fieldtype {
+	margin-left: -15px;
+	margin-right: -15px;
+}
+
+.statamify_countries-fieldtype > label {
+	display: none;
+}

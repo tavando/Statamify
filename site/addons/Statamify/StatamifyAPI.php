@@ -9,6 +9,12 @@ use Statamic\API\Entry;
 class StatamifyAPI extends API
 {
 
+	/*************
+	
+	CART API 
+
+	*************/
+
 	public function cartInit($instance = 'cart', $recalculated = false) {
 
 		$session = session('statamify.' . $instance);
@@ -268,6 +274,24 @@ class StatamifyAPI extends API
 			}
 
 		}
+
+	}
+
+	/*************
+	
+	ORDER API
+
+	*************/
+
+	public function countries() {
+
+		return $this->storage->getYAML('countries');
+		
+	}
+
+	public function regions() {
+
+		return $this->storage->getYAML('regions');
 
 	}
 

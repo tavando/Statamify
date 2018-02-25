@@ -33,4 +33,17 @@ class StatamifyController extends Controller
 		return $this->api('Statamify')->cartAdd($data);
 
 	}
+
+	public function getCountries() {
+
+		$countries = $this->api('Statamify')->countries();
+		$regions = $this->api('Statamify')->regions();
+
+		return [ 
+			'countries' => reset($countries), 
+			'regions' => reset($regions) 
+		];
+
+	}
+
 }

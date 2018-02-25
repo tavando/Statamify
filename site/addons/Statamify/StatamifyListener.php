@@ -34,7 +34,7 @@ class StatamifyListener extends Listener
 
 		$store = Nav::item('store');
 		$store->add(Nav::item('statamify-analytics')->title('Analytics')->icon('line-graph'));
-		$store->add(Nav::item('statamify-orders')->title('Orders')->icon('shopping-cart'));
+		$store->add(Nav::item('statamify-orders')->title('Orders')->route('entries.show', 'orders')->icon('shopping-cart'));
 
 		$products = Nav::item('statamify-products')->title('Products')->route('entries.show', 'products')->icon('shop');
 		$products->add(Nav::item('statamify-all-products')->title('All')->route('entries.show', 'products'));
