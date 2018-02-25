@@ -66,6 +66,7 @@ Statamify = {
 							'id': 'panel' + index,
 							'role': 'tabpanel',
 					});
+					$(this).addClass('tab-' + $('[href="#panel' + index + '"] label').text().trim().toLowerCase())
 			});
 
 			var tabContainer = $('<div>', {'class': 'tab-content'});
@@ -100,6 +101,88 @@ Statamify = {
 
 		}
 
+	},
+
+	orderPreviewCustomerDetails: function() {
+
+		$dataGroups = $('.tab-customer .grid-fieldtype')
+		details = []
+
+		$.each($dataGroups, function(key, group) {
+			
+			if (key == 0 || (key == 1 && $('.tab-customer .toggle-container').is('.on'))) {
+
+				text = ''
+				fields = $(group).find('.col-md-6 input')
+
+				line1 = $(fields[0]).val() + ' ' + $(fields[1]).val() + ($(fields[2]).val() != '' ? ', ' + $(fields[2]).val() : '')
+				text += line1.trim() + '\n'
+
+				line2 = $(fields[4]).val()  + '\n' + $(fields[5]).val()
+				text += line2.trim() + '\n'
+
+				last = $(group).find('.col-md-12 .col-md-6')
+				region = $(last[1]).find('input').length ? $(last[1]).find('input').val() : $(last[1]).find('.select').attr('data-content') + ' (' + $(last[1]).find('select').val() + ')'
+				country = $(last[0]).find('.select').attr('data-content') ? $(last[0]).find('.select').attr('data-content') + ' (' + $(last[0]).find('select').val() + ')' : ''
+
+				line3 = $(fields[7]).val()  + ' ' + $(fields[6]).val() + (region != '' ? ', ' + region : '')
+				text += line3.trim() + (country ? '\n' + country : '')
+
+				details.push(text)
+
+			}
+
+		})
+
+		html = `
+			<div class="card" id="order-preview-details">
+				<div class="publish-fields pb-1">
+					<div class="form-group inline">
+						<div class="form-group">
+							<label class="block">Customer</label>
+							<div class="customer-name"><a href="">Lorem Ipsum</a></div>
+							<div class="customer-phone small-text"><strong>Phone:</strong> <span>12345678</span></div>
+							<div class="customer-email small-text"><strong>Email:</strong> <span>test@test.com</span></div>
+						</div>
+						<div class="form-group" id="shipping-textarea">
+							<label class="block">Shipping address</label>
+							<textarea class="form-control mono" readonly>` + details[0] + `</textarea>
+						</div>
+						<div class="form-group" id="billing-textarea">
+							<label class="block">Billing address</label>
+							<div class="small-text">` + (details[1] ? '<textarea class="form-control mono" readonly>' + details[1] + '</textarea>' : 'Same as Shipping') + `</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		`;
+
+		if (!$('#order-preview-details').length) {
+
+			$('#publish-meta').append(html)
+
+		} else {
+
+			$('#shipping-textarea textarea').val(details[0])
+
+			if (details[1]) {
+
+				$('#billing-textarea > div').html('<textarea class="form-control mono" readonly>' + details[1] + '</textarea>')
+
+			} else {
+
+				$('#billing-textarea > div').text('Same as Shipping')
+
+			}
+
+		}
+
+		$.each($('#shipping-textarea textarea, #billing-textarea textarea'), function() {
+			if ($(this).length) {
+				$(this)[0].style.cssText = 'height:' + $(this)[0].scrollHeight + 'px'
+			}
+		})
+
 	}
 
 }
@@ -114,6 +197,7 @@ function newXHR() {
 			setTimeout(function(){
 				Statamify.changeSectionsToTabs()
 				Statamify.convertListingCells()
+				Statamify.orderPreviewCustomerDetails()
 			}, 0)
 		}
 	}, false);
