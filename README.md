@@ -16,6 +16,7 @@ Currently it's not production ready and fully working eCommerce store. It's stil
 ![All products](/screenshot-products.jpg?raw=true "All products")
 ![General Settings for Product](/screenshot-product-new-general.jpg?raw=true "General Settings for Product")
 ![Relation Settings for Product](/screenshot-product-new-relation.jpg?raw=true "Relation Settings for Product")
+![Order view](/order-view.jpg?raw=true "Order view")
 
 <a name="features"></a>
 ## 2. Features
