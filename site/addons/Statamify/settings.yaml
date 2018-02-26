@@ -2,9 +2,34 @@ fields:
   general_setttings:
     type: section
     display: General
-  store_title:
+  store_name:
     type: text
-    display: Store Title
+    display: Store Name
+  owner_email:
+    type: text
+    display: Owner Email
+    instructions: Email address for receiving emails from store
+    width: 50
+  store_email:
+    type: text
+    display: Store Email
+    instructions: Email address used to send emails to customers and contact them
+    width: 50
+  store_address:
+    type: textarea
+    display: Store Address
+  order_id_format:
+    type: text
+    display: Order ID Format
+    instructions: Remember to use [id] inside the format
+    default: '#[id]'
+    width: 50
+  order_next_id:
+    type: text
+    display: Next Order ID
+    instructions: Incremental value for every order
+    width: 50
+    default: 1000
   shipping:
     type: section
     display: Shipping
@@ -128,3 +153,6 @@ fields:
     display: Package Weight
     validate: numeric
     instructions: This weight will be added to total weight of the cart
+  payments:
+    type: section
+    display: Payments
