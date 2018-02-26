@@ -159,7 +159,11 @@ Statamify = {
 
 		if (!$('#order-preview-details').length) {
 
-			$('#publish-meta').append(html)
+			if ($('.tab-order').length) {
+
+				$('#publish-meta').append(html)
+
+			}
 
 		} else {
 
