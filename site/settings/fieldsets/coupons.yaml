@@ -1,0 +1,72 @@
+taxonomies: false
+title: Coupons
+create_title: ""
+fields:
+  listing_used:
+    type: hidden
+    display: Listing Used
+  listing_status:
+    type: hidden
+    display: Listing Status
+  type:
+    type: select
+    display: Type
+    options:
+      percentage: Percentage Discount
+      fixed: Fixed Discount
+      free_ship: Free Shipping
+    default: percentage
+    width: 33
+  value:
+    type: text
+    display: Value
+    width: 33
+    hide_when:
+      type: free_ship
+  min:
+    type: text
+    display: Minimum Purchase
+    width: 33
+    validate: numeric
+  countries:
+    type: suggest
+    display: Countries
+    instructions: Use only for selected countries
+    options: [ ]
+    width: 50
+  customers:
+    type: tags
+    display: Customers
+    instructions: Use only for selected emails
+    width: 50
+  total:
+    type: integer
+    display: Total
+    instructions: Limit number of total uses
+    width: 25
+  per_user:
+    type: integer
+    display: Per User
+    instructions: Coupon usage per user
+    width: 25
+  start_date:
+    type: date
+    display: Start Date
+    allow_blank: true
+    allow_time: true
+    earliest_date: January 1, 2018
+    width: 25
+    instructions: Coupon active since
+  end_date:
+    type: date
+    display: End Date
+    allow_blank: true
+    allow_time: true
+    earliest_date: January 1, 2018
+    width: 25
+    instructions: Coupon active until
+  used_by:
+    type: collection
+    display: Used By
+    collection: [ ]
+    mode: tags

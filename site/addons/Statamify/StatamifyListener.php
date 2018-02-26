@@ -44,7 +44,7 @@ class StatamifyListener extends Listener
 		$store->add($products);
 
 		$store->add(Nav::item('statamify-customers')->title('Customers')->icon('users'));
-		$store->add(Nav::item('statamify-coupons')->title('Coupons')->icon('ticket'));
+		$store->add(Nav::item('statamify-coupons')->title('Coupons')->route('entries.show', 'coupons')->icon('ticket'));
 
 		$settings = Nav::item('statamify-settings')->title('Settings')->route('addon.settings', 'statamify')->icon('sound-mix');
 		$store->add($settings);
@@ -290,6 +290,10 @@ class StatamifyListener extends Listener
 			case 'collections':
 				if (!$this->cp) $this->eventSavedCollection($entry, $original);
 			break;
+
+			case 'coupons':
+				$this->eventSavedCoupons($entry, $original);
+			break;
 		}
 
 	}
@@ -406,6 +410,33 @@ class StatamifyListener extends Listener
 			}
 
 			Stache::update();
+
+		}
+
+	}
+
+	private function eventSavedCoupons($entry, $original) {
+
+		$data = $entry->toArray();
+		$data_original = reset($original['data']);
+
+		if (isset($data['used_by'])) {
+
+			if($data['used_by'] != @$data_original['used_by']) {
+
+				$entry->set('listing_used', count($data['used_by']));
+				$entry->save();
+
+			}
+
+		} else {
+
+			if(!isset($data['listing_used']) || $data['listing_used'] != @$data_original['listing_used']) {
+
+				$entry->set('listing_used', 0);
+				$entry->save();
+				
+			}
 
 		}
 
