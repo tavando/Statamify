@@ -34,6 +34,25 @@ class StatamifyController extends Controller
 
 	}
 
+	public function postCartUpdate(Request $request) {
+
+		$data = $request->all();
+
+		$validator = Validator::make($data, [
+			'item_id' => 'required',
+			'quantity' => 'required',
+		]);
+
+		if ($validator->fails()) {
+
+			throw new \Exception('somethings_wrong');
+
+		}
+
+		return $this->api('Statamify')->cartUpdate($data);
+
+	}
+
 	public function getCountries() {
 
 		$countries = $this->api('Statamify')->countries();
