@@ -22,7 +22,12 @@ Currently it's not production ready and fully working eCommerce store. It's stil
 ## 2. Features
 Here is the list of currently implemented features
 
-### 2.1. Products
+### 2.1. Settings
+- **Shipping Zones** - add price/weight based rates to different zones or rest of the world
+
+- **Order ID Format** - format the id of the orders as you like
+
+### 2.2. Products
 - **Listing** - new listing view with the most important details about your product, like image, inventory, relations (with sorting)
 
 - **Catalog** - three different relation types to categorize products
@@ -33,6 +38,13 @@ Here is the list of currently implemented features
 - **Variants** - use custom-written addon called *Statamify Variants* to handle complex products with individual prices, inventory, etc.
 
 - **Two-way binding** - setting type, vendor or collections updates respective type of relation and vice versa
+
+### 2.3. Orders
+- **Customer Details** - beside form for editing customer details of order, added additional card on the sidebar to show summary of data
+
+- **Countries & Regions** - use custom-written addon called *Statamify Countries* to handle easily countries and respective regions/states
+
+- **Track Shipping** - add details for tracking
 
 <a name="api"></a>
 ## 3. API
@@ -56,7 +68,7 @@ Add new item to cart (if item exists in cart, update function will fire)
 ```
 
 ### 3.3. Update cart
-Update item in cart (not implemented yet)
+Update item in cart
 
 ```
   POST /!/statamify/cart_update
