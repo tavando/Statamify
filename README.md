@@ -46,6 +46,10 @@ Here is the list of currently implemented features
 
 - **Track Shipping** - add details for tracking
 
+### 2.4. Coupons
+- **Different types** - percentage, fixed, free shipping
+- **Limits** - limit per users, countries, total usage, date range
+
 <a name="api"></a>
 ## 3. API
 Below are API ends to use with Statamify. Remember to use CSRF _token for POST ends
