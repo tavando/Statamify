@@ -1,7 +1,130 @@
 fields:
   general_setttings:
     type: section
-    display: General Setttings
+    display: General
   store_title:
     type: text
     display: Store Title
+  shipping:
+    type: section
+    display: Shipping
+  shipping_zones:
+    type: replicator
+    display: Zones
+    sets:
+      zone:
+        display: Zone
+        fields:
+          name:
+            type: text
+            display: Name
+            width: 25
+          countries:
+            type: suggest
+            display: Countries
+            mode: StatamifyCountry
+            width: 75
+          price_rates:
+            type: grid
+            display: Price Based Rates
+            replicator_preview: false
+            width: 50
+            fields:
+              name:
+                type: text
+                display: Name
+              min:
+                type: text
+                display: Minimum
+                validate: numeric
+              max:
+                type: text
+                display: Maximum
+                validate: numeric
+              rate:
+                type: text
+                display: Rate
+                validate: numeric
+            mode: table
+            add_row: Add Rate
+          weight_rates:
+            type: grid
+            display: Weight Based Rates
+            replicator_preview: false
+            width: 50
+            fields:
+              name:
+                type: text
+                display: Name
+              min:
+                type: text
+                display: Minimum
+                validate: numeric
+              max:
+                type: text
+                display: Maximum
+                validate: numeric
+              rate:
+                type: text
+                display: Rate
+                validate: numeric
+            mode: table
+            add_row: Add Rate
+      rest:
+        display: Rest of world
+        instructions: This zone includes any countries not already defined in zones.
+        fields:
+          name:
+            type: text
+            display: Name
+          price_rates:
+            type: grid
+            display: Price Based Rates
+            replicator_preview: false
+            width: 50
+            fields:
+              name:
+                type: text
+                display: Name
+              min:
+                type: text
+                display: Minimum
+                validate: numeric
+              max:
+                type: text
+                display: Maximum
+                validate: numeric
+              rate:
+                type: text
+                display: Rate
+                validate: numeric
+            mode: table
+            add_row: Add Rate
+          weight_rates:
+            type: grid
+            display: Weight Based Rates
+            replicator_preview: false
+            width: 50
+            fields:
+              name:
+                type: text
+                display: Name
+              min:
+                type: text
+                display: Minimum
+                validate: numeric
+              max:
+                type: text
+                display: Maximum
+                validate: numeric
+              rate:
+                type: text
+                display: Rate
+                validate: numeric
+            mode: table
+            add_row: Add Rate
+  shipping_package_weight:
+    type: text
+    display: Package Weight
+    validate: numeric
+    instructions: This weight will be added to total weight of the cart
