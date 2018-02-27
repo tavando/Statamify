@@ -156,3 +156,69 @@ fields:
   payments:
     type: section
     display: Payments
+  currency:
+    type: grid
+    display: Currency
+    instructions: Set rate to 1 for **default currency**. Use `[symbol]` and `[price]` for formatting the display price
+    fields:
+      code:
+        type: text
+        display: Code
+      symbol:
+        type: text
+        display: Symbol
+      format:
+        type: text
+        display: Format
+        default: '[symbol] [price]'
+      rate:
+        type: text
+        display: Rate
+    mode: table
+    add_row: Add Currency
+  gateway_cheque_start:
+    type: fieldblock
+    display: Cheque Gateway
+  gateway_cheque_info:
+    type: textarea
+    display: Information
+    width: 50
+  gateway_cheque_active:
+    type: toggle
+    display: Enable
+    width: 50
+  gateway_cheque_end:
+    type: fieldblock
+    end: true
+  gateway_stripe_start:
+    type: fieldblock
+    display: Stripe Gateway
+  gateway_stripe_settings:
+    type: array
+    display: Stripe Settings
+    keys:
+      public_key: Public Key
+      secret_key: Secret Key
+    hide_when:
+      gateway_stripe_test: true
+    width: 50
+  gateway_stripe_settings_test:
+    type: array
+    display: Stripe Settings - Test Mode
+    keys:
+      public_key: Test Public Key
+      secret_key: Test Secret Key
+    hide_when:
+      gateway_stripe_test: false
+    width: 50
+  gateway_stripe_test:
+    type: toggle
+    display: Test Mode
+    width: 25
+  gateway_stripe_active:
+    type: toggle
+    display: Enable
+    width: 25
+  gateway_stripe_end:
+    type: fieldblock
+    end: true

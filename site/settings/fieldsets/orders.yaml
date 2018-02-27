@@ -106,7 +106,7 @@ fields:
     max_rows: 1
     add_row: Add Data
     show_when:
-      billing_same: true
+      billing_diff: true
   other:
     type: section
     display: Other

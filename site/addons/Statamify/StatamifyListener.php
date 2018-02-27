@@ -43,7 +43,7 @@ class StatamifyListener extends Listener
 		$products->add(Nav::item('statamify-vendors')->title('Vendors')->route('entries.show', 'vendors'));
 		$store->add($products);
 
-		$store->add(Nav::item('statamify-customers')->title('Customers')->icon('users'));
+		$store->add(Nav::item('statamify-customers')->title('Customers')->route('entries.show', 'customers')->icon('users'));
 		$store->add(Nav::item('statamify-coupons')->title('Coupons')->route('entries.show', 'coupons')->icon('ticket'));
 
 		$settings = Nav::item('statamify-settings')->title('Settings')->route('addon.settings', 'statamify')->icon('sound-mix');
