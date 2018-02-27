@@ -1,0 +1,78 @@
+taxonomies:
+  tags: true
+title: Customers
+fields:
+  listing_orders:
+    type: hidden
+    display: Listing Orders
+  listing_spent:
+    type: hidden
+    display: Listing Spent
+  general:
+    type: section
+    display: General
+  user:
+    type: users
+    display: User
+    max_items: 1
+    mode: tags
+    validate: required
+  note:
+    type: textarea
+    display: Customer Note
+  addresses_section:
+    type: section
+    display: Addresses
+  adresses:
+    type: grid
+    display: Adresses
+    fields:
+      default:
+        type: toggle
+        display: Default
+      first_name:
+        type: text
+        display: First Name
+        width: 50
+      last_name:
+        type: text
+        display: Last Name
+        width: 50
+      company:
+        type: text
+        display: Company
+        width: 50
+      phone:
+        type: text
+        display: Phone
+        width: 50
+      address:
+        type: text
+        display: Address
+        width: 50
+      address_2:
+        type: text
+        display: Address 2
+        width: 50
+      city:
+        type: text
+        display: City
+        width: 50
+      postal:
+        type: text
+        display: Postal
+        width: 50
+      country:
+        type: statamify_countries
+        display: Country
+    mode: stacked
+    add_row: Add Address
+  orders_section:
+    type: section
+    display: Orders
+  orders:
+    type: collection
+    display: Orders
+    collection:
+      - orders
+    mode: tags

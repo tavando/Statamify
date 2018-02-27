@@ -1,0 +1,6 @@
+title: Customers
+fieldset: customers
+columns:
+  - title
+  - listing_orders
+  - listing_spent
