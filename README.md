@@ -1,6 +1,9 @@
 # Statamify
 
-Statamify is **FREE** Shopify-like ecommerce addon for Statamic. Copy the files to your main Statamic folder and you are set to go.
+Statamify is **FREE** Shopify-like ecommerce addon for Statamic. To install:
+1) Copy the files to your main Statamic folder
+2) Add new User Role called Customer
+3) Go to Settings > Users and set New User Roles to Customer
 
 Currently it's not production ready and fully working eCommerce store. It's still in development.
 
