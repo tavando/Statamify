@@ -53,6 +53,9 @@ Here is the list of currently implemented features
 - **Different types** - percentage, fixed, free shipping
 - **Limits** - limit per users, countries, total usage, date range
 
+### 2.5. Cart
+- **Instances** - there can be many instances of different carts. It can be helpful for example to create Wishlist (so one cart is CART, and second instance is WISHLIST)
+
 <a name="api"></a>
 ## 3. API
 Below are API ends to use with Statamify. Remember to use CSRF _token for POST ends
