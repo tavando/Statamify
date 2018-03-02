@@ -2,9 +2,6 @@ fields:
   general_setttings:
     type: section
     display: General
-  store_name:
-    type: text
-    display: Store Name
   owner_email:
     type: text
     display: Owner Email

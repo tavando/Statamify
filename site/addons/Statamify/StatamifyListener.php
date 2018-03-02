@@ -53,6 +53,10 @@ class StatamifyListener extends Listener
 		$nav->remove('content.collections.collections:products');
 		$nav->remove('content.collections.collections:types');
 		$nav->remove('content.collections.collections:vendors');
+		$nav->remove('content.collections.collections:collections');
+		$nav->remove('content.collections.collections:coupons');
+		$nav->remove('content.collections.collections:customers');
+		$nav->remove('content.collections.collections:orders');
 
 	}
 
@@ -278,22 +282,28 @@ class StatamifyListener extends Listener
 	public function eventSaved($entry, $original) {
 
 		$this->original = $original;
-		$collection = $entry->toArray()['collection'];
+		$data = $entry->toArray();
 
-		switch ($collection) {
+		if (isset($data['collection'])) {
 
-			case 'types':
-			case 'vendors':
+			$collection = $data['collection'];
+
+			switch ($collection) {
+
+				case 'types':
+				case 'vendors':
 				if (!$this->cp) $this->eventSavedRelation($entry, $original, $collection);
-			break;
+				break;
 
-			case 'collections':
+				case 'collections':
 				if (!$this->cp) $this->eventSavedCollection($entry, $original);
-			break;
+				break;
 
-			case 'coupons':
+				case 'coupons':
 				$this->eventSavedCoupons($entry, $original);
-			break;
+				break;
+			}
+
 		}
 
 	}
