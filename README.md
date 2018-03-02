@@ -42,6 +42,12 @@ Here is the list of currently implemented features
 
 - **Two-way binding** - setting type, vendor or collections updates respective type of relation and vice versa
 
+- **Filters** - build simple or complex filters on frontend using URL, example:
+
+  `/store?sort=price:desc&filter=type:dresses|watches;collection:new-arrivals;price:>50;price:<100`
+
+  Get `dresses` or `watches` from collection `new-arrivals` which price is `higher or equal 50` and `lower or equal 100` and sort it by `price descending`
+
 ### 2.3. Orders
 - **Customer Details** - beside form for editing customer details of order, added additional card on the sidebar to show summary of data
 
