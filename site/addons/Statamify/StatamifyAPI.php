@@ -35,11 +35,17 @@ class StatamifyAPI extends API
 
 			return [
 				'cart_id' => Helper::makeUuid(),
-				'total_price' => 0,
-				'total_weight' => 0,
 				'items' => [],
 				'coupons' => [],
-				'shipping' => false
+				'shipping' => false,
+				'total' => [
+					'sub' => 0,
+					'coupons' => 0,
+					'shipping' => 0,
+					'tax' => 0,
+					'grand' => 0,
+					'weight' => 0
+				]
 			];
 
 		}
@@ -64,7 +70,14 @@ class StatamifyAPI extends API
 		$fieldset = Fieldset::get(Collection::whereHandle('products')->get('fieldset'));
 		$fieldset_data = $fieldset->toArray();
 
-		$cart['total_price'] = $cart['total_weight'] = 0;
+		$cart['total'] = [
+			'sub' => 0,
+			'coupons' => 0,
+			'shipping' => 0,
+			'tax' => 0,
+			'grand' => 0,
+			'weight' => 0
+		];
 
 		foreach ($cart['items'] as $key => $item) {
 			
@@ -120,24 +133,26 @@ class StatamifyAPI extends API
 
 				}
 
-				$cart['total_price'] += @$product['price'] ? ((float) $product['price']) * $item['quantity'] : 0;
-				$cart['total_weight'] += @$product['weight'] ? ((float) $product['weight']) * $item['quantity'] : 0;
+				$cart['total']['sub'] += @$product['price'] ? ((float) $product['price']) * $item['quantity'] : 0;
+				$cart['total']['weight'] += @$product['weight'] ? ((float) $product['weight']) * $item['quantity'] : 0;
 
 			}
 
 			if ($item['variant']) {
 
 				/********** FIND VARIANT KEY IN PRODUCT'S VARIANTS  ***/
-				$key = array_search($item['variant'], array_column($product['variants'], 'id'));
+				$vkey = array_search($item['variant'], array_column($product['variants'], 'id'));
 
 				/********** REPLACE VARIANT ID WITH DATA  ***/
-				if (!is_bool($key)) $cart['items'][$key]['variant'] = $product['variants'][$key];
+				if (!is_bool($vkey)) $cart['items'][$key]['variant'] = $product['variants'][$vkey];
 
-				$cart['total_price'] += @$product['variants'][$key]['price'] ? (float) $product['variants'][$key]['price'] : 0;
+				$cart['total']['sub'] += @$product['variants'][$vkey]['price'] ? ((float) $product['variants'][$vkey]['price']) * $item['quantity'] : 0;
 
 			}
 
 		}
+
+		$cart['total']['grand'] = $cart['total']['sub'] + $cart['total']['coupons'] + $cart['total']['shipping'] + $cart['total']['tax'];
 
 		return $cart;
 
@@ -236,6 +251,7 @@ class StatamifyAPI extends API
 			if ($item['quantity'] == 0) {
 
 				unset( $cart['items'][ $key ] );
+				$cart['items'] = array_values($cart['items']);
 				session(['statamify.' . $instance => $cart]);
 
 			} else {

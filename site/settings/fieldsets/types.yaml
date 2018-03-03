@@ -8,3 +8,9 @@ fields:
     collection:
       - products
     mode: panes
+  image:
+    type: assets
+    display: Image
+    container: main
+    folder: /
+    max_files: 1

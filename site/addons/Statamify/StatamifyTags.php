@@ -269,13 +269,13 @@ class StatamifyTags extends Tags
 
 				$currency = $currencies[$key];
 
-				if ($this->get('get')) {
+				if ($get) {
 
-					return isset($currency[$this->get('get')]) ? $currency[$this->get('get')] : '';
+					return isset($currency[$get]) ? $currency[$get] : '';
 
 				} else {
 					
-					return isset($currency[$get]) ? $currency[$get] : '';
+					return '';
 
 				}
 
@@ -287,6 +287,7 @@ class StatamifyTags extends Tags
 
 	public function cart() {
 
+		//session()->forget('statamify.cart');
 		return $this->api('Statamify')->cartGet( $this->get('instance') ?: 'cart' );
 
 	}

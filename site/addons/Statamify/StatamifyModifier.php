@@ -20,6 +20,7 @@ class StatamifyModifier extends Modifier
 
 			switch (reset($params)) {
 				case 'money': return $this->money($value, $params, $context); 
+				case 'attrs': return join(explode('|', $value), ', '); 
 				break;
 			}
 
@@ -38,7 +39,24 @@ class StatamifyModifier extends Modifier
 			if (!is_bool($key)) {
 
 				$currency = $currencies[$key];
-				return str_replace('[symbol]', $currency['symbol'], str_replace('[price]', $value, $currency['format']));
+				$priceFormat = $currency['formatPrice'];
+
+				switch ($priceFormat) {
+					case 1: $price = number_format($value, 0, '', ','); break;
+					case 2: $price = number_format($value, 0, '', ' '); break;
+					case 3: $price = number_format($value, 2, '.', ','); break;
+					case 4: $price = number_format($value, 2, '.', ' '); break;
+					case 5: $price = number_format($value, 2, ',', ' '); break;
+					case 6: $price = number_format($value, 0, '', ''); break;
+					case 7: $price = number_format($value, 2, '', '.'); break;
+					case 8: $price = number_format($value, 2, '', ','); break;
+					
+					default:
+						$price = number_format($value, 2, '.', ' '); break;
+						break;
+				}
+
+				return str_replace('[symbol]', $currency['symbol'], str_replace('[price]', $price, $currency['format']));
 
 			}
 

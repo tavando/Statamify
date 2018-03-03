@@ -4,8 +4,9 @@ currency:
   - 
     code: USD
     symbol: $
-    format: '[symbol] [price]'
+    format: '[symbol][price]'
     rate: "1"
+    formatPrice: 4
 gateway_cheque_info: Basic info
 gateway_cheque_active: true
 gateway_stripe_settings:
