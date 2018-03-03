@@ -5,6 +5,8 @@ namespace Statamic\Addons\Statamify;
 use Statamic\Extend\API;
 use Statamic\API\Helper;
 use Statamic\API\Entry;
+use Statamic\API\Collection;
+use Statamic\API\Fieldset;
 
 class StatamifyAPI extends API
 {
@@ -59,6 +61,9 @@ class StatamifyAPI extends API
 
 	private function cartRecalculated($cart) {
 
+		$fieldset = Fieldset::get(Collection::whereHandle('products')->get('fieldset'));
+		$fieldset_data = $fieldset->toArray();
+
 		$cart['total_price'] = $cart['total_weight'] = 0;
 
 		foreach ($cart['items'] as $key => $item) {
@@ -71,34 +76,43 @@ class StatamifyAPI extends API
 				$product = $product->toArray();
 				$cart['items'][$key]['product'] = $this->removeExtraValues($product);
 
-				/********** REPLACE RELATIONS ID WITH DATA  ***/
-				$relations = ['type', 'vendor', 'collections'];
-				
-				foreach ($relations as $type) {
+				/********** REPLACE RELATIONS' ID WITH DATA  ***/
 
-					if ($type == 'collections') {
+				foreach ($fieldset_data['fields'] as $fkey => $field) {
+					
+					if ($field['type'] == 'collection') {
 
-						foreach ($product['collections'] as $ckey => $id) {
-							
-							$relation = Entry::find($id);
+						$type = $field['name'];
 
-							if ($relation) {
+						if (isset($product[$type])) {
 
-								$relation = $relation->toArray();
-								$cart['items'][$key]['product'][$type][$ckey] = $this->removeExtraValues($relation);
+							if (isset($field['max_items']) && $field['max_items'] == '1') {
+
+								$relation = Entry::find($product[$type]);
+
+								if ($relation) {
+
+									$relation = $relation->toArray();
+									$cart['items'][$key]['product'][$type] = $this->removeExtraValues($relation);
+
+								}
+
+							} else {
+
+								foreach ($product[$type] as $ckey => $id) {
+
+									$relation = Entry::find($id);
+
+									if ($relation) {
+
+										$relation = $relation->toArray();
+										$cart['items'][$key]['product'][$type][$ckey] = $this->removeExtraValues($relation);
+
+									}
+
+								}
 
 							}
-
-						}
-
-					} else {
-
-						$relation = Entry::find($product[$type]);
-
-						if ($relation) {
-
-							$relation = $relation->toArray();
-							$cart['items'][$key]['product'][$type] = $this->removeExtraValues($relation);
 
 						}
 
@@ -106,8 +120,8 @@ class StatamifyAPI extends API
 
 				}
 
-				$cart['total_price'] += @$product['price'] ? (float) $product['price'] : 0;
-				$cart['total_weight'] += @$product['weight'] ? (float) $product['weight'] : 0;
+				$cart['total_price'] += @$product['price'] ? ((float) $product['price']) * $item['quantity'] : 0;
+				$cart['total_weight'] += @$product['weight'] ? ((float) $product['weight']) * $item['quantity'] : 0;
 
 			}
 
@@ -192,7 +206,7 @@ class StatamifyAPI extends API
 				$cart['items'][] = $item;
 				session(['statamify.' . $instance => $cart]);
 
-				return $this->cartGet();
+				return $this->cartGet($instance);
 
 			} else {
 
@@ -206,7 +220,7 @@ class StatamifyAPI extends API
 			$item['item_id'] = $cart['items'][$found]['item_id'];
 			$item['quantity'] += $cart['items'][$found]['quantity'];
 
-			$this->cartUpdate($item, $instance);
+			return $this->cartUpdate($item, $instance);
 
 		}
 
@@ -236,6 +250,8 @@ class StatamifyAPI extends API
 
 					$cart['items'][ $key ]['quantity'] = $item['quantity'];
 					session(['statamify.' . $instance => $cart]);
+
+					return $this->cartGet($instance);
 
 				} else {
 

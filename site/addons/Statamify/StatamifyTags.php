@@ -35,6 +35,7 @@ class StatamifyTags extends Tags
 		$key = $this->get('key');
 		$value = $this->get('value');
 		$logic = $this->get('logic') ?: 'OR';
+		$arg = $this->get('arg') ? $this->get('arg') : false;
 
 		switch ($type) {
 
@@ -49,20 +50,37 @@ class StatamifyTags extends Tags
 					} else {
 
 						$fields = explode(';', $query[$key]);
+						$arg_index = 0;
 
 						foreach ($fields as $k => $field) {
 
 							$field = explode(':', $field);
-							$value = str_replace('@', ':', $value);
+							$value = str_replace('@', ':', $value);			
 
 							$condition = 	$field[0] == $value 
 														|| join($field, ':') == $value 
-														|| in_array(@explode(':', $value)[1], explode('|', $field[1])) 
-														|| in_array(@explode(':', $value)[1], explode(',', $field[1]));
+														|| (in_array(@explode(':', $value)[1], explode('|', $field[1]))  && explode(':', $value)[0] == $field[0])
+														|| (in_array(@explode(':', $value)[1], explode(',', $field[1]))  && explode(':', $value)[0] == $field[0]);
 
 							if ($condition) {
 
-								return $field[1];
+								if (is_bool($arg)) {
+
+									return $field[1];
+
+								} else {
+
+									if ($arg_index == $arg) {
+
+										return $field[1];
+
+									} else {
+
+										$arg_index++;
+
+									}
+
+								}
 
 							}
 
@@ -197,13 +215,79 @@ class StatamifyTags extends Tags
 				break;
 			
 			default:
-				
-				$query[$key] = $value;
+
+				if (!$arg) {
+
+					$query[$key] = $value;
+
+				} else {
+
+					if (!isset($query[$key])) {
+
+						$query[$key] = $value;
+
+					} else {
+
+						$fields = explode(';', $query[$key]);
+
+						foreach ($fields as $k => $field) {
+
+							$field = explode(':', $field);
+
+							if ($field[0] == $arg) {
+
+								unset($fields[$k]);
+
+							}
+
+						}
+
+						$fields[] = $value;
+						$query[$key] = join($fields, ';');
+
+					}
+
+				}
 
 				break;
 		}
 
-		return $uri[0] . ($query ? '?' . http_build_query($query) : '');
+		return $uri[0] . ($query ? '?' . urldecode(http_build_query($query)) : '');
+
+	}
+
+	public function money() {
+
+		$get = $this->get('get');
+		$currencies = $this->getConfig('currency');
+
+		if (count($currencies)) {
+
+			$key = array_search('1', array_column($currencies, 'rate'));
+
+			if (!is_bool($key)) {
+
+				$currency = $currencies[$key];
+
+				if ($this->get('get')) {
+
+					return isset($currency[$this->get('get')]) ? $currency[$this->get('get')] : '';
+
+				} else {
+					
+					return isset($currency[$get]) ? $currency[$get] : '';
+
+				}
+
+			}
+
+		}
+
+	}
+
+	public function cart() {
+
+		return $this->api('Statamify')->cartGet( $this->get('instance') ?: 'cart' );
 
 	}
 }
