@@ -271,7 +271,34 @@ class StatamifyTags extends Tags
 
 				if ($get) {
 
-					return isset($currency[$get]) ? $currency[$get] : '';
+					if ($get == 'zero') {
+
+						/********** TO RETURN ZERO FORMATED WHEN VAR UNDEFINED  ***/
+
+						$priceFormat = $currency['formatPrice'];
+
+						switch ($priceFormat) {
+							case 1: $price = number_format(0, 0, '', ','); break;
+							case 2: $price = number_format(0, 0, '', ' '); break;
+							case 3: $price = number_format(0, 2, '.', ','); break;
+							case 4: $price = number_format(0, 2, '.', ' '); break;
+							case 5: $price = number_format(0, 2, ',', ' '); break;
+							case 6: $price = number_format(0, 0, '', ''); break;
+							case 7: $price = number_format(0, 2, '', '.'); break;
+							case 8: $price = number_format(0, 2, '', ','); break;
+
+							default:
+							$price = number_format(0, 2, '.', ' '); break;
+							break;
+						}
+
+						return str_replace('[symbol]', $currency['symbol'], str_replace('[price]', $price, $currency['format']));
+
+					} else {
+
+						return isset($currency[$get]) ? $currency[$get] : '';
+
+					}
 
 				} else {
 					
@@ -291,4 +318,39 @@ class StatamifyTags extends Tags
 		return $this->api('Statamify')->cartGet( $this->get('instance') ?: 'cart' );
 
 	}
+
+	public function location() {
+
+		$shipping_country = session('statamify.shipping_country');
+		$countries = $this->api('Statamify')->countries();
+		$regions = $this->api('Statamify')->regions();
+
+		if ($shipping_country) {
+
+			$regions = reset($regions);
+
+			if (isset($regions[$shipping_country])) {
+
+				$regions = $regions[$shipping_country];
+
+			} else {
+
+				$regions = false;
+
+			}
+
+		} else {
+
+			$regions = false;
+
+		}
+
+		return [ 
+			'countries' => reset($countries), 
+			'regions' => $regions,
+			'shipping_country' => $shipping_country
+		];
+
+	}
+
 }

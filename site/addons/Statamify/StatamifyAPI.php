@@ -22,7 +22,6 @@ class StatamifyAPI extends API
 		$session = session('statamify.' . $instance);
 
 		if ($session) {
-
 			if ($recalculated) {
 
 				return $this->cartRecalculated($session);
@@ -133,20 +132,97 @@ class StatamifyAPI extends API
 
 				}
 
-				$cart['total']['sub'] += @$product['price'] ? ((float) $product['price']) * $item['quantity'] : 0;
+				if ($item['variant']) {
+
+					/********** FIND VARIANT KEY IN PRODUCT'S VARIANTS  ***/
+					$vkey = array_search($item['variant'], array_column($product['variants'], 'id'));
+
+					/********** REPLACE VARIANT ID WITH DATA  ***/
+					if (!is_bool($vkey)) $cart['items'][$key]['variant'] = $product['variants'][$vkey];
+
+					$price = @$product['variants'][$vkey]['price'] ? (float) $product['variants'][$vkey]['price'] : 0;
+
+				} else {
+
+					if (@$product['price']) {
+
+						$price = (float) $product['price'];
+
+					} else {
+
+						$price = 0;
+
+					}
+
+				}
+
+				$cart['total']['sub'] += $price * $item['quantity'];
 				$cart['total']['weight'] += @$product['weight'] ? ((float) $product['weight']) * $item['quantity'] : 0;
 
 			}
 
-			if ($item['variant']) {
+		}
 
-				/********** FIND VARIANT KEY IN PRODUCT'S VARIANTS  ***/
-				$vkey = array_search($item['variant'], array_column($product['variants'], 'id'));
+		if (!$cart['shipping'] && session('statamify.shipping_country')) {
 
-				/********** REPLACE VARIANT ID WITH DATA  ***/
-				if (!is_bool($vkey)) $cart['items'][$key]['variant'] = $product['variants'][$vkey];
+			$this->cartSetShipping();
 
-				$cart['total']['sub'] += @$product['variants'][$vkey]['price'] ? ((float) $product['variants'][$vkey]['price']) * $item['quantity'] : 0;
+		}
+
+		if ($cart['shipping']) {
+
+			$shipping_methods = [];
+			$shipping_zones = $this->getConfig('shipping_zones');
+			$shipping_zone = $shipping_zones[$cart['shipping']['zone']];
+
+			foreach ($shipping_zone['price_rates'] as $key => $price_rate) {
+				
+				$condition = true;
+
+				if (isset($price_rate['min']) && $price_rate['min']) {
+
+					if ($cart['total']['sub'] < $price_rate['min']) {
+
+						$condition = false;
+
+					}
+
+				}
+
+				if (isset($price_rate['max']) && $price_rate['max']) {
+
+					if ($cart['total']['sub'] > $price_rate['max']) {
+
+						$condition = false;
+
+					}
+
+				}
+
+				if ($condition) {
+
+					$shipping_methods[slugify($price_rate['name'])] = $price_rate;
+
+				}
+
+			}
+
+			if (count($shipping_methods)) {
+
+				$shipping_method = session('statamify.shipping_method');
+
+				if (!$shipping_method || !isset($shipping_methods[$shipping_method])) {
+
+					$keys = array_keys($shipping_methods);
+					$first = reset($keys);
+					$shipping_method = $first;
+					session(['statamify.shipping_method' => $first]);
+
+				}
+
+				$cart['shipping']['methods'] = $shipping_methods;
+				$cart['shipping']['methods'][$shipping_method]['active'] = true;
+				$cart['total']['shipping'] = isset($shipping_methods[$shipping_method]['rate']) ? $shipping_methods[$shipping_method]['rate'] : 0;
 
 			}
 
@@ -252,6 +328,14 @@ class StatamifyAPI extends API
 
 				unset( $cart['items'][ $key ] );
 				$cart['items'] = array_values($cart['items']);
+
+				if (!count($cart['items'])) {
+
+					$cart['shipping'] = false;
+					session()->forget('statamify.shipping_method');
+
+				}
+
 				session(['statamify.' . $instance => $cart]);
 
 			} else {
@@ -306,6 +390,48 @@ class StatamifyAPI extends API
 			}
 
 		}
+
+	}
+
+	public function cartSetShipping() {
+
+		$shipping_country = session('statamify.shipping_country');
+		$cart = $this->cartInit();
+
+		if ($shipping_country) {
+
+			$zones = $this->getConfig('shipping_zones');
+			$shipping_zone = array_search('rest', array_column($zones, 'type'));
+
+			foreach ($zones as $key => $zone) {
+				
+				if (isset($zone['countries']) && in_array($shipping_country, $zone['countries'])) {
+
+					$shipping_zone = $key;
+
+					break;
+				}
+
+			}
+
+			if (!is_bool($shipping_zone)) {
+
+				$cart['shipping'] = ['zone' => $shipping_zone];
+
+			} else {
+
+				$cart['shipping'] = false;
+
+			}
+
+		} else {
+
+			$cart['shipping'] = false;
+
+		}
+
+		session()->forget('statamify.shipping_method');
+		session(['statamify.cart' => $cart]);
 
 	}
 

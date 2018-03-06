@@ -58,10 +58,48 @@ class StatamifyController extends Controller
 		$countries = $this->api('Statamify')->countries();
 		$regions = $this->api('Statamify')->regions();
 
-		return [ 
+		$data = [ 
 			'countries' => reset($countries), 
 			'regions' => reset($regions) 
 		];
+
+		return $data;
+
+	}
+
+	public function postSetShipping(Request $request) {
+
+		if (isset($request->shipping_country)) {
+
+			$data = $this->getCountries();
+
+			if ($request->shipping_country) {
+				session(['statamify.shipping_country' => $request->shipping_country]);
+			} else {
+				session()->forget('statamify.shipping_country');
+			}
+			
+			$this->api('Statamify')->cartSetShipping();
+
+			$data['cart'] = $this->api('Statamify')->cartGet();
+
+			return $data;
+
+		}
+
+	}
+
+	public function postSetShippingMethod(Request $request) {
+
+		if (isset($request->shipping)) {
+
+			$shipping = explode('|', $request->shipping);
+
+			session(['statamify.shipping_method' => isset($shipping[1]) ? $shipping[1] : 0]);
+
+			return $this->api('Statamify')->cartGet();
+
+		}
 
 	}
 

@@ -67,6 +67,9 @@ fields:
 								type: text
 								display: Rate
 								validate: numeric
+							note:
+								type: text
+								display: Note
 						mode: table
 						add_row: Add Rate
 					weight_rates:
@@ -90,6 +93,9 @@ fields:
 								type: text
 								display: Rate
 								validate: numeric
+							note:
+								type: text
+								display: Note
 						mode: table
 						add_row: Add Rate
 			rest:
@@ -120,6 +126,9 @@ fields:
 								type: text
 								display: Rate
 								validate: numeric
+							note:
+								type: text
+								display: Note
 						mode: table
 						add_row: Add Rate
 					weight_rates:
