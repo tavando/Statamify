@@ -1,2 +1,8 @@
+order: date
 title: Orders
 fieldset: orders
+columns:
+  - title
+  - listing_customer
+  - listing_total
+  - listing_status

@@ -1,5 +1,6 @@
 title: Products
 fieldset: products
+template: product
 columns:
   - title
   - listing_image
