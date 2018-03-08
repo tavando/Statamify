@@ -216,5 +216,68 @@
 
 .small-text {
 	font-size: 11px;
+	line-height: 2;
+	padding-left: 10px;
 	font-family: Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;
+}
+
+table.order-summary {
+	margin-top: 0;
+}
+
+table.order-summary .item-image {
+	width: 70px;
+}
+
+table.order-summary .item-image > div {
+	width: 50px;
+	height: 50px;
+	border-radius: 3px;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center center;
+	position: relative;
+}
+
+table.order-summary .item-image > div::after {
+	content: '';
+	display: block;
+	position: absolute;
+	border: 1px solid #e0e0e0;
+	border-radius: 3px;
+	top: -3px;
+	left: -3px;
+	width: calc(100% + 6px);
+	height: calc(100% + 6px);
+}
+
+table.order-summary .item-line p {
+	margin: 0;
+	font-size: 11px;
+}
+
+table.order-summary .item-totals {
+	width: 50px;
+	text-align: center;
+}
+
+table.order-summary .item-totals:last-child {
+	text-align: right;
+}
+
+table.order-summary tr.noborder {
+	border-top: 0;
+}
+
+table.order-summary .text-right {
+	padding-right: 20px;
+	color: #637381;
+}
+
+table.order-summary tr.totals td {
+	padding-bottom: 0;
+}
+
+table.order-summary tr.totals strong {
+	color: #212b35;
 }

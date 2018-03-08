@@ -115,18 +115,17 @@ Statamify = {
 				text = ''
 				fields = $(group).find('.col-md-6 input')
 
-				line1 = $(fields[0]).val() + ' ' + $(fields[1]).val() + ($(fields[2]).val() != '' ? ', ' + $(fields[2]).val() : '')
-				text += line1.trim() + '\n'
-
-				line2 = $(fields[4]).val()  + '\n' + $(fields[5]).val()
-				text += line2.trim() + '\n'
+				line1 = '<strong>Name:</strong> ' + $(fields[0]).val() + ' ' + $(fields[1]).val() + ($(fields[2]).val() != '' ? '<br/><strong>Company: </strong>' + $(fields[2]).val() : '')
+				text += line1.trim() + '<br/>'
+				line2 = '<strong>Address:</strong> ' + $(fields[4]).val()  + ($(fields[5]).val() != '' ? ', ' + $(fields[5]).val() : '')
+				text += line2.trim() + '<br/>'
 
 				last = $(group).find('.col-md-12 .col-md-6')
 				region = $(last[1]).find('input').length ? $(last[1]).find('input').val() : $(last[1]).find('.select').attr('data-content') + ' (' + $(last[1]).find('select').val() + ')'
 				country = $(last[0]).find('.select').attr('data-content') ? $(last[0]).find('.select').attr('data-content') + ' (' + $(last[0]).find('select').val() + ')' : ''
 
-				line3 = $(fields[7]).val()  + ' ' + $(fields[6]).val() + (region != '' ? ', ' + region : '')
-				text += line3.trim() + (country ? '\n' + country : '')
+				line3 = '<strong>City:</strong> ' + $(fields[7]).val()  + ' ' + $(fields[6]).val() + (region != '' ? ', ' + region : '')
+				text += line3.trim() + '<br/><strong>Country:</strong> ' + country.trim()
 
 				details.push(text)
 
@@ -138,17 +137,16 @@ Statamify = {
 			<div class="card" id="order-preview-details">
 				<div class="publish-fields pb-1">
 					<div class="form-group inline">
-						<div class="form-group">
+						<div class="form-group" style="margin-bottom:0">
 							<label class="block">Customer</label>
-							<div class="customer-name"><a href="">Lorem Ipsum</a></div>
-							<div class="customer-phone small-text"><strong>Phone:</strong> <span>12345678</span></div>
+							<div class="customer-phone small-text"><strong>Name:</strong> <span><a href="">Lorem Ipsum</a></span></div>
 							<div class="customer-email small-text"><strong>Email:</strong> <span>test@test.com</span></div>
 						</div>
-						<div class="form-group" id="shipping-textarea">
+						<div class="form-group" style="margin-bottom:0" id="shipping-textarea">
 							<label class="block">Shipping address</label>
-							<textarea class="form-control mono" readonly>` + details[0] + `</textarea>
+							<div class="small-text">` + details[0] + `</div>
 						</div>
-						<div class="form-group" id="billing-textarea">
+						<div class="form-group" style="margin-bottom:0" id="billing-textarea">
 							<label class="block">Billing address</label>
 							<div class="small-text">` + (details[1] ? '<textarea class="form-control mono" readonly>' + details[1] + '</textarea>' : 'Same as Shipping') + `</div>
 						</div>
@@ -167,11 +165,11 @@ Statamify = {
 
 		} else {
 
-			$('#shipping-textarea textarea').val(details[0])
+			$('#shipping-textarea > div').html(details[0])
 
 			if (details[1]) {
 
-				$('#billing-textarea > div').html('<textarea class="form-control mono" readonly>' + details[1] + '</textarea>')
+				$('#billing-textarea > div').html(details[1])
 
 			} else {
 
@@ -180,12 +178,6 @@ Statamify = {
 			}
 
 		}
-
-		$.each($('#shipping-textarea textarea, #billing-textarea textarea'), function() {
-			if ($(this).length) {
-				$(this)[0].style.cssText = 'height:' + $(this)[0].scrollHeight + 'px'
-			}
-		})
 
 	}
 

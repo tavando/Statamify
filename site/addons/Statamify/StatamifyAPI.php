@@ -7,9 +7,17 @@ use Statamic\API\Helper;
 use Statamic\API\Entry;
 use Statamic\API\Collection;
 use Statamic\API\Fieldset;
+use Statamic\API\File;
+use Statamic\API\YAML;
 
 class StatamifyAPI extends API
 {
+
+	public function t($string, $space = 'statamify', $params = []) {
+
+		return app('translator')->trans('addons.Statamify::' . $space . '.' . $string, $params);
+
+	}
 
 	/*************
 	
@@ -39,7 +47,7 @@ class StatamifyAPI extends API
 				'shipping' => false,
 				'total' => [
 					'sub' => 0,
-					'coupons' => 0,
+					'discount' => 0,
 					'shipping' => 0,
 					'tax' => 0,
 					'grand' => 0,
@@ -71,7 +79,7 @@ class StatamifyAPI extends API
 
 		$cart['total'] = [
 			'sub' => 0,
-			'coupons' => 0,
+			'discount' => 0,
 			'shipping' => 0,
 			'tax' => 0,
 			'grand' => 0,
@@ -175,33 +183,45 @@ class StatamifyAPI extends API
 			$shipping_zones = $this->getConfig('shipping_zones');
 			$shipping_zone = $shipping_zones[$cart['shipping']['zone']];
 
-			foreach ($shipping_zone['price_rates'] as $key => $price_rate) {
+			$bases = ['price_rates', 'weight_rates'];
+
+			foreach ($bases as $base) {
 				
-				$condition = true;
+				if (isset($shipping_zone[$base])) {
 
-				if (isset($price_rate['min']) && $price_rate['min']) {
+					$compare = $base == 'price_rates' ? 'sub' : 'weight';
 
-					if ($cart['total']['sub'] < $price_rate['min']) {
+					foreach ($shipping_zone[$base] as $key => $method) {
 
-						$condition = false;
+						$condition = true;
+
+						if (isset($method['min']) && $method['min']) {
+
+							if ($cart['total'][$compare] < $method['min']) {
+
+								$condition = false;
+
+							}
+
+						}
+
+						if (isset($method['max']) && $method['max']) {
+
+							if ($cart['total'][$compare] > $method['max']) {
+
+								$condition = false;
+
+							}
+
+						}
+
+						if ($condition) {
+
+							$shipping_methods[slugify($method['name'])] = $method;
+
+						}
 
 					}
-
-				}
-
-				if (isset($price_rate['max']) && $price_rate['max']) {
-
-					if ($cart['total']['sub'] > $price_rate['max']) {
-
-						$condition = false;
-
-					}
-
-				}
-
-				if ($condition) {
-
-					$shipping_methods[slugify($price_rate['name'])] = $price_rate;
 
 				}
 
@@ -228,7 +248,7 @@ class StatamifyAPI extends API
 
 		}
 
-		$cart['total']['grand'] = $cart['total']['sub'] + $cart['total']['coupons'] + $cart['total']['shipping'] + $cart['total']['tax'];
+		$cart['total']['grand'] = $cart['total']['sub'] + $cart['total']['discount'] + $cart['total']['shipping'] + $cart['total']['tax'];
 
 		return $cart;
 
@@ -271,13 +291,13 @@ class StatamifyAPI extends API
 
 					if (!isset($item['variant']) || !$item['variant']) {
 
-						throw new \Exception('variant_required');
+						throw new \Exception($this->t('variant_required', 'errors'));
 
 					} else {
 
 						$key = array_search($item['variant'], array_column($product->get('variants'), 'id'));
 
-						if (is_bool($key)) throw new \Exception('variant_not_found');
+						if (is_bool($key)) throw new \Exception($this->t('variant_not_found', 'errors'));
 
 					}
 
@@ -291,7 +311,7 @@ class StatamifyAPI extends API
 					'quantity' => $item['quantity'],
 					'product' => $item['product'],
 					'variant' => $item['variant'] ?: false,
-					'custom' => null
+					'custom' => isset($item['custom']) && $item['custom'] ? $item['custom'] : null
 				];
 
 				$cart['items'][] = $item;
@@ -301,7 +321,7 @@ class StatamifyAPI extends API
 
 			} else {
 
-				throw new \Exception('product_not_found');
+				throw new \Exception($this->t('product_not_found', 'errors'));
 
 			}
 
@@ -355,7 +375,7 @@ class StatamifyAPI extends API
 
 				} else {
 
-					throw new \Exception('product_not_found');
+					throw new \Exception($this->t('product_not_found', 'errors'));
 
 				}
 
@@ -373,7 +393,7 @@ class StatamifyAPI extends API
 
 			if ($product->get('class') == 'simple') {
 
-				if ($product->get('inventory') < $item['quantity'] + $init) throw new \Exception('product_too_many');
+				if ($product->get('inventory') < $item['quantity'] + $init) throw new \Exception($this->t('product_too_many', 'errors'));
 
 			} elseif ($product->get('class') == 'complex') {
 
@@ -381,7 +401,7 @@ class StatamifyAPI extends API
 
 					if ($key != 'settings' && $variant['id'] == $item['variant']) {
 
-						if (!$variant['inventory'] || $variant['inventory'] < $item['quantity'] + $init) throw new \Exception('product_too_many');
+						if (!$variant['inventory'] || $variant['inventory'] < $item['quantity'] + $init) throw new \Exception($this->t('product_too_many', 'errors'));
 
 					}
 
@@ -435,6 +455,18 @@ class StatamifyAPI extends API
 
 	}
 
+	public function cartClear($instance = 'cart') {
+
+		session()->forget('statamify.' . $instance);
+
+		if ($instance == 'cart') {
+
+			session()->forget('statamify.shipping_method');
+
+		}
+
+	}
+
 	/*************
 	
 	ORDER API
@@ -450,6 +482,117 @@ class StatamifyAPI extends API
 	public function regions() {
 
 		return $this->storage->getYAML('regions');
+
+	}
+
+	public function currencies() {
+
+		return $this->getConfig('currency');
+
+	}
+
+	public function orderCreate($data) {
+
+		$order_next_id = $this->getConfigInt('order_next_id', 1000);
+		$order_id_format = $this->getConfig('order_id_format', '#[id]');
+		$shipping_zones = $this->getConfig('shipping_zones');
+
+		$data['title'] = str_replace('[id]', $order_next_id, $order_id_format);
+
+		$shipping_method = explode('|', $data['shipping_method']);
+		$zone = $shipping_zones[$shipping_method[0]];
+		$payment_method = $data['payment_method'];
+
+		$data['shipping_method'] = ['zone' => $zone['name']];
+
+		foreach (@$zone['price_rates'] as $rate) {
+			
+			if (slugify($rate['name']) == $shipping_method[1]) {
+
+				$data['shipping_method']['name'] = $rate['name'];
+				$data['shipping_method']['rate'] = @$rate['rate'] ?: 0;
+
+			}
+
+		}
+
+		if (!isset($data['shipping_method']['name'])) {
+
+			foreach (@$zone['weight_rates'] as $rate) {
+
+				if (slugify($rate['name']) == $shipping_method[1]) {
+
+					$data['shipping_method']['name'] = $rate['name'];
+					$data['shipping_method']['rate'] = @$rate['rate'] ?: 0;
+
+				}
+
+			}
+
+		}
+
+		$data['payment_method'] = [];
+
+		switch ($payment_method) {
+			case 'cheque':
+			$data['status'] = 'awaiting_payment';
+			$data['payment_method'] = ['name' => 'Cheque', 'fee' => 0];
+			break;
+			case 'stripe':
+			$data['status'] = 'pending';
+			$data['payment_method'] = ['name' => 'Stripe', 'fee' => 0];
+			break;
+			
+			default:
+			$data['status'] = 'pending';
+			$data['payment_method'] = ['name' => 'Default', 'fee' => 0];
+			break;
+		}
+
+		if (isset($data['billing_diff']) && $data['billing_diff'] == '1') {
+
+			$data['billing_diff'] = true;
+
+		}
+
+		$cart = $this->cartGet();
+
+		$data['summary'] = [
+			'items' => [],
+			'total' => $cart['total']
+		];
+
+		foreach ($cart['items'] as $item) {
+			
+			$data['summary']['items'][] = [
+				'id' => $item['item_id'],
+				'name' => $item['product']['title'],
+				'variant' => $item['variant'] ? $item['variant']['attrs'] : false,
+				'sku' => $item['variant'] ? @$item['variant']['sku'] : @$item['product']['sku'],
+				'price' => $item['variant'] ? @$item['variant']['price'] : @$item['product']['price'],
+				'quantity' => $item['quantity'],
+				'custom' => isset($item['custom']) && $item['custom'] ? $item['custom'] : null,
+				'image' => $item['product']['image'],
+				'edit_url' => '/cp/collections/entries/products/' . $item['product']['slug']
+			];
+
+		}
+
+		$order = Entry::create(slugify($data['title']))
+		->collection('orders')
+		->with($data)
+		->published(true)
+		->date(date('Y-m-d H:i'))
+		->get();
+
+		$settings_file = File::get('site/settings/addons/statamify.yaml');
+		$settings = YAML::parse($settings_file);
+		$settings['order_next_id'] = $order_next_id + 1;
+		File::put('site/settings/addons/statamify.yaml', YAML::dump($settings));
+
+		$order->save();
+
+		return $order;
 
 	}
 

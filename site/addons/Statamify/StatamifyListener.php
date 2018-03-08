@@ -33,20 +33,20 @@ class StatamifyListener extends Listener
 	public function eventNavCreated($nav) {
 
 		$store = Nav::item('store');
-		$store->add(Nav::item('statamify-analytics')->title('Analytics')->icon('line-graph'));
-		$store->add(Nav::item('statamify-orders')->title('Orders')->route('entries.show', 'orders')->icon('shopping-cart'));
+		$store->add(Nav::item('statamify-analytics')->title($this->api('Statamify')->t('analytics'))->icon('line-graph'));
+		$store->add(Nav::item('statamify-orders')->title($this->api('Statamify')->t('orders'))->route('entries.show', 'orders')->icon('shopping-cart'));
 
-		$products = Nav::item('statamify-products')->title('Products')->route('entries.show', 'products')->icon('shop');
-		$products->add(Nav::item('statamify-all-products')->title('All')->route('entries.show', 'products'));
-		$products->add(Nav::item('statamify-collections')->title('Collections')->route('entries.show', 'collections'));
-		$products->add(Nav::item('statamify-types')->title('Types')->route('entries.show', 'types'));
-		$products->add(Nav::item('statamify-vendors')->title('Vendors')->route('entries.show', 'vendors'));
+		$products = Nav::item('statamify-products')->title($this->api('Statamify')->t('products'))->route('entries.show', 'products')->icon('shop');
+		$products->add(Nav::item('statamify-all-products')->title($this->api('Statamify')->t('all'))->route('entries.show', 'products'));
+		$products->add(Nav::item('statamify-collections')->title($this->api('Statamify')->t('collections'))->route('entries.show', 'collections'));
+		$products->add(Nav::item('statamify-types')->title($this->api('Statamify')->t('types'))->route('entries.show', 'types'));
+		$products->add(Nav::item('statamify-vendors')->title($this->api('Statamify')->t('vendors'))->route('entries.show', 'vendors'));
 		$store->add($products);
 
-		$store->add(Nav::item('statamify-customers')->title('Customers')->route('entries.show', 'customers')->icon('users'));
-		$store->add(Nav::item('statamify-coupons')->title('Coupons')->route('entries.show', 'coupons')->icon('ticket'));
+		$store->add(Nav::item('statamify-customers')->title($this->api('Statamify')->t('customers'))->route('entries.show', 'customers')->icon('users'));
+		$store->add(Nav::item('statamify-coupons')->title($this->api('Statamify')->t('coupons'))->route('entries.show', 'coupons')->icon('ticket'));
 
-		$settings = Nav::item('statamify-settings')->title('Settings')->route('addon.settings', 'statamify')->icon('sound-mix');
+		$settings = Nav::item('statamify-settings')->title($this->api('Statamify')->t('settings'))->route('addon.settings', 'statamify')->icon('sound-mix');
 		$store->add($settings);
 
 		$nav->add($store);
@@ -118,7 +118,7 @@ class StatamifyListener extends Listener
 
 			if ($entry->get('class') == 'simple') {
 
-				$inventory = '<span class="inventory-quantity">' . ($entry->get('inventory') ?: '0') . '</span> in stock';
+				$inventory = '<span class="inventory-quantity">' . ($entry->get('inventory') ?: '0') . '</span> ' . $this->api('Statamify')->t('instock');
 
 			} elseif ($entry->get('class') == 'complex') {
 
@@ -139,7 +139,7 @@ class StatamifyListener extends Listener
 
 				}
 
-				$inventory = '<span class="inventory-quantity">' . ($sum ?: '0') . '</span> in stock for ' . (count($variants) - 1) . ' variants';
+				$inventory = '<span class="inventory-quantity">' . ($sum ?: '0') . '</span> ' . $this->api('Statamify')->t('instock_for', 'statamify', ['number' => (count($variants) - 1)]);
 
 			}
 
