@@ -1,6 +1,17 @@
 taxonomies: false
 title: Orders
+date:
+  allow_time: true
 fields:
+  listing_customer:
+    type: hidden
+    display: Listing Customer
+  listing_total:
+    type: hidden
+    display: Listing Total
+  listing_status:
+    type: hidden
+    display: Listing Status
   order_details:
     type: section
     display: Order Details
@@ -15,6 +26,30 @@ fields:
       cancelled: Cancelled
       refunded: Refunded
       refunded_partially: Refunded Partially
+  summary:
+    type: statamify_order_summary
+    display: Summary
+  shipping_method:
+    type: array
+    display: Shipping Method
+    keys:
+      zone: Zone
+      name: Name
+      rate: Rate
+    width: 50
+  payment_method:
+    type: array
+    display: Payment Method
+    keys:
+      name: Name
+      fee: Fee
+    width: 50
+  coupon:
+    type: array
+    display: Coupon
+    keys:
+      name: Name
+      discount: Discount
   customer_details:
     type: section
     display: Customer Details

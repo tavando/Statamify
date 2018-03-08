@@ -1,5 +1,6 @@
 taxonomies:
   tags: true
+  colors: true
 title: Products
 fields:
   title:
@@ -122,3 +123,14 @@ fields:
   description:
     type: redactor
     display: Description
+  tabs:
+    type: grid
+    display: Tabs
+    fields:
+      heading:
+        type: text
+        display: Heading
+      desc:
+        type: redactor
+        display: Description
+    mode: stacked
