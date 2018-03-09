@@ -177,6 +177,7 @@ class StatamifyListener extends Listener
 				$relation->set('products', $products);
 				$this->cp = true;
 				$relation->save();
+				Stache::update();
 
 			}
 
@@ -209,6 +210,7 @@ class StatamifyListener extends Listener
 				$old_relation->set('products', $old_relation_products);
 				$this->cp = true;
 				$old_relation->save();
+				Stache::update();
 
 			}
 
@@ -271,6 +273,8 @@ class StatamifyListener extends Listener
 
 				}
 
+				Stache::update();
+
 			}
 
 		}
@@ -301,6 +305,10 @@ class StatamifyListener extends Listener
 
 				case 'coupons':
 				$this->eventSavedCoupons($entry, $original);
+				break;
+
+				case 'orders':
+				$this->eventSavedOrders($entry, $original);
 				break;
 			}
 
@@ -449,6 +457,28 @@ class StatamifyListener extends Listener
 			}
 
 		}
+
+		Stache::update();
+
+	}
+
+	private function eventSavedOrders($entry, $original) {
+
+		$data = $entry->toArray();
+		$data_original = reset($original['data']);
+
+		if (isset($data['status'])) {
+
+			if($data['status'] != @$data_original['status']) {
+
+				$entry->set('listing_status', '<span class="order-status ' . $data['status'] . '">' . $this->api('Statamify')->t('status.' . $data['status']) . '</span>');
+				$entry->save();
+
+			}
+
+		}
+
+		Stache::update();
 
 	}
 

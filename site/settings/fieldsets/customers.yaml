@@ -16,12 +16,6 @@ fields:
     display: User
     max_items: 1
     mode: tags
-    width: 50
-  email:
-    type: text
-    display: Email address
-    validate: required|email
-    width: 50
   note:
     type: textarea
     display: Customer Note

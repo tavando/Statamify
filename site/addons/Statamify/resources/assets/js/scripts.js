@@ -133,14 +133,17 @@ Statamify = {
 
 		})
 
+		customer = $('[name="listing_customer"]').val()
+		email = $('[name="listing_email"]').val()
+
 		html = `
 			<div class="card" id="order-preview-details">
 				<div class="publish-fields pb-1">
 					<div class="form-group inline">
 						<div class="form-group" style="margin-bottom:0">
 							<label class="block">Customer</label>
-							<div class="customer-phone small-text"><strong>Name:</strong> <span><a href="">Lorem Ipsum</a></span></div>
-							<div class="customer-email small-text"><strong>Email:</strong> <span>test@test.com</span></div>
+							<div class="customer-phone small-text"><strong>Name:</strong> <span>` + customer + `</span></div>
+							<div class="customer-email small-text"><strong>Email:</strong> <span><a href="mailto:` + email + `">` + email + `</a></span></div>
 						</div>
 						<div class="form-group" style="margin-bottom:0" id="shipping-textarea">
 							<label class="block">Shipping address</label>
@@ -148,7 +151,7 @@ Statamify = {
 						</div>
 						<div class="form-group" style="margin-bottom:0" id="billing-textarea">
 							<label class="block">Billing address</label>
-							<div class="small-text">` + (details[1] ? '<textarea class="form-control mono" readonly>' + details[1] + '</textarea>' : 'Same as Shipping') + `</div>
+							<div class="small-text">` + (details[1] ? `<textarea class="form-control mono" readonly>` + details[1] + `</textarea>` : `Same as Shipping`) + `</div>
 						</div>
 					</div>
 				</div>

@@ -6,6 +6,7 @@ use Statamic\Extend\Controller;
 use Illuminate\Http\Request;
 use Statamic\API\Entry;
 use Statamic\API\Fieldset;
+use Statamic\API\User;
 use Validator;
 
 class StatamifyController extends Controller
@@ -108,27 +109,50 @@ class StatamifyController extends Controller
 	public function postOrder(Request $request) {
 
 		$data = $request->all();
+		$user = User::getCurrent();
 
-		$this->validateOrder($data);
+		if ($user) {
 
-		unset($data['_token'], $data['addresso']);
+			$data['user'] = $user->get('id');
+			$data['email'] = $user->email();
 
-		$order = $this->api('Statamify')->orderCreate($data);
-		$this->api('Statamify')->cartClear();
+		} else {
 
-		$whitelist = ['title', 'email', 'shipping', 'billing', 'billing_diff', 
-		'shipping_method', 'payment_method', 'status', 'id', 'slug', 'url', 'last_modified'];
-		$data = array_intersect_key($order->toArray(), array_flip($whitelist));
+			$data['user'] = null;
 
-		return redirect('/store/summary')->withInput(['order' => $data]);
+		}
+
+		$valid = $this->validateOrder($data);
+
+		if (is_bool($valid)) {
+
+			unset($data['_token'], $data['addresso']);
+
+			$order = $this->api('Statamify')->orderCreate($data);
+			$this->api('Statamify')->cartClear();
+
+			$whitelist = ['title', 'email', 'shipping', 'billing', 'billing_diff', 
+			'shipping_method', 'payment_method', 'status', 'id', 'slug', 'url', 'last_modified'];
+			$data = array_intersect_key($order->toArray(), array_flip($whitelist));
+
+			return redirect('/store/summary')->withInput(['order' => $data]);
+
+		} else {
+
+			return redirect('/store/checkout')->withInput([
+				'errors' => $valid,
+				'data' => $data
+			]);
+
+		}
 
 	}
 
 	private function validateOrder($data) {
 
 		$messages = [
-			'email.required' => 'Email is required',
-			'email.email' => 'Email is not valid',
+			'email.required' => 'Email address is required',
+			'email.email' => 'Email address is not valid',
 
 			'shipping.0.first_name.required' => 'Shipping: First name is required',
 			'shipping.0.last_name.required' => 'Shipping: Last name is required',
@@ -143,6 +167,9 @@ class StatamifyController extends Controller
 			'billing.0.city.required_if' => 'Billing: City is required',
 			'billing.0.postal.required_if' => 'Billing: Postal is required',
 			'billing.0.country.required_if' => 'Billing: Country is required',
+
+			'password.required_if' => 'Password is required',
+			'password_confirmation.required_if' => 'Password Confirmation is required',
 		];
 
 		$validator = Validator::make($data, [
@@ -167,16 +194,24 @@ class StatamifyController extends Controller
 
 			'shipping_method' => 'required',
 			'payment_method' => 'required',
+
+			'password' => 'confirmed|required_if:user,',
+			'password_confirmation' => 'required_if:user,',
 		], $messages);
 
 		if ($validator->fails()) {
 
-			return redirect('/store/checkout')->withInput([
-				'errors' => $validator->errors()->all(),
-				'data' => $data
-			]);
+			return $validator->errors()->all();
 
 		}
+
+		if (!$data['user'] && User::whereEmail($data['email'])) {
+
+			return [$this->api('Statamify')->t('customer_exists', 'errors')];
+
+		}
+
+		return true;
 
 	}
 

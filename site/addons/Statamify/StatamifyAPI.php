@@ -9,6 +9,9 @@ use Statamic\API\Collection;
 use Statamic\API\Fieldset;
 use Statamic\API\File;
 use Statamic\API\YAML;
+use Statamic\API\Stache;
+use Statamic\API\User;
+use Statamic\API\Role;
 
 class StatamifyAPI extends API
 {
@@ -491,7 +494,120 @@ class StatamifyAPI extends API
 
 	}
 
+	public function money($value) {
+
+		$currencies = $this->getConfig('currency');
+		
+		if (count($currencies)) {
+
+			$key = array_search('1', array_column($currencies, 'rate'));
+
+			if (!is_bool($key)) {
+
+				$currency = $currencies[$key];
+				$priceFormat = $currency['formatPrice'];
+
+				switch ($priceFormat) {
+					case 1: $price = number_format($value, 0, '', ','); break;
+					case 2: $price = number_format($value, 0, '', ' '); break;
+					case 3: $price = number_format($value, 2, '.', ','); break;
+					case 4: $price = number_format($value, 2, '.', ' '); break;
+					case 5: $price = number_format($value, 2, ',', ' '); break;
+					case 6: $price = number_format($value, 0, '', ''); break;
+					case 7: $price = number_format($value, 2, '', '.'); break;
+					case 8: $price = number_format($value, 2, '', ','); break;
+					
+					default:
+						$price = number_format($value, 2, '.', ' '); break;
+						break;
+				}
+
+				return str_replace('[symbol]', $currency['symbol'], str_replace('[price]', $price, $currency['format']));
+
+			}
+
+		}
+
+	}
+
 	public function orderCreate($data) {
+
+		$cart = $this->cartGet();
+
+		/********** REFORMAT DATA FOR SHIPPING AND BILLING COUNTRY/REGION  ***/
+
+		if (isset($data['shipping'][0]['region']) && $data['shipping'][0]['region'] != '') {
+
+			$data['shipping'][0]['country'] = $data['shipping'][0]['country'] . '|' . $data['shipping'][0]['region'];
+
+		}
+
+		if (isset($data['billing'][0]['region']) && $data['billing'][0]['region'] != '') {
+
+			$data['billing'][0]['country'] = $data['billing'][0]['country'] . '|' . $data['billing'][0]['region'];
+
+		}
+
+		if (isset($data['billing_diff']) && $data['billing_diff'] == '1') {
+
+			$data['billing_diff'] = true;
+
+		}
+
+		/********** CREATE USER IF DOESN'T EXIST  ***/
+		if (!$data['user']) {
+
+			$roles = collect(Role::all()->toArray());
+
+			$user_data = [
+				'first_name' => $data['shipping'][0]['first_name'],
+				'last_name' => $data['shipping'][0]['last_name'],
+				'roles' => [$roles->where('slug', 'customer')->keys()->first()],
+				'password' => $data['password']
+			];
+
+			$user = User::create()
+			->with($user_data)
+			->email($data['email'])
+			->get();
+
+			$user->save();
+			$data['user'] = $user->get('id');
+			unset($data['password'], $data['password_confirmation']);
+
+		}
+
+		$customer = Entry::whereSlug($data['email'], 'customers');
+
+		if (!$customer) {
+
+			$address = $data['shipping'];
+			$address[0]['default'] = true;
+
+			$customer_data = [
+				'user' => $data['user'],
+				'title' => $user->get('first_name') . ' ' . $user->get('last_name'),
+				'listing_orders' => 1,
+				'listing_spent' => '<span data-total="' . $cart['total']['grand'] . '">' . $this->money($cart['total']['grand']) . '</span>',
+				'adresses' => $address,
+				'orders' => []
+			];
+
+			$customer = Entry::create($data['email'])
+			->collection('customers')
+			->with($customer_data)
+			->published(true)
+			->get();
+
+		} else {
+
+			$customer->set('listing_orders', $customer->get('listing_orders') + 1);
+			$spent = explode('"', $customer->get('listing_orders'));
+			$spent[1] = $spent[1] + $cart['total']['grand'];
+			$spent[2] = $this->money($spent[1]);
+			$customer->set('listing_spent', join($spent, '"'));
+
+		}
 
 		$order_next_id = $this->getConfigInt('order_next_id', 1000);
 		$order_id_format = $this->getConfig('order_id_format', '#[id]');
@@ -549,13 +665,7 @@ class StatamifyAPI extends API
 			break;
 		}
 
-		if (isset($data['billing_diff']) && $data['billing_diff'] == '1') {
-
-			$data['billing_diff'] = true;
-
-		}
-
-		$cart = $this->cartGet();
+		$data['listing_status'] = '<span class="order-status ' . $data['status'] . '">' . $this->t('status.' . $data['status']) . '</span>';
 
 		$data['summary'] = [
 			'items' => [],
@@ -578,6 +688,12 @@ class StatamifyAPI extends API
 
 		}
 
+		$data['listing_total'] = $this->money($data['summary']['total']['grand']);
+		$data['listing_customer'] = $customer->get('title') . ' <a data-email="' . $data['email'] . '" href="/cp/collections/entries/customers/' . $data['email'] . '" class="statamify-link"><span class="icon icon-forward"></span></a>';
+
+		$data['listing_email'] = $data['email'];
+		unset($data['email']);
+
 		$order = Entry::create(slugify($data['title']))
 		->collection('orders')
 		->with($data)
@@ -591,6 +707,13 @@ class StatamifyAPI extends API
 		File::put('site/settings/addons/statamify.yaml', YAML::dump($settings));
 
 		$order->save();
+
+		$customers_orders = $customer->get('orders');
+		$customers_orders[] = $order->get('id');
+		$customer->set('orders', $customers_orders);
+		$customer->save();
+
+		Stache::update();
 
 		return $order;
 

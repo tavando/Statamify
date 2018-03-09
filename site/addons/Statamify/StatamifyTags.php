@@ -321,17 +321,26 @@ class StatamifyTags extends Tags
 
 	public function location() {
 
-		$shipping_country = session('statamify.shipping_country');
+		if ($this->get('country')) {
+
+			$country = $this->get('country');
+
+		} else {
+
+			$country = session('statamify.shipping_country');
+
+		}
+		
 		$countries = $this->api('Statamify')->countries();
 		$regions = $this->api('Statamify')->regions();
 
-		if ($shipping_country) {
+		if ($country) {
 
 			$regions = reset($regions);
 
-			if (isset($regions[$shipping_country])) {
+			if (isset($regions[$country])) {
 
-				$regions = $regions[$shipping_country];
+				$regions = $regions[$country];
 
 			} else {
 
@@ -348,7 +357,7 @@ class StatamifyTags extends Tags
 		return [ 
 			'countries' => reset($countries), 
 			'regions' => $regions,
-			'shipping_country' => $shipping_country
+			'country' => $country
 		];
 
 	}

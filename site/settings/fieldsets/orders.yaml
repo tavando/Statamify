@@ -6,6 +6,9 @@ fields:
   listing_customer:
     type: hidden
     display: Listing Customer
+  listing_email:
+    type: hidden
+    display: Listing Email
   listing_total:
     type: hidden
     display: Listing Total
@@ -19,8 +22,8 @@ fields:
     type: select
     display: Status
     options:
-      pending: Pending
       awaiting_payment: Awaiting Payment
+      pending: Pending
       completed: Completed
       shipped: Shipped
       cancelled: Cancelled

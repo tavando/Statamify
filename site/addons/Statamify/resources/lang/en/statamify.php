@@ -17,6 +17,13 @@ return [
 	'products' => 'Products',
 
 	'settings' => 'Settings',
+	'status.awaiting_payment' => 'Awaiting payment',
+	'status.pending' => 'Pending',
+	'status.completed' => 'Completed',
+	'status.shipped' => 'Shipped',
+	'status.cancelled' => 'Cancelled',
+	'status.refunded' => 'Refunded',
+	'status.refunded_partially' => 'Refunded Partially',
 
 	'types' => 'Types',
 
