@@ -1,10 +1,11 @@
 # Statamify
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](http://opensource.org/licenses/MIT)
 
 Statamify is **FREE** Shopify-like ecommerce addon for Statamic. 
 
 Check demo: http://demo.statamify.com/
 
-*Included: homepage, products listing (/store is complex, relations like /store/types/dresses are simple), product view, cart*
+*Included: homepage, products listing (/store is complex, relations like /store/types/dresses are simple), product view, cart, checkout (in progress)*
 
 To install:
 1) Copy the files to your main Statamic folder
@@ -101,14 +102,16 @@ Update item in cart
 
 <a name="todos"></a>
 ## 4. Todos
-
- - Whole Ecommerce Store :)
+ - Coupons in checkout
+ - Inventory Management
+ - Emails on status change
+ - Customer Account Management
+ - Stripe Integration
+ - Analytics
+ - Multi Currency
+ - Multi Language
+ - Digital Goods for Download
 
 <a name="disclaimer"></a>
 ## 5. Disclaimer
 I'm not the pro expert of PHP like guys from Statamic, I hate writing docs and I work alone - that's why everyone who'd like to help is invited.
-
-License
-----
-
-MIT
