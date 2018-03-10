@@ -22,7 +22,7 @@ fields:
   addresses_section:
     type: section
     display: Addresses
-  adresses:
+  addresses:
     type: grid
     display: Adresses
     fields:

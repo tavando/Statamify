@@ -37,7 +37,7 @@ fields:
   customers:
     type: tags
     display: Customers
-    instructions: Use only for selected emails
+    instructions: Use only for selected emails (comma for separation)
     width: 50
   total:
     type: integer
@@ -68,5 +68,6 @@ fields:
   used_by:
     type: collection
     display: Used By
-    collection: [ ]
+    collection:
+      - customers
     mode: tags
