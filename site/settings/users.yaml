@@ -1,0 +1,6 @@
+login_type: email
+new_user_roles:
+  - 72d5aa40-2e56-44b0-9604-c742e0371dda
+enable_gravatar: true
+driver: file
+redis_write_file: true

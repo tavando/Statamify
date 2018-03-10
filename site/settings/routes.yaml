@@ -1,0 +1,16 @@
+collections:
+  products: '/store/products/{slug}'
+  types: '/store/types/{slug}'
+  vendors: '/store/vendors/{slug}'
+  collections: '/store/collections/{slug}'
+taxonomies:
+  tags: '/blog/tags/{slug}'
+  colors: '/store/colors/{slug}'
+routes:
+  /search: search
+  /account:
+    template: account/account
+    protect:
+      type: logged_in
+      login_url: /account/login
+  /account/login: account/login
