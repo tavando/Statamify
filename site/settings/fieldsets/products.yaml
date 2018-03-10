@@ -1,6 +1,5 @@
 taxonomies:
   tags: true
-  colors: true
 title: Products
 fields:
   title:

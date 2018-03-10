@@ -57,9 +57,9 @@ template = `
 				<th>
 					<span>Variants</span>
 				</th><th>
-					<span>Price change</span>
+					<span>Price</span>
 				</th><th>
-					<span>Compare at price change</span>
+					<span>Compare at price</span>
 				</th><th>
 					<span>Inventory</span>
 				</th><th>

@@ -144,11 +144,11 @@ class StatamifyController extends Controller
 			$order = $this->api('Statamify')->orderCreate($data);
 			$this->api('Statamify')->cartClear();
 
-			$whitelist = ['title', 'email', 'shipping', 'billing', 'billing_diff', 
+			$whitelist = ['title', 'email', 'shipping', 'billing', 'billing_diff', 'summary',
 			'shipping_method', 'payment_method', 'status', 'id', 'slug', 'url', 'last_modified'];
 			$data = array_intersect_key($order->toArray(), array_flip($whitelist));
 
-			return redirect('/store/summary')->withInput(['order' => $data]);
+			return redirect('/store/summary')->withInput($data);
 
 		} else {
 

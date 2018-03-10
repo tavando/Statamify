@@ -2,6 +2,7 @@ title: Coupons
 fieldset: coupons
 columns:
   - title
+  - slug
   - listing_used
   - start_date
   - end_date

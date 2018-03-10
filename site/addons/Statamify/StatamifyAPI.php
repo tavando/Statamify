@@ -551,14 +551,12 @@ class StatamifyAPI extends API
 		if (isset($data['shipping'][0]['region']) && $data['shipping'][0]['region'] != '') {
 
 			$data['shipping'][0]['country'] = $data['shipping'][0]['country'] . '|' . $data['shipping'][0]['region'];
-			unset($data['shipping'][0]['region']);
 
 		}
 
 		if (isset($data['billing'][0]['region']) && $data['billing'][0]['region'] != '') {
 
 			$data['billing'][0]['country'] = $data['billing'][0]['country'] . '|' . $data['billing'][0]['region'];
-			unset($data['billing'][0]['region']);
 
 		}
 
@@ -568,7 +566,7 @@ class StatamifyAPI extends API
 
 		}
 
-		unset($data['saved_addresses']);
+		unset($data['shipping'][0]['region'], $data['billing'][0]['region'], $data['saved_addresses']);
 
 		/********** CREATE USER IF DOESN'T EXIST  ***/
 		if (!$data['user']) {
