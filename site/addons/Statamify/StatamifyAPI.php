@@ -12,6 +12,8 @@ use Statamic\API\YAML;
 use Statamic\API\Stache;
 use Statamic\API\User;
 use Statamic\API\Role;
+use Statamic\API\Config;
+use Statamic\API\GlobalSet;
 
 class StatamifyAPI extends API
 {
@@ -771,6 +773,19 @@ class StatamifyAPI extends API
 			}
 
 		}
+
+	}
+
+	public function wrapGlobals($data) {
+
+		$global = GlobalSet::whereHandle('global');
+
+		$data['site_url'] = Config::getSiteUrl();
+		$data['site_name'] = $global->get('site_name');
+		$data['store_address'] = $global->get('store_address');
+		$data['date'] = date(Config::get('system.date_format'), $data['last_modified']);
+
+		return $data;
 
 	}
 

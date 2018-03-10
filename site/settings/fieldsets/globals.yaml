@@ -1,0 +1,13 @@
+title: Default Globals
+hide: true
+taxonomies:
+  tags: true
+fields:
+  site_name:
+    type: text
+    display: Website Name
+    instructions: The name of your website
+    localizable: true
+  store_address:
+    type: redactor
+    display: Store Address
