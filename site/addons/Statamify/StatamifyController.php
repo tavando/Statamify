@@ -12,19 +12,6 @@ use Validator;
 class StatamifyController extends Controller
 {
 
-	public function getLogout() {
-
-		\Auth::logout();
-		
-		session()->forget('statamify.default_address');
-		session()->forget('statamify.shipping_country');
-		session()->forget('statamify.shipping_method');
-		$this->api('Statamify')->cartSetShipping();
-
-		return redirect('/');
-
-	}
-
 	public function getCart() {
 
 		return $this->api('Statamify')->cartGet();

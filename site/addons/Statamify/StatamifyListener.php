@@ -19,6 +19,7 @@ class StatamifyListener extends Listener
 		'cp.nav.created' => 'eventNavCreated',
 		'cp.entry.published' => 'eventPublished',
 		'content.saved' => 'eventSaved',
+		'auth.logout' => 'eventAuthLogout',
 	];
 
 	public $cp = false;
@@ -479,6 +480,15 @@ class StatamifyListener extends Listener
 		}
 
 		Stache::update();
+
+	}
+
+	public function eventAuthLogout() {
+
+		session()->forget('statamify.default_address');
+		session()->forget('statamify.shipping_country');
+		session()->forget('statamify.shipping_method');
+		$this->api('Statamify')->cartSetShipping();
 
 	}
 
