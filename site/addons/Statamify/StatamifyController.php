@@ -12,6 +12,19 @@ use Validator;
 class StatamifyController extends Controller
 {
 
+	public function getLogout() {
+
+		\Auth::logout();
+		
+		session()->forget('statamify.default_address');
+		session()->forget('statamify.shipping_country');
+		session()->forget('statamify.shipping_method');
+		$this->api('Statamify')->cartSetShipping();
+
+		return redirect('/');
+
+	}
+
 	public function getCart() {
 
 		return $this->api('Statamify')->cartGet();
@@ -212,6 +225,24 @@ class StatamifyController extends Controller
 		}
 
 		return true;
+
+	}
+
+	public function postSetDefaultAddress(Request $request) {
+
+		$data = $request->all();
+
+		$validator = Validator::make($data, [
+			'address' => 'required|numeric',
+		]);
+
+		if ($validator->fails()) {
+
+			throw new \Exception($this->api('Statamify')->t('somethings_wrong', 'errors'));
+
+		}
+
+		$this->api('Statamify')->setDefaultAddress($data['address']);
 
 	}
 

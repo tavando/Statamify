@@ -44,7 +44,7 @@ fields:
 					countries:
 						type: suggest
 						display: Countries
-						mode: StatamifyCountry
+						mode: Statamify
 						width: 75
 					price_rates:
 						type: grid

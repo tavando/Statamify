@@ -4,6 +4,8 @@ namespace Statamic\Addons\Statamify;
 
 use Statamic\Extend\Tags;
 use Statamic\API\URL;
+use Statamic\API\User;
+use Statamic\API\Entry;
 
 class StatamifyTags extends Tags
 {
@@ -41,44 +43,42 @@ class StatamifyTags extends Tags
 
 			case 'get':
 
-				if (isset($query[$key])) {
+			if (isset($query[$key])) {
 
-					if (!$value) {
+				if (!$value) {
 
-						return $query[$key];
+					return $query[$key];
 
-					} else {
+				} else {
 
-						$fields = explode(';', $query[$key]);
-						$arg_index = 0;
+					$fields = explode(';', $query[$key]);
+					$arg_index = 0;
 
-						foreach ($fields as $k => $field) {
+					foreach ($fields as $k => $field) {
 
-							$field = explode(':', $field);
-							$value = str_replace('@', ':', $value);			
+						$field = explode(':', $field);
+						$value = str_replace('@', ':', $value);			
 
-							$condition = 	$field[0] == $value 
-														|| join($field, ':') == $value 
-														|| (in_array(@explode(':', $value)[1], explode('|', $field[1]))  && explode(':', $value)[0] == $field[0])
-														|| (in_array(@explode(':', $value)[1], explode(',', $field[1]))  && explode(':', $value)[0] == $field[0]);
+						$condition = 	$field[0] == $value 
+						|| join($field, ':') == $value 
+						|| (in_array(@explode(':', $value)[1], explode('|', $field[1]))  && explode(':', $value)[0] == $field[0])
+						|| (in_array(@explode(':', $value)[1], explode(',', $field[1]))  && explode(':', $value)[0] == $field[0]);
 
-							if ($condition) {
+						if ($condition) {
 
-								if (is_bool($arg)) {
+							if (is_bool($arg)) {
+
+								return $field[1];
+
+							} else {
+
+								if ($arg_index == $arg) {
 
 									return $field[1];
 
 								} else {
 
-									if ($arg_index == $arg) {
-
-										return $field[1];
-
-									} else {
-
-										$arg_index++;
-
-									}
+									$arg_index++;
 
 								}
 
@@ -86,155 +86,107 @@ class StatamifyTags extends Tags
 
 						}
 
-						return false;
-
 					}
-
-				} else {
 
 					return false;
 
 				}
 
-				break;
+			} else {
+
+				return false;
+
+			}
+
+			break;
 
 			case 'add':
+
+			if (isset($query[$key])) {
+
+				$sign = $logic == 'OR' ? '|' : ',';
+				$fields = explode(';', $query[$key]);
+				$value = explode(':', $value);
+
+				$found = false;
+
+				foreach ($fields as $k => $field) {
+
+					$field = explode(':', $field);
+
+					if ($field[0] == $value[0]) {
+
+						$found = true;
+						$values = explode($sign, $field[1]);
+
+						if (!in_array($value[1], $values)) {
+
+							$values[] = $value[1];
+
+						}
+
+						$field[1] = join($values, $sign);
+						$fields[$k] = join($field, ':');
+
+					}
+
+				}
+
+				if (!$found) {
+
+					$field = array_shift($value);
+					$fields[] = $field . ':' . join($value, $sign);
+					$query[$key] = join($fields, ';');
+
+				}
+
+				$query[$key] = join($fields, ';');
+
+			} else {
+
+				$query[$key] = $value;
+
+			}
+
+			break;
+
+			case 'remove':
+
+			if ($value) {
 
 				if (isset($query[$key])) {
 
 					$sign = $logic == 'OR' ? '|' : ',';
 					$fields = explode(';', $query[$key]);
-					$value = explode(':', $value);
-
-					$found = false;
 
 					foreach ($fields as $k => $field) {
-						
-						$field = explode(':', $field);
 
-						if ($field[0] == $value[0]) {
+						if (strpos($value, ':')) {
 
-							$found = true;
+							$field = explode(':', $field);
+							$val = explode(':', $value);
 							$values = explode($sign, $field[1]);
 
-							if (!in_array($value[1], $values)) {
+							if (in_array($val[1], $values)) {
 
-								$values[] = $value[1];
+								$values = array_diff($values, [$val[1]]);
 
 							}
 
-							$field[1] = join($values, $sign);
-							$fields[$k] = join($field, ':');
+							if ($values) {
 
-						}
-
-					}
-
-					if (!$found) {
-
-						$field = array_shift($value);
-						$fields[] = $field . ':' . join($value, $sign);
-						$query[$key] = join($fields, ';');
-
-					}
-
-					$query[$key] = join($fields, ';');
-
-				} else {
-
-					$query[$key] = $value;
-
-				}
-
-				break;
-
-			case 'remove':
-
-				if ($value) {
-
-					if (isset($query[$key])) {
-
-						$sign = $logic == 'OR' ? '|' : ',';
-						$fields = explode(';', $query[$key]);
-
-						foreach ($fields as $k => $field) {
-
-							if (strpos($value, ':')) {
-
-								$field = explode(':', $field);
-								$val = explode(':', $value);
-								$values = explode($sign, $field[1]);
-
-								if (in_array($val[1], $values)) {
-
-									$values = array_diff($values, [$val[1]]);
-
-								}
-
-								if ($values) {
-
-									$field[1] = join($values, $sign);
-									$fields[$k] = join($field, ':');
-
-								} else {
-
-									unset($fields[$k]);
-
-								}
+								$field[1] = join($values, $sign);
+								$fields[$k] = join($field, ':');
 
 							} else {
 
-								if (strpos($field, $value . ':') !== false) {
-
-									unset($fields[$k]);
-
-								}
+								unset($fields[$k]);
 
 							}
 
-						}
-
-						if (count($fields)) {
-
-							$query[$key] = join($fields, ';');
-
 						} else {
 
-							unset($query[$key]);
-
-						}
-
-					}
-
-				} else {
-
-					unset($query[$key]);
-
-				}
-
-				break;
-			
-			default:
-
-				if (!$arg) {
-
-					$query[$key] = $value;
-
-				} else {
-
-					if (!isset($query[$key])) {
-
-						$query[$key] = $value;
-
-					} else {
-
-						$fields = explode(';', $query[$key]);
-
-						foreach ($fields as $k => $field) {
-
-							$field = explode(':', $field);
-
-							if ($field[0] == $arg) {
+							if (strpos($field, $value . ':') !== false) {
 
 								unset($fields[$k]);
 
@@ -242,14 +194,64 @@ class StatamifyTags extends Tags
 
 						}
 
-						$fields[] = $value;
+					}
+
+					if (count($fields)) {
+
 						$query[$key] = join($fields, ';');
+
+					} else {
+
+						unset($query[$key]);
 
 					}
 
 				}
 
-				break;
+			} else {
+
+				unset($query[$key]);
+
+			}
+
+			break;
+			
+			default:
+
+			if (!$arg) {
+
+				$query[$key] = $value;
+
+			} else {
+
+				if (!isset($query[$key])) {
+
+					$query[$key] = $value;
+
+				} else {
+
+					$fields = explode(';', $query[$key]);
+
+					foreach ($fields as $k => $field) {
+
+						$field = explode(':', $field);
+
+						if ($field[0] == $arg) {
+
+							unset($fields[$k]);
+
+						}
+
+					}
+
+					$fields[] = $value;
+					$query[$key] = join($fields, ';');
+
+				}
+
+			}
+
+			break;
 		}
 
 		return $uri[0] . ($query ? '?' . urldecode(http_build_query($query)) : '');
@@ -330,11 +332,21 @@ class StatamifyTags extends Tags
 			$country = session('statamify.shipping_country');
 
 		}
+
+		$is_part = strpos($country, '|') !== false;
 		
 		$countries = $this->api('Statamify')->countries();
 		$regions = $this->api('Statamify')->regions();
 
 		if ($country) {
+
+			if ($is_part) {
+
+				$parts = explode('|', $country);
+				$country = $parts[0];
+				$region = $parts[1];
+
+			}
 
 			$regions = reset($regions);
 
@@ -354,11 +366,69 @@ class StatamifyTags extends Tags
 
 		}
 
+		$countries = reset($countries);
+
 		return [ 
-			'countries' => reset($countries), 
+			'countries' => $countries, 
 			'regions' => $regions,
-			'country' => $country
+			'country' => $is_part ? $countries[$country] : $country,
+			'region' => $is_part ? (isset($regions[$region]) ? $regions[$region] : $region) : null
 		];
+
+	}
+
+	public function addresses() {
+
+		$user = User::getCurrent();
+
+		if ($user) {
+
+			$customer = Entry::whereSlug($user->email(), 'customers');
+
+			if ($customer) {
+
+				$default_address = session('statamify.default_address');
+				$addresses = $customer->get('addresses');
+
+				foreach ($addresses as $key => $address) {
+					
+					$parts = explode('|', $address['country']);
+					$address['country'] = $parts[0];
+					$address['region'] = $parts[1];
+
+					if (!$default_address && $address['default']) {
+
+						$default_address = $key;
+						session(['statamify.default_address' => [
+							'defaultKey' => $key,
+							'default' => $address
+						]]);
+						session(['statamify.shipping_country' => $address['country']]);
+						$this->api('Statamify')->cartSetShipping();
+
+					}
+
+				}
+
+				return $this->parseLoop($customer->get('addresses'));
+
+			} else {
+
+				return [];
+
+			}
+
+		} else {
+
+			return [];
+
+		}
+
+	}
+
+	public function defaultAddress() {
+
+		return session('statamify.default_address') ?: [];
 
 	}
 

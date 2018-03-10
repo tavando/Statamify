@@ -174,9 +174,19 @@ class StatamifyAPI extends API
 
 		}
 
+
+		/********** USER IS LOGGED IN BUT DEFAULT ADDRESS IS NOT SET - RESET SHIPPING SET BEFORE LOGIN  ***/
+
+		if (!session('statamify.default_address')) {
+
+			$this->setDefaultAddress('default');
+			$cart['shipping'] = $this->cartSetShipping();
+
+		}
+
 		if (!$cart['shipping'] && session('statamify.shipping_country')) {
 
-			$this->cartSetShipping();
+			$cart['shipping'] = $this->cartSetShipping();
 
 		}
 
@@ -456,6 +466,8 @@ class StatamifyAPI extends API
 		session()->forget('statamify.shipping_method');
 		session(['statamify.cart' => $cart]);
 
+		return $cart['shipping'];
+
 	}
 
 	public function cartClear($instance = 'cart') {
@@ -518,8 +530,8 @@ class StatamifyAPI extends API
 					case 8: $price = number_format($value, 2, '', ','); break;
 					
 					default:
-						$price = number_format($value, 2, '.', ' '); break;
-						break;
+					$price = number_format($value, 2, '.', ' '); break;
+					break;
 				}
 
 				return str_replace('[symbol]', $currency['symbol'], str_replace('[price]', $price, $currency['format']));
@@ -539,12 +551,14 @@ class StatamifyAPI extends API
 		if (isset($data['shipping'][0]['region']) && $data['shipping'][0]['region'] != '') {
 
 			$data['shipping'][0]['country'] = $data['shipping'][0]['country'] . '|' . $data['shipping'][0]['region'];
+			unset($data['shipping'][0]['region']);
 
 		}
 
 		if (isset($data['billing'][0]['region']) && $data['billing'][0]['region'] != '') {
 
 			$data['billing'][0]['country'] = $data['billing'][0]['country'] . '|' . $data['billing'][0]['region'];
+			unset($data['billing'][0]['region']);
 
 		}
 
@@ -553,6 +567,8 @@ class StatamifyAPI extends API
 			$data['billing_diff'] = true;
 
 		}
+
+		unset($data['saved_addresses']);
 
 		/********** CREATE USER IF DOESN'T EXIST  ***/
 		if (!$data['user']) {
@@ -589,7 +605,7 @@ class StatamifyAPI extends API
 				'title' => $user->get('first_name') . ' ' . $user->get('last_name'),
 				'listing_orders' => 1,
 				'listing_spent' => '<span data-total="' . $cart['total']['grand'] . '">' . $this->money($cart['total']['grand']) . '</span>',
-				'adresses' => $address,
+				'addresses' => $address,
 				'orders' => []
 			];
 
@@ -602,9 +618,9 @@ class StatamifyAPI extends API
 		} else {
 
 			$customer->set('listing_orders', $customer->get('listing_orders') + 1);
-			$spent = explode('"', $customer->get('listing_orders'));
+			$spent = explode('"', $customer->get('listing_spent'));
 			$spent[1] = $spent[1] + $cart['total']['grand'];
-			$spent[2] = $this->money($spent[1]);
+			$spent[2] = '>' . $this->money($spent[1]) . '</span>';
 			$customer->set('listing_spent', join($spent, '"'));
 
 		}
@@ -689,7 +705,7 @@ class StatamifyAPI extends API
 		}
 
 		$data['listing_total'] = $this->money($data['summary']['total']['grand']);
-		$data['listing_customer'] = $customer->get('title') . ' <a data-email="' . $data['email'] . '" href="/cp/collections/entries/customers/' . $data['email'] . '" class="statamify-link"><span class="icon icon-forward"></span></a>';
+		$data['listing_customer'] = $customer->get('title') . ' <a href="/cp/collections/entries/customers/' . $data['email'] . '" class="statamify-link"><span class="icon icon-forward"></span></a>';
 
 		$data['listing_email'] = $data['email'];
 		unset($data['email']);
@@ -716,6 +732,47 @@ class StatamifyAPI extends API
 		Stache::update();
 
 		return $order;
+
+	}
+
+	public function setDefaultAddress($key) {
+
+		$user = User::getCurrent();
+
+		if ($user) {
+
+			$customer = Entry::whereSlug($user->email(), 'customers');
+
+			if ($customer) {
+
+				$addresses = $customer->get('addresses');
+
+				if (!isset($addresses[$key])) {
+
+					$key = array_search(true, array_column($addresses, 'default'));
+
+				}
+
+				if (!is_bool($key) && isset($addresses[$key])) {
+
+					$address = $addresses[$key];
+
+					$parts = explode('|', $address['country']);
+					$address['country'] = $parts[0];
+					$address['region'] = $parts[1];
+
+					session(['statamify.default_address' => [
+						'defaultKey' => $key,
+						'default' => $address
+					]]);
+					session(['statamify.shipping_country' => $address['country']]);
+					$this->cartSetShipping();
+
+				}
+
+			}
+
+		}
 
 	}
 
