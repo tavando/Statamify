@@ -138,7 +138,7 @@ class StatamifyController extends Controller
 
 			$email = Email::create();
 			$email
-				->to('szarzynski.lukasz@gmail.com')
+				->to($data['listing_email'])
 				->subject('Order ' . $data['title'] . ' confirmed')
 				->in('/site/addons/Statamify/resources/emails')
 				->with($this->api('Statamify')->wrapGlobals($data))
