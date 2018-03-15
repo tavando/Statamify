@@ -322,8 +322,13 @@ class StatamifyTags extends Tags
 	}
 
 	public function location() {
+		
+		$countries = $this->api('Statamify')->countries();
+		$regions = $this->api('Statamify')->regions();
+		
+		$is_part = strpos($this->get('country'), '|') !== false;
 
-		if ($this->get('country')) {
+		if ($this->get('country') && $is_part) {
 
 			$country = $this->get('country');
 
@@ -332,11 +337,6 @@ class StatamifyTags extends Tags
 			$country = session('statamify.shipping_country');
 
 		}
-
-		$is_part = strpos($country, '|') !== false;
-		
-		$countries = $this->api('Statamify')->countries();
-		$regions = $this->api('Statamify')->regions();
 
 		if ($country) {
 

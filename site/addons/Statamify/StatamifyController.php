@@ -5,9 +5,7 @@ namespace Statamic\Addons\Statamify;
 use Statamic\Extend\Controller;
 use Illuminate\Http\Request;
 use Statamic\API\Entry;
-use Statamic\API\Fieldset;
 use Statamic\API\User;
-use Statamic\API\Email;
 use Validator;
 
 class StatamifyController extends Controller
@@ -136,14 +134,7 @@ class StatamifyController extends Controller
 			'shipping_method', 'payment_method', 'status', 'id', 'slug', 'url', 'last_modified'];
 			$data = array_intersect_key($order->toArray(), array_flip($whitelist));
 
-			$email = Email::create();
-			$email
-				->to($data['listing_email'])
-				->subject('Order ' . $data['title'] . ' confirmed')
-				->in('/site/addons/Statamify/resources/emails')
-				->with($this->api('Statamify')->wrapGlobals($data))
-				->template('order-new');
-			$email->send();
+			$this->api('Statamify')->sendEmail('order-new', $data, $data['listing_email']);
 
 			return redirect('/store/summary')->withInput($data);
 

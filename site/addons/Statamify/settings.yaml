@@ -4,16 +4,16 @@ fields:
 		display: General
 	owner_email:
 		type: text
-		display: Owner Email
+		display: Owner's Email
 		instructions: Email address for receiving emails from store
 		width: 50
-	store_email:
+	store_name:
 		type: text
-		display: Store Email
-		instructions: Email address used to send emails to customers and contact them
+		display: Store Name
+		instructions: Name of the store used in website and emails
 		width: 50
 	store_address:
-		type: textarea
+		type: redactor
 		display: Store Address
 	order_id_format:
 		type: text
