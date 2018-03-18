@@ -1,0 +1,9 @@
+taxonomies: false
+title: Emails
+fields:
+  data:
+    type: textarea
+    display: Data
+  email:
+    type: text
+    display: Email

@@ -58,6 +58,7 @@ class StatamifyListener extends Listener
 		$nav->remove('content.collections.collections:coupons');
 		$nav->remove('content.collections.collections:customers');
 		$nav->remove('content.collections.collections:orders');
+		$nav->remove('content.collections.collections:emails');
 
 	}
 

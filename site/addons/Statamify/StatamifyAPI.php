@@ -146,7 +146,7 @@ class StatamifyAPI extends API
 		$data = $this->wrapGlobals($data);
 
 		$email = new Email($template, $data, $to);
-		$email->send();
+		$email->create();
 
 	}
 

@@ -3,6 +3,8 @@
 namespace Statamic\Addons\Statamify\Models;
 
 use Statamic\API\Email;
+use Statamic\API\Entry;
+use Statamic\API\Stache;
 
 class StatamifyEmail
 {
@@ -12,6 +14,20 @@ class StatamifyEmail
 		$this->template = $template;
 		$this->data = $data;
 		$this->to = $to;
+
+	}
+
+	public function create() {
+
+		$email = Entry::create($this->to . '_' . $this->template)
+		->collection('emails')
+		->with(['title' => $this->template, 'data' => serialize($this->data), 'email' => $this->to])
+		->published(true)
+		->get();
+
+		$email->save();
+
+		Stache::update();
 
 	}
 
