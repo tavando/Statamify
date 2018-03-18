@@ -63,6 +63,8 @@ Here is the list of currently implemented features
 
 - **Track Shipping** - add details for tracking
 
+- **Emails on Queue** - emails are sent via Cron to speed up checkout and status change
+
 ### 2.4. Coupons
 - **Different types** - percentage, fixed, free shipping
 - **Limits** - limit per users, countries, total usage, date range
@@ -104,7 +106,6 @@ Update item in cart
 ## 4. Todos
  - Coupons in checkout
  - Inventory Management
- - Emails on status change
  - Customer Account Management
  - Stripe Integration
  - Analytics
