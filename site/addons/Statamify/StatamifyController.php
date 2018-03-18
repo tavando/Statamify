@@ -134,8 +134,6 @@ class StatamifyController extends Controller
 			'shipping_method', 'payment_method', 'status', 'id', 'slug', 'url', 'last_modified'];
 			$data = array_intersect_key($order->toArray(), array_flip($whitelist));
 
-			$this->api('Statamify')->sendEmail('order-new', $data, $data['listing_email']);
-
 			return redirect('/store/summary')->withInput($data);
 
 		} else {

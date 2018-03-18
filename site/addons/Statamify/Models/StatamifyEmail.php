@@ -23,7 +23,7 @@ class StatamifyEmail
 		$email
 			->to($this->to)
 			->subject($attrs['subject'])
-			->in($attrs['tmpl'])
+			->in('/site/addons/Statamify/resources/emails')
 			->with($this->data)
 			->template($this->template);
 
@@ -37,10 +37,21 @@ class StatamifyEmail
 
 		switch ($this->template) {
 
+			case 'admin-order-new':
+				
+				$attrs['subject'] = 'New Order ' . $this->data['title'] . ' has been placed'; 
+
+				break;
+
 			case 'order-new':
 				
 				$attrs['subject'] = 'Order ' . $this->data['title'] . ' confirmed'; 
-				$attrs['tmpl'] = '/site/addons/Statamify/resources/emails';
+
+				break;
+
+			case 'order-status':
+				
+				$attrs['subject'] = 'Order ' . $this->data['title'] . ' is now ' . strtolower(strip_tags($this->data['listing_status'])); 
 
 				break;
 			

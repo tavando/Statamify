@@ -80,7 +80,7 @@ class StatamifyOrder
 		$order = Entry::create(slugify($this->data['title']))
 			->collection('orders')
 			->with($this->data)
-			->published(true)
+			->published(false)
 			->date(date('Y-m-d H:i'))
 			->get();
 
@@ -103,7 +103,6 @@ class StatamifyOrder
 		Stache::update();
 
 		return $order;
-
 
 	}
 

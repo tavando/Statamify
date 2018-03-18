@@ -475,7 +475,19 @@ class StatamifyListener extends Listener
 				$entry->set('listing_status', '<span class="order-status ' . $data['status'] . '">' . $this->api('Statamify')->t('status.' . $data['status']) . '</span>');
 				$entry->save();
 
+				$this->api('Statamify')->sendEmail('order-status', $entry->toArray(), $data['listing_email']);
+
 			}
+
+		}
+
+		if (!$data['published']) {
+
+			$this->api('Statamify')->sendEmail('order-new', $data, $data['listing_email']);
+			$this->api('Statamify')->sendEmail('admin-order-new', $data);
+
+			$entry->set('published', true);
+			$entry->save();
 
 		}
 
