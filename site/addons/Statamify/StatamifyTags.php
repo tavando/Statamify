@@ -432,4 +432,21 @@ class StatamifyTags extends Tags
 
 	}
 
+	public function gateways() {
+
+		return [
+
+			'cheque' => [ 
+				'active' => $this->getConfig('gateway_cheque_active'), 
+				'info' => $this->getConfig('gateway_cheque_info') 
+			],
+
+			'paypal' => [ 
+				'active' => $this->getConfig('gateway_paypal_active')
+			],
+
+		];
+
+	}
+
 }

@@ -23,6 +23,21 @@ class StatamifyOrder
 
 		$this->data = $data;
 
+		$order_next_id = $this->statamic->getConfigInt('order_next_id', 1000);
+		$order_id_format = $this->statamic->getConfig('order_id_format', '#[id]');
+
+		// Create Entry / Order title based on the format in the settings
+
+		$this->data['title'] = str_replace('[id]', $order_next_id, $order_id_format);
+
+		// Update Shipping for Summary
+
+		$this->updateShippingMethods();
+
+		// Charge and Update Payment for Summary
+
+		$this->updatePaymentMethods();
+
 		// Create User if doesn't exist
 
 		if (!$this->data['user']) {
@@ -34,16 +49,6 @@ class StatamifyOrder
 		// Get Customer or create one if doesn't exist
 
 		$customer = $this->getCustomer();
-
-		$order_next_id = $this->statamic->getConfigInt('order_next_id', 1000);
-		$order_id_format = $this->statamic->getConfig('order_id_format', '#[id]');
-
-		// Create Entry / Order title based on the format in the settings
-
-		$this->data['title'] = str_replace('[id]', $order_next_id, $order_id_format);
-
-		$this->updateShippingMethods();
-		$this->updatePaymentMethods();
 
 		// Create summary that will be populated in StatamifyOrderSummary addon
 
@@ -251,8 +256,6 @@ class StatamifyOrder
 
 	private function updatePaymentMethods() {
 
-		$this->data['payment_method'] = [];
-
 		switch ($this->data['payment_method']) {
 
 			case 'cheque':
@@ -261,8 +264,16 @@ class StatamifyOrder
 			break;
 
 			case 'stripe':
+
+				$charge = $this->statamic->api('StatamifyStripe')->charge($this->data, $this->cart);
+
 				$this->data['status'] = 'pending';
-				$this->data['payment_method'] = ['name' => 'Stripe', 'fee' => 0];
+				$this->data['payment_method'] = [
+					'name' => $this->statamic->api('StatamifyStripe')->getConfig('name'), 
+					'fee' => $charge->application_fee, 
+					'id' => $charge->id
+				];
+
 			break;
 			
 			default:

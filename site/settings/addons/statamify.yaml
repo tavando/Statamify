@@ -40,8 +40,3 @@ currency:
     formatPrice: 4
 gateway_cheque_info: Basic info
 gateway_cheque_active: true
-gateway_stripe_settings:
-  public_key: null
-  secret_key: null
-gateway_stripe_test: false
-gateway_stripe_active: false

@@ -1,0 +1,28 @@
+fields:
+  active:
+    type: toggle
+    display: Enable
+    width: 25
+  test:
+    type: toggle
+    display: Test Mode
+    width: 25
+  name:
+    type: text
+    display: Name
+  keys:
+    type: array
+    display: Stripe Settings
+    keys:
+      public_key: Public Key
+      secret_key: Secret Key
+    hide_when:
+      test: true
+  keys_test:
+    type: array
+    display: Stripe Settings - Test Mode
+    keys:
+      public_key: Test Public Key
+      secret_key: Test Secret Key
+    hide_when:
+      test: false

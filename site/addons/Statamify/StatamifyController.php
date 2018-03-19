@@ -127,7 +127,19 @@ class StatamifyController extends Controller
 
 			unset($data['_token'], $data['addresso']);
 
-			$order = $this->api('Statamify')->orderCreate($data);
+			try {
+
+				$order = $this->api('Statamify')->orderCreate($data);
+
+			} catch(\Exception $e) {
+
+				return redirect('/store/checkout')->withInput([
+					'errors' => [$e->getMessage()],
+					'data' => $data
+				]);
+
+			}
+			
 			$this->api('Statamify')->cartClear();
 
 			$whitelist = ['title', 'listing_email', 'shipping', 'billing', 'billing_diff', 'summary',
@@ -196,6 +208,9 @@ class StatamifyController extends Controller
 
 			'password' => 'confirmed|required_if:user,',
 			'password_confirmation' => 'required_if:user,',
+
+			'payment_token' => 'required_if:payment_method,stripe',
+
 		], $messages);
 
 		if ($validator->fails()) {

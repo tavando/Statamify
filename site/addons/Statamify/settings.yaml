@@ -210,35 +210,24 @@ fields:
 	gateway_cheque_end:
 		type: fieldblock
 		end: true
-	gateway_stripe_start:
+	gateway_paypal_start:
 		type: fieldblock
-		display: Stripe Gateway
-	gateway_stripe_settings:
+		display: PayPal Gateway
+	gateway_paypal_settings:
 		type: array
-		display: Stripe Settings
+		display: PayPal Settings
 		keys:
-			public_key: Public Key
-			secret_key: Secret Key
-		hide_when:
-			gateway_stripe_test: true
+			username: API Username
+			password: API Password
 		width: 50
-	gateway_stripe_settings_test:
-		type: array
-		display: Stripe Settings - Test Mode
-		keys:
-			public_key: Test Public Key
-			secret_key: Test Secret Key
-		hide_when:
-			gateway_stripe_test: false
-		width: 50
-	gateway_stripe_test:
+	gateway_paypal_sandbox:
 		type: toggle
-		display: Test Mode
+		display: Sandbox Mode
 		width: 25
-	gateway_stripe_active:
+	gateway_paypal_active:
 		type: toggle
 		display: Enable
 		width: 25
-	gateway_stripe_end:
+	gateway_paypal_end:
 		type: fieldblock
 		end: true

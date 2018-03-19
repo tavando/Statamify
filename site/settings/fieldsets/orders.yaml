@@ -46,6 +46,7 @@ fields:
     keys:
       name: Name
       fee: Fee
+      id: ID
     width: 50
   coupon:
     type: array

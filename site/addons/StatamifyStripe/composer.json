@@ -1,0 +1,6 @@
+{
+	"name": "tavando/statamify-stripe",
+	"require": {
+		"stripe/stripe-php": "^6.4"
+	}
+}
