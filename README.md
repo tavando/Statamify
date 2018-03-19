@@ -107,6 +107,7 @@ Update item in cart
  - Coupons in checkout
  - Customer Account Management
  - Stripe Integration
+ - Refund feature
  - Analytics
  - Multi Currency
  - Multi Language
