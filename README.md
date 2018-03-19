@@ -105,9 +105,9 @@ Update item in cart
 <a name="todos"></a>
 ## 4. Todos
  - Coupons in checkout
- - Inventory Management
  - Customer Account Management
  - Stripe Integration
+ - Refund feature
  - Analytics
  - Multi Currency
  - Multi Language
