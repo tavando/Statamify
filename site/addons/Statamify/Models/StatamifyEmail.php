@@ -19,7 +19,9 @@ class StatamifyEmail
 
 	public function create() {
 
-		$email = Entry::create($this->to . '_' . $this->template)
+		// Create Email entry - it will be sent later with Cron
+		
+		$email = Entry::create(date('Y-m-d-H-i-s') . '_' . $this->template)
 		->collection('emails')
 		->with(['title' => $this->template, 'data' => serialize($this->data), 'email' => $this->to])
 		->published(true)

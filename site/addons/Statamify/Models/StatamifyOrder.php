@@ -53,6 +53,12 @@ class StatamifyOrder
 		];
 
 		foreach ($this->cart['items'] as $item) {
+
+			// Update inventory for products
+			
+			$this->updateProductInventory($item);
+
+			// Transform data to match Statamify Order Summary addon
 			
 			$this->data['summary']['items'][] = [
 				'id' => $item['item_id'],
@@ -263,6 +269,46 @@ class StatamifyOrder
 				$this->data['status'] = 'pending';
 				$this->data['payment_method'] = ['name' => 'Default', 'fee' => 0];
 			break;
+
+		}
+
+	}
+
+	private function updateProductInventory($item) {
+
+		$product = Entry::find($item['product']['id']);
+
+		if ($product->get('track_inventory')) {
+
+			switch ($product->get('class')) {
+
+				case 'complex':
+
+				$variants = $product->get('variants');
+
+				foreach ($variants as $variant_key => $variant) {
+
+					if (isset($variant['id']) && $variant['id'] == $item['variant']['id']) {
+
+						$variants[$variant_key]['inventory'] = $variants[$variant_key]['inventory'] - $item['quantity'];
+						$product->set('variants', $variants);
+						$product->save();
+
+						break;
+
+					}
+
+				}
+
+				break;
+
+				default:
+
+				$product->set('inventory', $product->get('inventory') - $item['quantity']);
+				$product->save();
+
+				break;
+			}
 
 		}
 

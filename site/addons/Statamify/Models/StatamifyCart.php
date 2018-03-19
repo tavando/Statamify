@@ -276,7 +276,7 @@ class StatamifyCart
 
 	}
 
-	private function checkInventory($product, $item, $init = 0) {
+	private function checkInventory($product, $item) {
 
 		// Check if product tracks inventory. Do nothing if not
 
@@ -286,19 +286,27 @@ class StatamifyCart
 
 				// If there are too many items of the product in cart, throws error
 
-				if ($product->get('inventory') < $item['quantity'] + $init) throw new \Exception($this->t('product_too_many', 'errors'));
+				if ($product->get('inventory') < $item['quantity']) $this->statamic->response(500, $this->statamic->t('product_too_many', 'errors'));
 
 			} elseif ($product->get('class') == 'complex') {
 
+				if (!isset($item['variant'])) {
+
+					foreach ($this->session['items'] as $cart_item_key => $cart_item) {
+
+						if ($item['item_id'] == $cart_item['item_id']) $item['variant'] = $cart_item['variant'];
+
+					}
+
+				}
+
 				foreach ($product->get('variants') as $variant_key => $variant) {
 
-					// Don't check variants settings
-
-					if ($variant_key != 'settings' && $variant['id'] == $item['variant']) {
+					if (isset($variant['id']) && $variant['id'] == $item['variant']) {
 
 						// If there are too many items of the product's variant in cart, throws error
 
-						if (!$variant['inventory'] || $variant['inventory'] < $item['quantity'] + $init) throw new \Exception($this->t('product_too_many', 'errors'));
+						if (!$variant['inventory'] || $variant['inventory'] < $item['quantity']) $this->statamic->response(500, $this->statamic->t('product_too_many', 'errors'));
 
 					}
 
@@ -407,7 +415,7 @@ class StatamifyCart
 
 					if (!isset($item['variant']) || !$item['variant']) {
 
-						throw new \Exception($this->t('variant_required', 'errors'));
+						$this->statamic->response(500, $this->statamic->t('variant_required', 'errors'));
 
 					} else {
 
@@ -415,7 +423,7 @@ class StatamifyCart
 
 						$variant_key = array_search($item['variant'], array_column($product->get('variants'), 'id'));
 
-						if (is_bool($variant_key)) throw new \Exception($this->t('variant_not_found', 'errors'));
+						if (is_bool($variant_key)) $this->statamic->response(500, $this->statamic->t('variant_not_found', 'errors'));
 
 					}
 
@@ -441,7 +449,7 @@ class StatamifyCart
 
 			} else {
 
-				throw new \Exception($this->t('product_not_found', 'errors'));
+				$this->statamic->response(500, $this->statamic->t('product_not_found', 'errors'));
 
 			}
 
@@ -480,7 +488,7 @@ class StatamifyCart
 
 				// If cart is empty, remove shipping methods
 
-				if (!count($cart['items'])) {
+				if (count($this->session['items']) == 0) {
 
 					$this->session['shipping'] = false;
 					session()->forget('statamify.shipping_method');
@@ -498,14 +506,14 @@ class StatamifyCart
 
 					// Check if you can add more items of the product
 
-					$this->checkInventory($product, $item, $cart_item['quantity']);
+					$this->checkInventory($product, $item);
 
 					$this->session['items'][ $item_key ]['quantity'] = $item['quantity'];
 					session(['statamify.' . $this->instance => $this->session]);
 
 				} else {
 
-					throw new \Exception($this->t('product_not_found', 'errors'));
+					$this->statamic->response(500, $this->statamic->t('product_not_found', 'errors'));
 
 				}
 

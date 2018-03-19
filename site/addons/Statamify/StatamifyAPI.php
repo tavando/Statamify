@@ -18,6 +18,14 @@ class StatamifyAPI extends API
 
 	}
 
+	public function response($code = 200, $msg = '') {
+
+		header('HTTP/1.1 ' . $code . ' Internal Server Error');
+		header('Content-Type: application/json; charset=UTF-8');
+		die(json_encode(array('message' => $msg)));
+
+	}
+
 	public function countries() {
 
 		return $this->storage->getYAML('countries');
