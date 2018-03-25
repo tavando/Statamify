@@ -15,11 +15,14 @@ class StatamifyCountriesFieldtype extends Fieldtype
     }
 
     public function preProcess($data) {
+    	
         return $data;
     }
 
     public function process($data) {
+
         return $data;
+
     }
 
 }

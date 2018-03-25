@@ -141,7 +141,7 @@ class StatamifyCart
 
 					// Add price from variant instead of product
 
-					$price = @$product['variants'][$variant_key]['price'] ? (float) $product['variants'][$variant_key]['price'] : 0;
+					$price = @$product['variants'][$variant_key]['price'] ? (float) $product['variants'][$variant_key]['price'] : (float) $product['price'];
 
 				} else {
 
@@ -170,7 +170,7 @@ class StatamifyCart
 
 		// We need to set default address for logged in customer
 
-		if (!session('statamify.default_address')) {
+		if (User::getCurrent() && !session('statamify.default_address')) {
 
 			$this->setDefaultAddress('default');
 			$cart['shipping'] = $this->setShipping();
@@ -268,6 +268,8 @@ class StatamifyCart
 
 		}
 
+		//var_dump($cart['shipping']);exit;
+
 		// Grand total = sum of all totals
 
 		$cart['total']['grand'] = $cart['total']['sub'] + $cart['total']['discount'] + $cart['total']['shipping'] + $cart['total']['tax'];
@@ -318,46 +320,42 @@ class StatamifyCart
 
 	}
 
-	private function setDefaultAddress($key) {
+	public function setDefaultAddress($key) {
 
 		$user = User::getCurrent();
 
-		if ($user) {
+		// Find customer in Customer Collection based on the slug (email is slug)
 
-			// Find customer in Customer Collection based on the slug (email is slug)
+		$customer = Entry::whereSlug($user->id(), 'customers');
 
-			$customer = Entry::whereSlug($user->email(), 'customers');
+		if ($customer) {
 
-			if ($customer) {
+			$addresses = $customer->get('addresses');
 
-				$addresses = $customer->get('addresses');
+			if (!isset($addresses[$key])) {
 
-				if (!isset($addresses[$key])) {
+				$key = array_search(true, array_column($addresses, 'default'));
 
-					$key = array_search(true, array_column($addresses, 'default'));
+			}
 
-				}
+			// If we found address for logged in user, we format country / region
+			// and set sessions
 
-				// If we found address for logged in user, we format country / region
-				// and set sessions
+			if (!is_bool($key) && isset($addresses[$key])) {
 
-				if (!is_bool($key) && isset($addresses[$key])) {
+				$address = $addresses[$key];
 
-					$address = $addresses[$key];
+				$parts = explode(';', $address['country']);
+				$address['country'] = $parts[0];
+				$address['region'] = @$parts[1];
 
-					$parts = explode('|', $address['country']);
-					$address['country'] = $parts[0];
-					$address['region'] = $parts[1];
+				session(['statamify.default_address' => [
+					'defaultKey' => $key,
+					'default' => $address
+				]]);
+				session(['statamify.shipping_country' => $address['country']]);
 
-					session(['statamify.default_address' => [
-						'defaultKey' => $key,
-						'default' => $address
-					]]);
-					session(['statamify.shipping_country' => $address['country']]);
-
-					$this->setShipping();
-
-				}
+				$this->setShipping();
 
 			}
 

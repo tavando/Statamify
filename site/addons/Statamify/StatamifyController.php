@@ -243,7 +243,134 @@ class StatamifyController extends Controller
 
 		}
 
-		$this->api('Statamify')->setDefaultAddress($data['address']);
+		$this->api('Statamify')->cartSetDefaultAddress($data['address']);
+
+	}
+
+	public function postAddress(Request $request) {
+
+		$data = $request->all();
+
+		$messages = [
+			'addresso' => 'max:0',
+
+			'first_name.required' => 'First name is required',
+			'last_name.required' => 'Last name is required',
+			'address.required' => 'Address is required',
+			'city.required' => 'City is required',
+			'postal.required' => 'Postal is required',
+			'country.required' => 'Country is required',
+
+		];
+
+		$validator = Validator::make($data, [
+			'first_name' => 'required',
+			'last_name' => 'required',
+			'address' => 'required',
+			'city' => 'required',
+			'postal' => 'required',
+			'country' => 'required',
+		], $messages);
+
+		if ($validator->fails()) {
+
+			throw new \Exception($this->api('Statamify')->t('somethings_wrong', 'errors'));
+
+		}
+
+		$user = User::getCurrent();
+
+		if ($user) {
+
+			$customer = Entry::whereSlug($user->id(), 'customers');
+
+			if ($customer) {
+
+				$addresses = $customer->get('addresses');
+
+				$data['country'] = $data['country'] . ';' . $data['region'];
+				$index = $data['address_index'];
+
+				unset($data['region'], $data['_token'], $data['address_index'], $data['addresso']);
+
+				if ($data['default'] == 'true') {
+
+					foreach ($addresses as $key => $addr) {
+						
+						$addresses[$key]['default'] = false;
+
+					}
+
+					$data['default'] = true;
+
+				} else {
+
+					$data['default'] = false;
+
+				}
+
+				if ($index == 'new') {
+
+					$addresses[] = $data;
+
+				} else {
+
+					if (isset($addresses[$index - 1])) {
+
+						$addresses[$index - 1] = $data;
+
+					}
+
+				}
+
+				$customer->set('addresses', array_values($addresses));
+				$customer->save();
+
+				if ($index == 'new') {
+
+					return redirect('/account');
+
+				} else {
+
+					return redirect('/account/address/' . $index);
+
+				}
+
+			}
+
+		}
+
+	}
+
+	public function getAddressRemove() {
+
+		$uri = explode('/', $_SERVER['REQUEST_URI']);
+		$id = end($uri);
+
+		$user = User::getCurrent();
+
+		if ($user) {
+
+			$customer = Entry::whereSlug($user->id(), 'customers');
+
+			if ($customer) {
+
+				$addresses = $customer->get('addresses');
+
+				if (isset($addresses[$id - 1])) {
+
+					unset($addresses[$id - 1]);
+
+					$customer->set('addresses', array_values($addresses));
+					$customer->save();
+
+					return redirect('/account');
+
+				}
+
+			}
+
+		}
 
 	}
 

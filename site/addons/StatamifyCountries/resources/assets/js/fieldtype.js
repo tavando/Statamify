@@ -47,38 +47,38 @@ Vue.component('statamify_countries-fieldtype', {
 
 		country: {
 			get: function() {
-				return this.data.split('|')[0]
+				return this.data.split(';')[0]
 			},
 
 			set: function(val) {
-				data = this.data.split('|')
+				data = this.data.split(';')
 				data[0] = val
-				this.data = data.join('|')
+				this.data = data.join(';')
 			}
 		},
 
 		region: {
 			get: function() {
-				return this.data.split('|')[1]
+				return this.data.split(';')[1]
 			},
 
 			set: function(val) {
-				data = this.data.split('|')
+				data = this.data.split(';')
 				data[1] = val
-				this.data = data.join('|')
+				this.data = data.join(';')
 			}
 		},
 
 		countryName: function() {
-			return this.countries[this.data.split('|')[0]]
+			return this.countries[this.data.split(';')[0]]
 		},
 
 		regionName: function() {
-			return this.states[this.data.split('|')[1]]
+			return this.states[this.data.split(';')[1]]
 		},
 
 		states: function() {
-			country = this.data.split('|')[0]
+			country = this.data.split(';')[0]
 			if (this.regions[country] != undefined) {
 				return this.regions[country]
 			} else {
@@ -92,7 +92,7 @@ Vue.component('statamify_countries-fieldtype', {
 	ready: function() {
 
 		if (!this.data) {
-			this.data = '|'
+			this.data = ';'
 		}
 
 		this.$http.get(cp_url('/addons/statamify/countries'), function(res) {

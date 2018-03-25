@@ -64,8 +64,8 @@ class StatamifyAPI extends API
 					case 4: $price = number_format($value, 2, '.', ' '); break;
 					case 5: $price = number_format($value, 2, ',', ' '); break;
 					case 6: $price = number_format($value, 0, '', ''); break;
-					case 7: $price = number_format($value, 2, '', '.'); break;
-					case 8: $price = number_format($value, 2, '', ','); break;
+					case 7: $price = number_format($value, 2, '.', ''); break;
+					case 8: $price = number_format($value, 2, ',', ''); break;
 					
 					default:
 					$price = number_format($value, 2, '.', ' '); break;
@@ -117,6 +117,14 @@ class StatamifyAPI extends API
 		$cart = new Cart($this);
 
 		$cart->setShipping();
+
+	}
+
+	public function cartSetDefaultAddress($data) {
+
+		$cart = new Cart($this);
+
+		$cart->setDefaultAddress($data);
 
 	}
 

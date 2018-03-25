@@ -2,9 +2,9 @@
 
 namespace Statamic\Addons\Statamify\Models;
 
+use Statamic\API\Asset;
 use Statamic\API\Entry;
 use Statamic\API\File;
-use Statamic\API\Role;
 use Statamic\API\Stache;
 use Statamic\API\User;
 use Statamic\API\YAML;
@@ -40,7 +40,11 @@ class StatamifyOrder
 
 		// Create User if doesn't exist
 
-		if (!$this->data['user']) {
+		if ($this->data['user']) {
+
+			$this->user = User::getCurrent();
+
+		} else {
 
 			$this->createUser();
 
@@ -63,6 +67,38 @@ class StatamifyOrder
 			
 			$this->updateProductInventory($item);
 
+			// Add image based on the class and crop it with Glide
+
+			if ($item['variant']) {
+
+				foreach ($item['product']['gallery'] as $img) {
+
+					$asset = Asset::find($img);
+
+					if ($asset && $asset->get('title') == $item['variant']['sku']) {
+
+						$image = $asset->manipulate(['w' => 50, 'h' => 50, 'fit' => 'crop']);
+						$image_original = $img;
+
+					}
+
+				}
+
+			}
+
+			if (!isset($image)) {
+
+				$asset = Asset::find($item['product']['image']);
+
+				if ($asset) {
+
+					$image = $asset->manipulate(['w' => 50, 'h' => 50, 'fit' => 'crop']);
+					$image_original = $item['product']['image'];
+
+				}
+
+			}
+
 			// Transform data to match Statamify Order Summary addon
 			
 			$this->data['summary']['items'][] = [
@@ -70,10 +106,12 @@ class StatamifyOrder
 				'name' => $item['product']['title'],
 				'variant' => $item['variant'] ? $item['variant']['attrs'] : false,
 				'sku' => $item['variant'] ? @$item['variant']['sku'] : @$item['product']['sku'],
-				'price' => $item['variant'] ? @$item['variant']['price'] : @$item['product']['price'],
+				'price' => $item['variant'] && @$item['variant']['price'] ? $item['variant']['price'] : @$item['product']['price'],
 				'quantity' => $item['quantity'],
 				'custom' => isset($item['custom']) && $item['custom'] ? $item['custom'] : null,
-				'image' => $item['product']['image'],
+				'image' => @$image,
+				'image_original' => @$image_original,
+				'includes' => $item['product']['includes'],
 				'edit_url' => '/cp/collections/entries/products/' . $item['product']['slug']
 			];
 
@@ -83,7 +121,7 @@ class StatamifyOrder
 
 		$this->data['listing_status'] = '<span class="order-status ' . $this->data['status'] . '">' . $this->statamic->t('status.' . $this->data['status']) . '</span>';
 		$this->data['listing_total'] = $this->statamic->money($this->data['summary']['total']['grand']);
-		$this->data['listing_customer'] = $customer->get('title') . ' <a href="/cp/collections/entries/customers/' . $this->data['email'] . '" class="statamify-link"><span class="icon icon-forward"></span></a>';
+		$this->data['listing_customer'] = $customer->get('title') . ' <a href="/cp/collections/entries/customers/' . $this->user->get('id') . '" class="statamify-link"><span class="icon icon-forward"></span></a>';
 
 		$this->data['listing_email'] = $this->data['email'];
 		unset($this->data['email']);
@@ -119,14 +157,9 @@ class StatamifyOrder
 
 	private function createUser() {
 
-		// We need to assign Customer Role to user because it's not set automatically
-
-		$roles = collect(Role::all()->toArray());
-
 		$user_data = [
 			'first_name' => $this->data['shipping'][0]['first_name'],
 			'last_name' => $this->data['shipping'][0]['last_name'],
-			'roles' => [$roles->where('slug', 'customer')->keys()->first()],
 			'password' => $this->data['password']
 		];
 
@@ -136,6 +169,7 @@ class StatamifyOrder
 		->get();
 
 		$user->save();
+		$this->user = $user;
 		$this->data['user'] = $user->get('id');
 
 		unset($this->data['password'], $this->data['password_confirmation']);
@@ -144,7 +178,7 @@ class StatamifyOrder
 
 	private function getCustomer() {
 
-		$customer = Entry::whereSlug($this->data['email'], 'customers');
+		$customer = Entry::whereSlug($this->user->get('id'), 'customers');
 
 		if (!$customer) {
 
@@ -162,7 +196,7 @@ class StatamifyOrder
 				'orders' => []
 			];
 
-			$customer = Entry::create($this->data['email'])
+			$customer = Entry::create($this->user->get('id'))
 			->collection('customers')
 			->with($customer_data)
 			->published(true)
@@ -186,19 +220,11 @@ class StatamifyOrder
 
 		// Merge shipping country and region into one field
 
-		if (isset($this->data['shipping'][0]['region']) && $this->data['shipping'][0]['region'] != '') {
-
-			$this->data['shipping'][0]['country'] = $this->data['shipping'][0]['country'] . '|' . $this->data['shipping'][0]['region'];
-
-		}
+		$this->data['shipping'][0]['country'] = $this->data['shipping'][0]['country'] . ';' . @$this->data['shipping'][0]['region'];
 
 		// Merge billing country and region into one field
 
-		if (isset($this->data['billing'][0]['region']) && $this->data['billing'][0]['region'] != '') {
-
-			$this->data['billing'][0]['country'] = $this->data['billing'][0]['country'] . '|' . $this->data['billing'][0]['region'];
-
-		}
+		$this->data['billing'][0]['country'] = $this->data['billing'][0]['country'] . ';' . @$this->data['billing'][0]['region'];
 
 		// billing_diff is toggle field so we convert '1' to true
 

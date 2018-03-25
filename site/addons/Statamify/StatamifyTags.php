@@ -286,8 +286,8 @@ class StatamifyTags extends Tags
 							case 4: $price = number_format(0, 2, '.', ' '); break;
 							case 5: $price = number_format(0, 2, ',', ' '); break;
 							case 6: $price = number_format(0, 0, '', ''); break;
-							case 7: $price = number_format(0, 2, '', '.'); break;
-							case 8: $price = number_format(0, 2, '', ','); break;
+							case 7: $price = number_format(0, 2, '.', ''); break;
+							case 8: $price = number_format(0, 2, ',', ''); break;
 
 							default:
 							$price = number_format(0, 2, '.', ' '); break;
@@ -297,6 +297,36 @@ class StatamifyTags extends Tags
 						return str_replace('[symbol]', $currency['symbol'], str_replace('[price]', $price, $currency['format']));
 
 					} else {
+
+						if ($get == 'formatPriceJS') {
+
+							switch($currency['formatPrice']) {
+								case 1:
+									return "number_format(price, 0, '', ',')";
+									break;
+								case 2:
+									return "number_format(price, 0, '', ' ')";
+									break;
+								case 3:
+									return "number_format(price, 2, '.', ',')";
+									break;
+								case 4:
+									return "number_format(price, 2, '.', ' ')";
+									break;
+								case 5:
+									return "number_format(price, 2, ',', ' ')";
+									break;
+								case 6:
+									return "number_format(price, 0, '', '')";
+									break;
+								case 7:
+									return "number_format(price, 2, '.', '')";
+									break;
+								default:
+									return "number_format(price, 2, ',', '')";
+							} 
+
+						}
 
 						return isset($currency[$get]) ? $currency[$get] : '';
 
@@ -326,7 +356,7 @@ class StatamifyTags extends Tags
 		$countries = $this->api('Statamify')->countries();
 		$regions = $this->api('Statamify')->regions();
 		
-		$is_part = strpos($this->get('country'), '|') !== false;
+		$is_part = strpos($this->get('country'), ';') !== false;
 
 		if ($this->get('country') && $is_part) {
 
@@ -342,7 +372,7 @@ class StatamifyTags extends Tags
 
 			if ($is_part) {
 
-				$parts = explode('|', $country);
+				$parts = explode(';', $country);
 				$country = $parts[0];
 				$region = $parts[1];
 
@@ -383,7 +413,7 @@ class StatamifyTags extends Tags
 
 		if ($user) {
 
-			$customer = Entry::whereSlug($user->email(), 'customers');
+			$customer = Entry::whereSlug($user->id(), 'customers');
 
 			if ($customer) {
 
@@ -391,10 +421,9 @@ class StatamifyTags extends Tags
 				$addresses = $customer->get('addresses');
 
 				foreach ($addresses as $key => $address) {
-					
-					$parts = explode('|', $address['country']);
+					$parts = explode(';', $address['country']);
 					$address['country'] = $parts[0];
-					$address['region'] = $parts[1];
+					$address['region'] = @$parts[1];
 
 					if (!$default_address && $address['default']) {
 
@@ -414,13 +443,13 @@ class StatamifyTags extends Tags
 
 			} else {
 
-				return [];
+				return ['no_results' => true];
 
 			}
 
 		} else {
 
-			return [];
+			return ['no_results' => true];
 
 		}
 
@@ -428,22 +457,16 @@ class StatamifyTags extends Tags
 
 	public function defaultAddress() {
 
-		return session('statamify.default_address') ?: [];
+		return session('statamify.default_address') ?: ['no_results' => true];
 
 	}
 
-	public function gateways() {
+	public function cheque() {
 
 		return [
 
-			'cheque' => [ 
-				'active' => $this->getConfig('gateway_cheque_active'), 
-				'info' => $this->getConfig('gateway_cheque_info') 
-			],
-
-			'paypal' => [ 
-				'active' => $this->getConfig('gateway_paypal_active')
-			],
+			'active' => $this->getConfig('gateway_cheque_active'), 
+			'info' => $this->getConfig('gateway_cheque_info')
 
 		];
 
