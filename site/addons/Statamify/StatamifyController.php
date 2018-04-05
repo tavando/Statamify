@@ -146,7 +146,13 @@ class StatamifyController extends Controller
 			'shipping_method', 'payment_method', 'status', 'id', 'slug', 'url', 'last_modified'];
 			$data = array_intersect_key($order->toArray(), array_flip($whitelist));
 
-			return redirect('/store/summary')->withInput($data);
+			if ($data['payment_method']['name'] == 'PayPal') {
+
+				return $this->api('StatamifyPaypal')->charge($data);
+
+			}
+
+			return redirect('/account/order/' . $data['slug'])->withInput($data);
 
 		} else {
 
@@ -371,6 +377,21 @@ class StatamifyController extends Controller
 			}
 
 		}
+
+	}
+
+	public function getAnalytics() {
+
+		$data = $this->api('Statamify')->analytics();
+
+		return $this->view('analytics', [
+			'split' => $data['split'],
+			'total_orders' => json_encode($data['total_orders']),
+			'total_sales' => json_encode($data['total_sales']),
+			'avg_order_value' => json_encode($data['avg_order_value']),
+			'repeat_rate' => json_encode($data['repeat_rate']),
+			'money' => $data['money']
+		]);
 
 	}
 

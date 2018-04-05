@@ -5,6 +5,7 @@ namespace Statamic\Addons\Statamify;
 use Statamic\Extend\API;
 use Statamic\API\Config;
 use Statamic\API\GlobalSet;
+use Statamic\Addons\Statamify\Models\StatamifyAnalytics as Analytics;
 use Statamic\Addons\Statamify\Models\StatamifyCart as Cart;
 use Statamic\Addons\Statamify\Models\StatamifyOrder as Order;
 use Statamic\Addons\Statamify\Models\StatamifyEmail as Email;
@@ -163,6 +164,14 @@ class StatamifyAPI extends API
 
 		$email = new Email($template, $data, $to);
 		$email->create();
+
+	}
+
+	public function analytics($data = 'today', $range = []) {
+
+		$analytics = new Analytics($this, $data, $range);
+
+		return $analytics->get();
 
 	}
 

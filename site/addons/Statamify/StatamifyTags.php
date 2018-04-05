@@ -402,7 +402,9 @@ class StatamifyTags extends Tags
 			'countries' => $countries, 
 			'regions' => $regions,
 			'country' => $is_part ? $countries[$country] : $country,
-			'region' => $is_part ? (isset($regions[$region]) ? $regions[$region] : $region) : null
+			'region' => $is_part ? (isset($regions[$region]) ? $regions[$region] : $region) : null,
+			'country_code' => $country,
+			'region_code' => @$region
 		];
 
 	}
@@ -458,6 +460,32 @@ class StatamifyTags extends Tags
 	public function defaultAddress() {
 
 		return session('statamify.default_address') ?: ['no_results' => true];
+
+	}
+
+	public function customer() {
+
+		$user = User::getCurrent();
+
+		if ($user) {
+
+			$customer = Entry::whereSlug($user->get('id'), 'customers');
+
+			if ($customer) {
+
+				return $customer->toArray();
+
+			} else {
+
+				return ['no_results' => true];
+
+			}
+
+		} else {
+
+			return redirect('/account/login');
+
+		}
 
 	}
 

@@ -1,2 +1,5 @@
 routes:
   countries: getCountries
+  analytics:
+    uses: getAnalytics
+    as: statamify.analytics

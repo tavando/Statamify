@@ -317,3 +317,40 @@ table.order-summary tr.totals td {
 table.order-summary tr.totals strong {
 	color: #212b35;
 }
+
+.statamify-analytics .card-body h2 {
+	margin-top: 0;
+}
+
+.statamify-analytics {
+	padding-bottom: 50px;
+}
+
+.statamify-analytics h1 {
+	font-weight: 400
+}
+
+.statamify-analytics svg {
+	width: 100%;
+	height: 300px;
+}
+
+.statamify-analytics .legend .britechart-legend {
+	height: auto;
+	height: initial;
+}
+
+.statamify-analytics .card-body {
+	position: relative;
+}
+
+.statamify-analytics .card-body .btn {
+	position: absolute;
+	top: 16px;
+	right: 16px;
+}
+
+.statamify-analytics .month-axis .tick:nth-child(odd),
+.statamify-analytics .axis.x {
+	display: none;
+}

@@ -111,7 +111,6 @@ class StatamifyOrder
 				'custom' => isset($item['custom']) && $item['custom'] ? $item['custom'] : null,
 				'image' => @$image,
 				'image_original' => @$image_original,
-				'includes' => $item['product']['includes'],
 				'edit_url' => '/cp/collections/entries/products/' . $item['product']['slug']
 			];
 
@@ -287,6 +286,11 @@ class StatamifyOrder
 			case 'cheque':
 				$this->data['status'] = 'awaiting_payment';
 				$this->data['payment_method'] = ['name' => 'Cheque', 'fee' => 0];
+			break;
+
+			case 'paypal':
+				$this->data['status'] = 'awaiting_payment';
+				$this->data['payment_method'] = ['name' => 'PayPal', 'fee' => 0];
 			break;
 
 			case 'stripe':
