@@ -208,7 +208,11 @@
 			totalRepeatRate: function() {
 				first_time = this.repeatRate.first_time
 				returning = this.repeatRate.returning
-				return (returning / (first_time + returning)) * 100
+				if (first_time + returning) {
+					return (returning / (first_time + returning)) * 100
+				} else {
+					return '0'
+				}
 			}
 		}
 	})

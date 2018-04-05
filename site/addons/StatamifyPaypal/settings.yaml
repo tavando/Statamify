@@ -1,0 +1,21 @@
+fields:
+  active:
+    type: toggle
+    display: Enable
+    width: 25
+  sandbox:
+    type: toggle
+    display: Sandbox Mode
+    width: 25
+  business:
+    type: text
+    display: Business Email
+    validate: email
+    hide_when:
+      sandbox: true
+  business_sandbox:
+    type: text
+    display: Sandbox Business Email
+    validate: email
+    hide_when:
+      sandbox: false

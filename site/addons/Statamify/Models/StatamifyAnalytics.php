@@ -22,7 +22,7 @@ class StatamifyAnalytics
 			
 			default:
 
-				$range = [strtotime('2018-03-27 00:00'), strtotime('2018-03-27 23:59')];
+				$range = [strtotime(date('Y-m-d') . ' 00:00'), strtotime(date('Y-m-d') . ' 23:59')];
 
 				return $this->summary($range, 'perhour');
 				break;
