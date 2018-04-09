@@ -167,9 +167,9 @@ class StatamifyAPI extends API
 
 	}
 
-	public function analytics($data = 'today', $range = []) {
+	public function analytics($range = [], $split = 'perday') {
 
-		$analytics = new Analytics($this, $data, $range);
+		$analytics = new Analytics($this, $range, $split);
 
 		return $analytics->get();
 

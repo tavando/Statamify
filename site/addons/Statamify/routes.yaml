@@ -3,3 +3,6 @@ routes:
   analytics:
     uses: getAnalytics
     as: statamify.analytics
+  post@analytics:
+    uses: postAnalytics
+    as: statamify.analytics

@@ -8,30 +8,33 @@ use Statamic\API\Entry;
 class StatamifyAnalytics
 {
 
-	public function __construct($statamic, $data = 'today', $range = []) {
+	public function __construct($statamic, $range = [], $split = 'perday') {
 
 		$this->statamic = $statamic;
-		$this->data = $data;
 		$this->range = $range;
+		$this->split = $split;
 
 	}
 
 	public function get() {
 
-		switch ($this->data) {
-			
-			default:
+		if (count($this->range)) {
 
-				$range = [strtotime(date('Y-m-d') . ' 00:00'), strtotime(date('Y-m-d') . ' 23:59')];
+			return $this->summary(array_map(function($date) { return strtotime($date); }, $this->range), $this->split);
 
-				return $this->summary($range, 'perhour');
-				break;
+		} else {
+
+			$range = [strtotime(date('Y-m-d') . ' 00:00:00'), strtotime(date('Y-m-d') . ' 23:59:59')];
+
+			return $this->summary($range, 'perhour');
+
 		}
 
 	}
 
-	private function summary($range, $split = 'perday') {
+	private function summary($range, $split) {
 
+		$format = $split == 'perhour' ? 'H' : 'Y-m-d';
 		$orders = collect(Entry::whereCollection('orders')->toArray());
 
 		$filtered = $orders->filter(function($order) use ($range) {
@@ -43,39 +46,43 @@ class StatamifyAnalytics
 
 		});
 
-		if ($split == 'perhour') {
+		$grouped = $filtered->groupBy(function ($order) use ($format) {
 
-			$grouped = $filtered->groupBy(function ($order) {
+			return date($format, $order['datestamp']);
 
-				return date('H', $order['datestamp']);
+		});
 
-			});
+		$grouped = $grouped->toArray();
 
-			$grouped = $grouped->toArray();
+		if ($split == 'perday') {
+
+			$total_orders = $total_sales = $avg_order_value = $this->day_range($range[0], $range[1]);
+
+		} else {
 
 			$total_orders = $total_sales = $avg_order_value = $this->time_range($range[0]);
 
-			foreach ($total_orders as $item_key => $item) {
-				
-				$hour = date('H', strtotime($item['date']));
+		}
 
-				if (isset($grouped[$hour])) {
+		foreach ($total_orders as $item_key => $item) {
 
-					$count = count($grouped[$hour]);
+			$hour = date($format, strtotime($item['date']));
 
-					$total_orders[$item_key]['value'] = $count;
-					
-					$total_sales[$item_key]['value'] = array_reduce($grouped[$hour], function($sum, $order) {
-						$sum += $order['summary']['total']['grand'];
-						return $sum;
-					});
+			if (isset($grouped[$hour])) {
 
-					$avg_order_value[$item_key]['value'] = array_reduce($grouped[$hour], function($sum, $order) use ($count) {
-						$sum += $order['summary']['total']['grand']/$count;
-						return $sum;
-					});
+				$count = count($grouped[$hour]);
 
-				}
+				$total_orders[$item_key]['value'] = $count;
+
+				$total_sales[$item_key]['value'] = array_reduce($grouped[$hour], function($sum, $order) {
+					$sum += $order['summary']['total']['grand'];
+					return $sum;
+				});
+
+				$avg_order_value[$item_key]['value'] = array_reduce($grouped[$hour], function($sum, $order) use ($count) {
+					$sum += $order['summary']['total']['grand']/$count;
+					return $sum;
+				});
 
 			}
 
@@ -123,6 +130,25 @@ class StatamifyAnalytics
 			$key = date('H:i:s', strtotime(date('Y-m-d') . ' + ' . $h . ' hours'));
 			$formatter[] = ['value' => 0, 'date' => date('Y-m-d', $day) . 'T' . $key];
 			$h++;
+		}
+
+		return $formatter;
+	}
+
+	private function day_range($start, $end) {
+		$h = 0;
+		$formatter = [];
+
+		$end = new \DateTime(date('Y-m-d', $end));
+
+		$period = new \DatePeriod(
+			new \DateTime(date('Y-m-d', $start)),
+			new \DateInterval('P1D'),
+			$end->modify('+1 day')
+		);
+
+		foreach ($period as $key => $value) {
+			$formatter[] = ['value' => 0, 'date' => $value->format('Y-m-d')];    
 		}
 
 		return $formatter;

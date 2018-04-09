@@ -350,7 +350,7 @@ table.order-summary tr.totals strong {
 	right: 16px;
 }
 
-.statamify-analytics .month-axis .tick:nth-child(odd),
-.statamify-analytics .axis.x {
+.statamify-analytics[data-type="perhour"] .month-axis .tick:nth-child(odd),
+.statamify-analytics[data-type="perhour"] .axis.x {
 	display: none;
 }

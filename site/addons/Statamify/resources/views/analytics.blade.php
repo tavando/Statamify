@@ -2,9 +2,10 @@
 
 @section('content')
 
-<div class="dashboard statamify-analytics" id="statamify-analytics">
+<div class="dashboard statamify-analytics" id="statamify-analytics" data-type="${ split }">
 	<div class="flexy mb-24">
 		<h1 class="fill">Analytics</h1>
+		<input name="daterange">
 	</div>
 
 	<div class="widgets">
@@ -60,10 +61,15 @@
 
 @section('scripts')
 
+<script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1/jquery.min.js"></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="/_resources/addons/Statamify/js/daterangepicker.js"></script>
+
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/4.7.4/d3.js"></script>
 <script src="//cdn.jsdelivr.net/npm/britecharts@2/dist/bundled/britecharts.min.js"></script>
 
 <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/britecharts/dist/css/britecharts.min.css" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/_resources/addons/Statamify/css/daterangepicker.css" />
 
 <script>
 
@@ -82,17 +88,26 @@
 
 		ready: function() {
 			
-			var lineChart = britecharts.line(), tooltip = britecharts.tooltip()
+			this.createChart()
 
-			var lineData =  {
-				dataByTopic: [{
-					topicName: this.name.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-					topic: 1,
-					dates: this.$parent[camelize(this.name.replace(/-/g, ' '))]
-				}]
-			};
+		},
 
-			lineChart
+		methods: {
+			createChart: function() {
+
+				$('#' + this.name).html('')
+
+				var lineChart = britecharts.line(), tooltip = britecharts.tooltip()
+
+				var lineData =  {
+					dataByTopic: [{
+						topicName: this.name.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+						topic: 1,
+						dates: this.$parent[camelize(this.name.replace(/-/g, ' '))]
+					}]
+				};
+
+				lineChart
 				.margin({
 					top: 60,
 					bottom: 50,
@@ -103,22 +118,26 @@
 				.height(300)
 				.grid('full')
 				.isAnimated(true)
-				.xAxisFormat(this.$parent.split == 'perday' ? britecharts.line().axisTimeCombinations.HOUR_DAY : britecharts.line().axisTimeCombinations.MINUTE_HOUR)
 				.on('customMouseOver', tooltip.show)
 				.on('customMouseMove', tooltip.update)
 				.on('customMouseOut', tooltip.hide);
 
-			tooltip.title('Date');
+				if (this.$parent.split == 'perday') {
+					lineChart.xAxisFormat('custom').xTicks(10)
+				} else {
+					lineChart.xAxisFormat(britecharts.line().axisTimeCombinations.MINUTE_HOUR)
+				}
 
-			if (this.$parent.split == 'perhour') {
+				tooltip.title('Date');
 
-				tooltip.dateFormat(tooltip.axisTimeCombinations.MINUTE_HOUR)
+				if (this.$parent.split == 'perhour') {
+					tooltip.dateFormat(tooltip.axisTimeCombinations.MINUTE_HOUR)
+				}
+
+				d3.select('#' + this.name).datum(lineData).call(lineChart);
+				d3.select('#' + this.name + ' .metadata-group .vertical-marker-container').datum(lineData).call(tooltip)
 
 			}
-
-			d3.select('#' + this.name).datum(lineData).call(lineChart);
-			d3.select('#' + this.name + ' .metadata-group .vertical-marker-container').datum(lineData).call(tooltip)
-
 		}
 	})
 
@@ -129,58 +148,69 @@
 
 		ready: function() {
 			
-			var donutChart = britecharts.donut(), legend = britecharts.legend(),
+			this.createChart()
 
-			legendContainer = d3.select('#' + this.name + ' + .legend'),
+		},
 
-			first_time = this.$parent.repeatRate.first_time,
-			returning = this.$parent.repeatRate.returning;
+		methods: {
+			createChart: function() {
 
-			var donutData = [
-				{
-					quantity: first_time,
-					percentage: (first_time / (first_time + returning)) * 100,
-					name: 'First-time',
-					id: 1
-				},
-				{
-					quantity: returning,
-					percentage: (returning / (first_time + returning)) * 100,
-					name: 'Returning',
-					id: 2
-				}
-			];
+				$('#' + this.name).html('')
+				$('#' + this.name).next().html('')
 
-			width = $('#' + this.name).width() - 10
+				var donutChart = britecharts.donut(), legend = britecharts.legend(),
 
-			donutChart
-				.margin({
-					top: 60,
-					bottom: 50,
-					left: 50,
-					right: 20
-				})
-				.width(width)
-				.height(300)
-				.externalRadius(width/5)
-				.internalRadius(width/10)
-				.isAnimated(true)
-				.on('customMouseOver', function(data) {
-					legendChart.highlight(data.data.id);
-				})
-				.on('customMouseOut', function() {
-					legendChart.clearHighlight();
-				});
+				legendContainer = d3.select('#' + this.name + ' + .legend'),
 
-			legend
-				.isHorizontal(true)
-				.width($('#' + this.name).width() - 10)
-				.markerSize(8)
-				.height(40)
+				first_time = this.$parent.repeatRate.first_time,
+				returning = this.$parent.repeatRate.returning;
 
-			d3.select('#' + this.name).datum(donutData).call(donutChart)
-			legendContainer.datum(donutData).call(legend)
+				var donutData = [
+					{
+						quantity: first_time,
+						percentage: (first_time / (first_time + returning)) * 100,
+						name: 'First-time',
+						id: 1
+					},
+					{
+						quantity: returning,
+						percentage: (returning / (first_time + returning)) * 100,
+						name: 'Returning',
+						id: 2
+					}
+				];
 
+				width = $('#' + this.name).width() - 10
+
+				donutChart
+					.margin({
+						top: 60,
+						bottom: 50,
+						left: 50,
+						right: 20
+					})
+					.width(width)
+					.height(300)
+					.externalRadius(width/5)
+					.internalRadius(width/10)
+					.isAnimated(true)
+					.on('customMouseOver', function(data) {
+						legendChart.highlight(data.data.id);
+					})
+					.on('customMouseOut', function() {
+						legendChart.clearHighlight();
+					});
+
+				legend
+					.isHorizontal(true)
+					.width($('#' + this.name).width() - 10)
+					.markerSize(8)
+					.height(40)
+
+				d3.select('#' + this.name).datum(donutData).call(donutChart)
+				legendContainer.datum(donutData).call(legend)
+
+			}
 		}
 	})
 
@@ -213,6 +243,48 @@
 				} else {
 					return '0'
 				}
+			}
+		},
+		ready: function() {
+			vm = this
+			$('input[name="daterange"]').daterangepicker({
+				locale: {
+					format: 'MMMM D, YYYY'
+				},
+				ranges: {
+					'Today': [moment(), moment()],
+					'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+					'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+					'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+					'This Month': [moment().startOf('month'), moment().endOf('month')],
+					'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+				},
+				"alwaysShowCalendars": true,
+				"startDate": moment(),
+				"endDate": moment(),
+				"opens": "left",
+				"applyClass": "btn-primary"
+			}, function(start, end, label) {
+				this.split = start.diff(end, 'hours') == -23 ? 'perhour' : 'perday'
+				vm.changeDate(start.format('YYYY-MM-DD H:mm:ss'), end.format('YYYY-MM-DD H:mm:ss'), this.split)
+			});
+
+		},
+		methods: {
+			changeDate(start, end, split) {
+				this.$http.post(cp_url('/addons/statamify/analytics'), {start:start, end:end, split:split}, function(res) {
+
+					this.$set('split', res.split)
+					this.$set('totalOrders', res.total_orders)
+					this.$set('totalSales', res.total_sales)
+					this.$set('averageOrderValue', res.avg_order_value)
+					this.$set('repeatRate', res.repeat_rate)
+
+					_.each(this.$children, function(c) {
+						console.log(c.createChart())
+					})
+
+				});
 			}
 		}
 	})

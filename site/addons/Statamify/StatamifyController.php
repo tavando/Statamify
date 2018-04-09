@@ -395,4 +395,23 @@ class StatamifyController extends Controller
 
 	}
 
+	public function postAnalytics(Request $request) {
+
+		$this->authorize('super');
+
+		$post = $request->all();
+
+		$data = $this->api('Statamify')->analytics([$post['start'], $post['end']], $post['split']);
+
+		return json_encode([
+			'split' => $data['split'],
+			'total_orders' => array_values($data['total_orders']),
+			'total_sales' => array_values($data['total_sales']),
+			'avg_order_value' => array_values($data['avg_order_value']),
+			'repeat_rate' => $data['repeat_rate'],
+			'money' => $data['money']
+		]);
+
+	}
+
 }
