@@ -2,6 +2,7 @@
 
 namespace Statamic\Addons\Statamify\Models;
 
+use Auth;
 use Statamic\API\Asset;
 use Statamic\API\Entry;
 use Statamic\API\File;
@@ -104,6 +105,7 @@ class StatamifyOrder
 			$this->data['summary']['items'][] = [
 				'id' => $item['item_id'],
 				'name' => $item['product']['title'],
+				'includes' => $item['product']['includes'],
 				'variant' => $item['variant'] ? $item['variant']['attrs'] : false,
 				'sku' => $item['variant'] ? @$item['variant']['sku'] : @$item['product']['sku'],
 				'price' => $item['variant'] && @$item['variant']['price'] ? $item['variant']['price'] : @$item['product']['price'],
@@ -173,6 +175,8 @@ class StatamifyOrder
 
 		unset($this->data['password'], $this->data['password_confirmation']);
 
+		Auth::loginUsingId($user->id());
+
 	}
 
 	private function getCustomer() {
@@ -219,11 +223,11 @@ class StatamifyOrder
 
 		// Merge shipping country and region into one field
 
-		$this->data['shipping'][0]['country'] = $this->data['shipping'][0]['country'] . ';' . @$this->data['shipping'][0]['region'];
+		$this->data['shipping'][0]['country'] = $this->data['shipping'][0]['country'] . ';' . $this->data['shipping'][0]['region'];
 
 		// Merge billing country and region into one field
 
-		$this->data['billing'][0]['country'] = $this->data['billing'][0]['country'] . ';' . @$this->data['billing'][0]['region'];
+		$this->data['billing'][0]['country'] = $this->data['billing'][0]['country'] . ';' . $this->data['billing'][0]['region'];
 
 		// billing_diff is toggle field so we convert '1' to true
 
@@ -245,37 +249,12 @@ class StatamifyOrder
 
 		$shipping_method = explode('|', $this->data['shipping_method']);
 		$zone = $shipping_zones[$shipping_method[0]];
-		$this->data['shipping_method'] = ['zone' => $zone['name']];
 
-		// Add shipping methods details
-
-		foreach (@$zone['price_rates'] as $rate) {
-			
-			if (slugify($rate['name']) == $shipping_method[1]) {
-
-				$this->data['shipping_method']['name'] = $rate['name'];
-				$this->data['shipping_method']['rate'] = @$rate['rate'] ?: 0;
-
-			}
-
-		}
-
-		// If there are no shipping methods - maybe we should check weight rates
-
-		if (!isset($this->data['shipping_method']['name'])) {
-
-			foreach (@$zone['weight_rates'] as $rate) {
-
-				if (slugify($rate['name']) == $shipping_method[1]) {
-
-					$this->data['shipping_method']['name'] = $rate['name'];
-					$this->data['shipping_method']['rate'] = @$rate['rate'] ?: 0;
-
-				}
-
-			}
-
-		}
+		$this->data['shipping_method'] = [
+			'zone' => $zone['name'],
+			'name' => $shipping_method[1],
+			'rate' => $this->cart['total']['shipping']
+		];
 
 	}
 

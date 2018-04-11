@@ -386,6 +386,7 @@ class StatamifyController extends Controller
 
 		return $this->view('analytics', [
 			'split' => $data['split'],
+			'all_orders' => json_encode($data['all_orders']),
 			'total_orders' => json_encode($data['total_orders']),
 			'total_sales' => json_encode($data['total_sales']),
 			'avg_order_value' => json_encode($data['avg_order_value']),
@@ -405,6 +406,7 @@ class StatamifyController extends Controller
 
 		return json_encode([
 			'split' => $data['split'],
+			'all_orders' => array_values($data['all_orders']),
 			'total_orders' => array_values($data['total_orders']),
 			'total_sales' => array_values($data['total_sales']),
 			'avg_order_value' => array_values($data['avg_order_value']),

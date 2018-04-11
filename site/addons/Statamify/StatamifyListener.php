@@ -2,6 +2,7 @@
 
 namespace Statamic\Addons\Statamify;
 
+use Statamic\API\Asset;
 use Statamic\API\Nav;
 use Statamic\API\Entry;
 use Statamic\Extend\Listener;
@@ -155,7 +156,10 @@ class StatamifyListener extends Listener
 
 		if ($entry->get('image')) {
 
-			return '<div class="statamify-thumb" style="background-image: url(' . $entry->get('image') . ')"></div>';
+			$asset = Asset::find($entry->get('image'));
+			$image = $asset->manipulate(['w' => 50, 'h' => 50, 'fit' => 'crop']);
+
+			return '<div class="statamify-thumb" style="background-image: url(' . $image . ')"></div>';
 
 		} else {
 

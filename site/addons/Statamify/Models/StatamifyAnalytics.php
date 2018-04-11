@@ -56,11 +56,11 @@ class StatamifyAnalytics
 
 		if ($split == 'perday') {
 
-			$total_orders = $total_sales = $avg_order_value = $this->day_range($range[0], $range[1]);
+			$all_orders = $total_orders = $total_sales = $avg_order_value = $this->day_range($range[0], $range[1]);
 
 		} else {
 
-			$total_orders = $total_sales = $avg_order_value = $this->time_range($range[0]);
+			$all_orders = $total_orders = $total_sales = $avg_order_value = $this->time_range($range[0]);
 
 		}
 
@@ -83,6 +83,8 @@ class StatamifyAnalytics
 					$sum += $order['summary']['total']['grand']/$count;
 					return $sum;
 				});
+
+				$all_orders[$item_key]['value'] = $grouped[$hour];
 
 			}
 
@@ -114,6 +116,7 @@ class StatamifyAnalytics
 
 		return [
 			'split' => $split,
+			'all_orders' => $all_orders,
 			'total_orders' => $total_orders,
 			'total_sales' => $total_sales,
 			'avg_order_value' => $avg_order_value,

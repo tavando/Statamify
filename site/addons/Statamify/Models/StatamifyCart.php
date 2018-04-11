@@ -227,11 +227,11 @@ class StatamifyCart
 
 						}
 
-						// If method matches criteria, add it to cart's shipping methods. Slugify name to use it as ID
+						// If method matches criteria, add it to cart's shipping methods
 
 						if ($condition) {
 
-							$shipping_methods[slugify($method['name'])] = $method;
+							$shipping_methods[$method['name']] = $method;
 
 						}
 

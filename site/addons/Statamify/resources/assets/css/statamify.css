@@ -354,3 +354,8 @@ table.order-summary tr.totals strong {
 .statamify-analytics[data-type="perhour"] .axis.x {
 	display: none;
 }
+
+[name="daterange"] {
+	min-width: 270px;
+	text-align: center;
+}
