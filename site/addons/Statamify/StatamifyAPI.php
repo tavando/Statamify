@@ -129,6 +129,14 @@ class StatamifyAPI extends API
 
 	}
 
+	public function cartAddCoupon($coupon, $instance = 'cart') {
+
+		$cart = new Cart($this, $instance);
+
+		return $cart->addCoupon($coupon);
+
+	}
+
 	public function orderCreate($data) {
 
 		$order = new Order($this);

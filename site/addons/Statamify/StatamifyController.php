@@ -380,6 +380,26 @@ class StatamifyController extends Controller
 
 	}
 
+	public function postCoupon(Request $request) {
+
+		$data = $request->all();
+
+		$messages = [ 'coupon.required' => 'Coupon code is required' ];
+
+		$validator = Validator::make($data, [
+			'coupon' => 'required',
+		], $messages);
+
+		if ($validator->fails()) {
+
+			throw new \Exception($this->api('Statamify')->t('somethings_wrong', 'errors'));
+
+		}
+
+		return $this->api('Statamify')->cartAddCoupon($data['coupon']);
+
+	}
+
 	public function getAnalytics() {
 
 		$data = $this->api('Statamify')->analytics();

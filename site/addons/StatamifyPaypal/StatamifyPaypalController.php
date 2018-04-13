@@ -17,7 +17,12 @@ class StatamifyPaypalController extends Controller
 
 		$ipn = new PaypalIPN();
 
-		$ipn->useSandbox();
+		if ($this->getConfig('sandbox', true)) {
+
+				$ipn->useSandbox();
+
+		}
+		
 		$verified = $ipn->verifyIPN();
 
 		if ($verified) {
@@ -40,7 +45,7 @@ class StatamifyPaypalController extends Controller
 
 				$summary = $order->get('summary');
 
-				if ($summary['total']['grand'] != $data['payment_gross']) { $error = true; }
+				if ($summary['total']['grand'] != $data['mc_gross']) { $error = true; }
 
 				// Check if payment status is Completed
 
@@ -53,7 +58,7 @@ class StatamifyPaypalController extends Controller
 				if (!$error) {
 
 					$payment_method = $order->get('payment_method');
-					$payment_method['fee'] = $data['payment_fee'];
+					$payment_method['fee'] = $data['mc_fee'];
 					$payment_method['id'] = $data['txn_id'];
 
 					$order->set('payment_method', $payment_method);
@@ -62,8 +67,6 @@ class StatamifyPaypalController extends Controller
 					$order->save();
 
 					Stache::update();
-
-					return redirect('/account/order/' . $order->slug());
 
 				} else {
 

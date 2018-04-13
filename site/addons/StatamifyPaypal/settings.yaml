@@ -6,16 +6,14 @@ fields:
   sandbox:
     type: toggle
     display: Sandbox Mode
-    width: 25
+    width: 75
   business:
     type: text
     display: Business Email
     validate: email
-    hide_when:
-      sandbox: true
+    width: 50
   business_sandbox:
     type: text
     display: Sandbox Business Email
     validate: email
-    hide_when:
-      sandbox: false
+    width: 50

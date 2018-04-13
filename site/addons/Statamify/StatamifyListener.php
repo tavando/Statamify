@@ -448,7 +448,7 @@ class StatamifyListener extends Listener
 
 			if($data['used_by'] != @$data_original['used_by']) {
 
-				$entry->set('listing_used', count($data['used_by']));
+				$entry->set('listing_used', count(explode(';', preg_replace('/\s+/', '', $data['used_by']))));
 				$entry->save();
 
 			}

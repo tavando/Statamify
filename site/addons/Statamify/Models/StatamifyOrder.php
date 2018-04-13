@@ -105,7 +105,6 @@ class StatamifyOrder
 			$this->data['summary']['items'][] = [
 				'id' => $item['item_id'],
 				'name' => $item['product']['title'],
-				'includes' => $item['product']['includes'],
 				'variant' => $item['variant'] ? $item['variant']['attrs'] : false,
 				'sku' => $item['variant'] ? @$item['variant']['sku'] : @$item['product']['sku'],
 				'price' => $item['variant'] && @$item['variant']['price'] ? $item['variant']['price'] : @$item['product']['price'],

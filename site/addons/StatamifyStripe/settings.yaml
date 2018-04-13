@@ -16,13 +16,11 @@ fields:
     keys:
       public_key: Public Key
       secret_key: Secret Key
-    hide_when:
-      test: true
+    width: 50
   keys_test:
     type: array
     display: Stripe Settings - Test Mode
     keys:
       public_key: Test Public Key
       secret_key: Test Secret Key
-    hide_when:
-      test: false
+    width: 50

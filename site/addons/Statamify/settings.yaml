@@ -210,24 +210,3 @@ fields:
 	gateway_cheque_end:
 		type: fieldblock
 		end: true
-	gateway_paypal_start:
-		type: fieldblock
-		display: PayPal Gateway
-	gateway_paypal_settings:
-		type: array
-		display: PayPal Settings
-		keys:
-			username: API Username
-			password: API Password
-		width: 50
-	gateway_paypal_sandbox:
-		type: toggle
-		display: Sandbox Mode
-		width: 25
-	gateway_paypal_active:
-		type: toggle
-		display: Enable
-		width: 25
-	gateway_paypal_end:
-		type: fieldblock
-		end: true

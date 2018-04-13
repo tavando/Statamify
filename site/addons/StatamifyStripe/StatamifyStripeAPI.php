@@ -34,8 +34,8 @@ class StatamifyStripeAPI extends API
 		$token = $order['payment_token'];
 
 		$charge = Charge::create([
-			'amount' => $cart['total']['grand'],
-			'currency' => 'usd',
+			'amount' => $cart['total']['grand'] * 100,
+			'currency' => 'eur',
 			'description' => $order['title'],
 			'source' => $token
 		]);
