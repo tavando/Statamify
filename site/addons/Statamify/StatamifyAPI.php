@@ -57,6 +57,9 @@ class StatamifyAPI extends API
 
 				$currency = $currencies[$key];
 				$priceFormat = $currency['formatPrice'];
+				$minus = false;
+
+				if ($value < 0) { $value *= -1; $minus = true; }
 
 				switch ($priceFormat) {
 					case 1: $price = number_format($value, 0, '', ','); break;
@@ -73,7 +76,7 @@ class StatamifyAPI extends API
 					break;
 				}
 
-				return str_replace('[symbol]', $currency['symbol'], str_replace('[price]', $price, $currency['format']));
+				return ($minus ? '- ' : '') . str_replace('[symbol]', $currency['symbol'], str_replace('[price]', $price, $currency['format']));
 
 			}
 
@@ -134,6 +137,120 @@ class StatamifyAPI extends API
 		$cart = new Cart($this, $instance);
 
 		return $cart->addCoupon($coupon);
+
+	}
+
+	public function cartRemoveCoupon($id, $instance = 'cart') {
+
+		$cart = new Cart($this, $instance);
+
+		return $cart->removeCoupon($id);
+
+	}
+
+	public function cartCheckCoupon($cart, $coupon_entry, $coupon, $email) {
+
+		// Check if minimum purches in met
+
+		if ($coupon_entry->get('min')) {
+
+			if ((float) $cart['total']['sub'] < (float) $coupon_entry->get('min')) {
+
+				return ['status' => 'error', 'error' => 'min'];
+
+			}
+
+		}
+
+		// Check if shipping country is in selected countries
+
+		if ($coupon_entry->get('countries')) {
+
+			$shipping_country = session('statamify.shipping_country');
+
+			if (!in_array($shipping_country, $coupon_entry->get('countries'))) {
+
+				return ['status' => 'error', 'error' => 'countries'];
+
+			}
+
+		}
+
+		// Check if logged in customer's email is in selected emails
+
+		if ($coupon_entry->get('customers') && array_filter($coupon_entry->get('customers'))) {
+
+			if (!$email || ($email && !in_array($email, $coupon_entry->get('customers')))) {
+
+			return ['status' => 'error', 'error' => 'customers'];
+
+			}
+
+		}
+
+		// Check if total number of coupons are used
+
+		if ($coupon_entry->get('total')) {
+
+			if ($coupon_entry->get('used_by') && $coupon_entry->get('total') == count()) {
+
+				return ['status' => 'error', 'error' => 'total'];
+
+			}
+
+		}
+
+		// Check if total number of coupons per user is used
+
+		if ($coupon_entry->get('per_user')) {
+
+			if (!$email) {
+
+				return ['status' => 'error', 'error' => 'per_user'];
+
+			}
+
+			if ($coupon_entry->get('used_by')) {
+
+				$emails_collection = collect(explode(';', preg_replace('/\s+/', '', $coupon_entry->get('used_by'))));
+
+				$filtered = $emails_collection->reject(function ($value) use($email) {
+					return $value != $email;
+				});
+
+				if ($coupon_entry->get('per_user') == $filtered->count()) {
+
+					return ['status' => 'error', 'error' => 'per_user'];
+
+				}
+
+			}
+
+		}
+
+		// Check dates
+
+		if ($coupon_entry->get('start_date')) {
+
+			if( strtotime($coupon_entry->get('start_date')) > strtotime('now') ) {
+
+				return ['status' => 'error', 'error' => 'start_date'];
+
+			}
+
+		}
+
+		if ($coupon_entry->get('end_date')) {
+
+			if( strtotime($coupon_entry->get('end_date')) < strtotime('now') ) {
+
+				return ['status' => 'error', 'error' => 'end_date'];
+
+			}
+
+		}
+
+		return [ 'status' => 'ok' ];
 
 	}
 

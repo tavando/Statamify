@@ -641,7 +641,7 @@ class StatamifyCart
 		$cart = $this->get();
 		$user = User::getCurrent();
 
-		if ($user) {
+		if ($user && $email == '') {
 
 			$email = $user->email();
 
@@ -663,13 +663,21 @@ class StatamifyCart
 
 			if ($coupon_entry) {
 
-				$this->checkCoupon($coupon_entry, $coupon, $email = '');
+				$validate_coupon = $this->statamic->cartCheckCoupon($cart, $coupon_entry, $coupon, $email);
 
-				$this->session['coupons'][] = $coupon;
+				if ($validate_coupon['status'] == 'ok') {
 
-				session(['statamify.' . $this->instance => $this->session]);
+					$this->session['coupons'][] = $coupon;
 
-				return $this->get();
+					session(['statamify.' . $this->instance => $this->session]);
+
+					return $this->get();
+
+				} else {
+
+					return $this->statamic->response(500, $this->statamic->t('coupon_not_valid', 'errors'));
+
+				}
 
 
 			} else {
@@ -686,107 +694,17 @@ class StatamifyCart
 
 	}
 
-	public function checkCoupon($coupon_entry, $coupon, $email) {
+	public function removeCoupon($index) {
 
-		// Check if minimum purches in met
+		$coupons = $this->session['coupons'];
 
-		if ($coupon_entry->get('min')) {
+		unset($coupons[$index]);
 
-			if ((float) $cart['total']['sub'] < (float) $coupon_entry->get('min')) {
+		$this->session['coupons'] = array_values($coupons);
 
-				$this->statamic->response(500, $this->statamic->t('coupon_not_valid', 'errors') . '. Minimum');
+		session(['statamify.' . $this->instance => $this->session]);
 
-			}
-
-		}
-
-		// Check if shipping country is in selected countries
-
-		if ($coupon_entry->get('countries')) {
-
-			$shipping_country = session('statamify.shipping_country');
-
-			if (!in_array($shipping_country, $coupon_entry->get('countries'))) {
-
-				$this->statamic->response(500, $this->statamic->t('coupon_not_valid', 'errors') . '. Country');
-
-			}
-
-		}
-
-		// Check if logged in customer's email is in selected emails
-
-		if ($coupon_entry->get('customers') && array_filter($coupon_entry->get('customers'))) {
-
-			if (!$email || ($email && !in_array($email, $coupon_entry->get('customers')))) {
-
-				$this->statamic->response(500, $this->statamic->t('coupon_not_valid', 'errors') . '. Email');
-
-			}
-
-		}
-
-		// Check if total number of coupons are used
-
-		if ($coupon_entry->get('total')) {
-
-			if ($coupon_entry->get('used_by') && $coupon_entry->get('total') == count()) {
-
-				$this->statamic->response(500, $this->statamic->t('coupon_not_valid', 'errors') . '. Total');
-
-			}
-
-		}
-
-		// Check if total number of coupons per user is used
-
-		if ($coupon_entry->get('per_user')) {
-
-			if (!$email) {
-
-				$this->statamic->response(500, $this->statamic->t('coupon_not_valid', 'errors') . '. Per user email');
-
-			}
-
-			if ($coupon_entry->get('used_by')) {
-
-				$emails_collection = collect(explode(';', preg_replace('/\s+/', '', $coupon_entry->get('used_by'))));
-
-				$filtered = $emails_collection->reject(function ($value) use($email) {
-					return $value != $email;
-				});
-
-				if ($coupon_entry->get('per_user') == $filtered->count()) {
-
-					$this->statamic->response(500, $this->statamic->t('coupon_not_valid', 'errors') . '. Per user total');
-
-				}
-
-			}
-
-		}
-
-		// Check dates
-
-		if ($coupon_entry->get('start_date')) {
-
-			if( strtotime($coupon_entry->get('start_date')) > strtotime('now') ) {
-
-				$this->statamic->response(500, $this->statamic->t('coupon_not_valid', 'errors') . '. Start');
-
-			}
-
-		}
-
-		if ($coupon_entry->get('end_date')) {
-
-			if( strtotime($coupon_entry->get('end_date')) < strtotime('now') ) {
-
-				$this->statamic->response(500, $this->statamic->t('coupon_not_valid', 'errors') . '. End');
-
-			}
-
-		}
+		return $this->get();
 
 	}
 

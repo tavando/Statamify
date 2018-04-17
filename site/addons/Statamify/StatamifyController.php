@@ -400,6 +400,26 @@ class StatamifyController extends Controller
 
 	}
 
+	public function postCouponRemove(Request $request) {
+
+		$data = $request->all();
+
+		$messages = [ 'id.required' => 'Coupon ID is required' ];
+
+		$validator = Validator::make($data, [
+			'id' => 'required',
+		], $messages);
+
+		if ($validator->fails()) {
+
+			throw new \Exception($this->api('Statamify')->t('somethings_wrong', 'errors'));
+
+		}
+
+		return $this->api('Statamify')->cartRemoveCoupon($data['id']);
+
+	}
+
 	public function getAnalytics() {
 
 		$data = $this->api('Statamify')->analytics();

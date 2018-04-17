@@ -24,6 +24,28 @@ class StatamifyOrder
 
 		$this->data = $data;
 
+		// Check again coupons
+
+		$coupons = $this->cart['coupons'];
+
+		if (count($coupons)) {
+
+			foreach ($coupons as $coupon) {
+
+				$coupon_entry = Entry::whereSlug($coupon, 'coupons');
+				$validate_coupon = $this->statamic->cartCheckCoupon($this->cart, $coupon_entry, $coupon, $this->data['email']);
+
+				if ($validate_coupon['status'] != 'ok') {
+
+					throw new \Exception($this->statamic->t('coupon_not_valid', 'errors'));
+
+				}
+
+
+			}
+
+		}
+
 		$order_next_id = $this->statamic->getConfigInt('order_next_id', 1000);
 		$order_id_format = $this->statamic->getConfig('order_id_format', '#[id]');
 
