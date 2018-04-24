@@ -149,10 +149,10 @@
 	function money(price) {
 
 		price = parseFloat(price).toFixed(2)
-		price = {!! $money['format'] !!}
-		formatMoney = '{{ $money['formatMoney'] }}'
+    price = {!! $moneyFormatFn !!}
+    formatMoney = '{{ $moneyFormat }}'
 
-		return formatMoney.replace('[symbol]', '{!! $money['symbol'] !!}').replace('[price]', price)
+    return formatMoney.replace('[symbol]', '{!! $moneySymbol !!}').replace('[price]', price)
 
 	}
 

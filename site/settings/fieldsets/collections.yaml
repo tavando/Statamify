@@ -1,9 +1,0 @@
-taxonomies: false
-title: Collections
-fields:
-  products:
-    type: collection
-    display: Products
-    collection:
-      - products
-    mode: panes

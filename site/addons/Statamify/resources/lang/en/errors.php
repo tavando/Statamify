@@ -2,9 +2,6 @@
 
 return [
 
-	'coupon_not_found' => 'Coupon doesn\'t exist',
-	'coupon_not_valid' => 'Coupon is not valid',
-	'coupon_used' => 'Coupon already used',
 	'customer_exists' => 'Provided email address belongs to existing customer. Please login first.',
 
 	'product_not_found' => 'Product not found',

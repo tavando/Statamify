@@ -1,8 +1,0 @@
-d32e14fb-08c9-44c2-aaf8-21200852bafd:
-  title: Admin
-  permissions:
-    - super
-72d5aa40-2e56-44b0-9604-c742e0371dda:
-  title: Customer
-  slug: customer
-  permissions: [ ]

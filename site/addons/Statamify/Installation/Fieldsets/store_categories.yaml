@@ -1,0 +1,9 @@
+taxonomies: false
+title: "Store: Categories"
+fields:
+  products:
+    type: collection
+    display: Products
+    collection:
+      - store_products
+    mode: panes

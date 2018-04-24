@@ -1,0 +1,8 @@
+title: "Store: Coupons"
+fieldset: store_coupons
+columns:
+  - title
+  - slug
+  - listing_used
+  - start_date
+  - end_date

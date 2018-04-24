@@ -1,9 +1,0 @@
-name: Fieldblock
-version: "1.0"
-developer: Tavando
-developer_url: http://www.tavando.com
-description: Block for grouping fields (only for user-experience)
-
-fieldtype_fields:
-  end:
-    type: toggle

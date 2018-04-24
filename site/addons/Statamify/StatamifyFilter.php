@@ -54,7 +54,7 @@ class StatamifyFilter extends Filter
 
 					}
 
-					$fieldset = Fieldset::get(Collection::whereHandle('products')->get('fieldset'));
+					$fieldset = Fieldset::get(Collection::whereHandle('store_products')->get('fieldset'));
 					$fieldset_data = $fieldset->toArray();
 					$key = array_search($param['field'], array_column($fieldset_data['fields'], 'name'));
 

@@ -3,6 +3,7 @@
 namespace Statamic\Addons\Statamify;
 
 use Statamic\Extend\Modifier;
+use Statamic\Addons\Statamify\Statamify;
 
 class StatamifyModifier extends Modifier
 {
@@ -16,16 +17,8 @@ class StatamifyModifier extends Modifier
 	 */
 	public function index($value, $params, $context) {
 
-		if (is_array($params)) {
-
-			switch (reset($params)) {
-				case 'money': return $this->api('Statamify')->money($value); 
-				case 'attrs': return join(explode('|', $value), ', '); 
-				break;
-			}
-
-		}
 		return $value;
+
 	}
 
 }

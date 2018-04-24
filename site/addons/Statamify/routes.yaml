@@ -1,8 +1,23 @@
 routes:
-  countries: getCountries
+  countries: BaseController@countries
   analytics:
-    uses: getAnalytics
+    uses: AnalyticsController@index
     as: statamify.analytics
   post@analytics:
-    uses: postAnalytics
+    uses: AnalyticsController@data
     as: statamify.analytics
+  orders:
+    uses: OrderController@index
+    as: statamify.orders
+  orders/get: 
+    uses: OrderController@get
+    as: statamify.orders.get
+  post@orders/status: 
+    uses: OrderController@status
+    as: statamify.orders.status
+  post@orders/tracking: 
+    uses: OrderController@tracking
+    as: statamify.orders.tracking
+  delete@orders/delete: 
+    uses: OrderController@delete
+    as: statamify.orders.delete

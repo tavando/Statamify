@@ -1,0 +1,178 @@
+taxonomies: false
+title: "Store: Orders"
+date:
+  allow_time: true
+fields:
+  title:
+    type: title
+    display: Order No
+  listing_customer:
+    type: hidden
+    display: Listing Customer
+  listing_email:
+    type: hidden
+    display: Listing Email
+  listing_total:
+    type: hidden
+    display: Listing Total
+  listing_status:
+    type: hidden
+    display: Listing Status
+  order_details:
+    type: section
+    display: Order Details
+  status:
+    type: select
+    display: Status
+    options:
+      awaiting_payment: Awaiting Payment
+      pending: Pending
+      completed: Completed
+      shipped: Shipped
+      cancelled: Cancelled
+      refunded: Refunded
+      refunded_partially: Refunded Partially
+  summary:
+    type: statamify.summary
+    display: Summary
+  shipping_method:
+    type: array
+    display: Shipping Method
+    keys:
+      zone: Zone
+      name: Name
+      rate: Rate
+    width: 50
+  payment_method:
+    type: array
+    display: Payment Method
+    keys:
+      name: Name
+      fee: Fee
+      id: ID
+    width: 50
+  coupon:
+    type: array
+    display: Coupon
+    keys:
+      name: Name
+      discount: Discount
+  customer_details:
+    type: section
+    display: Customer Details
+  shipping:
+    type: grid
+    display: Shipping Details
+    fields:
+      first_name:
+        type: text
+        display: First Name
+        width: 50
+      last_name:
+        type: text
+        display: Last Name
+        width: 50
+      company:
+        type: text
+        display: Company
+        width: 50
+      phone:
+        type: text
+        display: Phone
+        width: 50
+      address:
+        type: text
+        display: Address
+        width: 50
+      address_2:
+        type: text
+        display: Address 2
+        width: 50
+      city:
+        type: text
+        display: City
+        width: 50
+      postal:
+        type: text
+        display: Postal
+        width: 50
+      country:
+        type: statamify.countries
+        display: Country
+    mode: stacked
+    max_rows: 1
+    add_row: Add Data
+  billing_diff:
+    type: toggle
+    display: Billing Details different than Shipping
+  billing:
+    type: grid
+    display: Billing Details
+    fields:
+      first_name:
+        type: text
+        display: First Name
+        width: 50
+      last_name:
+        type: text
+        display: Last Name
+        width: 50
+      company:
+        type: text
+        display: Company
+        width: 50
+      phone:
+        type: text
+        display: Phone
+        width: 50
+      address:
+        type: text
+        display: Address
+        width: 50
+      address_2:
+        type: text
+        display: Address 2
+        width: 50
+      city:
+        type: text
+        display: City
+        width: 50
+      postal:
+        type: text
+        display: Postal
+        width: 50
+      country:
+        type: statamify.countries
+        display: Country
+    mode: stacked
+    max_rows: 1
+    add_row: Add Data
+    show_when:
+      billing_diff: true
+  other:
+    type: section
+    display: Other
+  tracking:
+    type: grid
+    display: Tracking Information
+    fields:
+      number:
+        type: text
+        display: Number
+        width: 50
+      carrier:
+        type: suggest
+        display: Carrier
+        options:
+          dpd: DPD
+          fedex: Fedex
+        max_items: 1
+        width: 50
+        create: true
+      url:
+        type: text
+        display: Tracking URL
+        instructions: Custom tracking URL
+    mode: stacked
+    max_rows: 1
+    add_row: Add Data

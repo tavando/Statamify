@@ -20,13 +20,18 @@ fields:
 		display: Order ID Format
 		instructions: Remember to use [id] inside the format
 		default: '#[id]'
-		width: 50
+		width: 33
 	order_next_id:
 		type: text
 		display: Next Order ID
 		instructions: Incremental value for every order
-		width: 50
+		width: 33
 		default: 1000
+	queue_emails:
+		type: toggle
+		display: Queue Emails
+		instructions: Delay emails after order created - use Cron to send them
+		width: 33
 	shipping:
 		type: section
 		display: Shipping
@@ -44,7 +49,7 @@ fields:
 					countries:
 						type: suggest
 						display: Countries
-						mode: Statamify
+						mode: Statamify.Country
 						width: 75
 					price_rates:
 						type: grid
@@ -176,7 +181,7 @@ fields:
 			format:
 				type: text
 				display: Format
-				default: '[symbol] [price]'
+				default: '[symbol][price]'
 			formatPrice:
 				type: select
 				display: Price Format
@@ -196,17 +201,11 @@ fields:
 				validate: numeric
 		mode: table
 		add_row: Add Currency
-	gateway_cheque_start:
-		type: fieldblock
-		display: Cheque Gateway
 	gateway_cheque_info:
 		type: textarea
-		display: Information
+		display: Cheque Gateway Information
 		width: 50
 	gateway_cheque_active:
 		type: toggle
-		display: Enable
+		display: Cheque Gateway Enable
 		width: 50
-	gateway_cheque_end:
-		type: fieldblock
-		end: true

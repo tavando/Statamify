@@ -1,0 +1,10 @@
+taxonomies:
+  tags: true
+title: "Store: Types"
+fields:
+  products:
+    type: collection
+    display: Products
+    collection:
+      - store_products
+    mode: panes

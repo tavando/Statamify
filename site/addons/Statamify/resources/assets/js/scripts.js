@@ -34,7 +34,13 @@ Statamify = {
 
 	changeSectionsToTabs: function() {
 
-		if ($(".section-fieldtype").length && !$('#publish-fields').is('.naked')) {
+		condition = Statamic.urlPath.indexOf('store_products') != -1 || Statamic.urlPath.indexOf('statamify/settings') != -1 || Statamic.urlPath.indexOf('store_customers') != -1
+
+		if (
+			$(".section-fieldtype").length 
+			&& !$('#publish-fields').is('.naked') 
+			&& (condition)
+			) {
 
 			$('#publish-fields').addClass('naked')
 
@@ -103,84 +109,83 @@ Statamify = {
 
 	},
 
-	orderPreviewCustomerDetails: function() {
+	orderPreview: function() {
 
-		$dataGroups = $('.tab-customer .grid-fieldtype')
-		details = []
+		$('body').on('click', '.statamify-orders .cell-title a', function() {
 
-		$.each($dataGroups, function(key, group) {
-			
-			if (key == 0 || (key == 1 && $('.tab-customer .toggle-container').is('.on'))) {
+			$(this).find('span').remove()
+			title = $(this).text().trim()
 
-				text = ''
-				fields = $(group).find('.col-md-6 input')
-
-				line1 = '<strong>Name:</strong> ' + $(fields[0]).val() + ' ' + $(fields[1]).val() + ($(fields[2]).val() != '' ? '<br/><strong>Company: </strong>' + $(fields[2]).val() : '')
-				text += line1.trim() + '<br/>'
-				line2 = '<strong>Address:</strong> ' + $(fields[4]).val()  + ($(fields[5]).val() != '' ? ', ' + $(fields[5]).val() : '')
-				text += line2.trim() + '<br/>'
-
-				last = $(group).find('.col-md-12 .col-md-6')
-				region = $(last[1]).find('input').length ? $(last[1]).find('input').val() : $(last[1]).find('.select').attr('data-content') + ' (' + $(last[1]).find('select').val() + ')'
-				country = $(last[0]).find('.select').attr('data-content') ? $(last[0]).find('.select').attr('data-content') + ' (' + $(last[0]).find('select').val() + ')' : ''
-
-				line3 = '<strong>City:</strong> ' + $(fields[7]).val()  + ' ' + $(fields[6]).val() + (region != '' ? ', ' + region : '')
-				text += line3.trim() + '<br/><strong>Country:</strong> ' + country.trim()
-
-				details.push(text)
-
+			if ($('.dossier .order-item[data-title="' + title + '"]').length) {
+				$('.dossier .order-item[data-title="' + title + '"]').remove()
+			} else {
+				$('.dossier .order-item').remove()
+				originalOrder = $('#orders-details .order-item[data-title="' + title + '"]')
+				label = originalOrder.find('[name="order-status"]').parent().attr('data-selected')
+				originalOrder.find('[name="order-status"]').val(label)
+				originalOrder.find('[name="order-status"]').parent().attr('data-content', originalOrder.find('[name="order-status"] :selected').text())
+				clone = $('#orders-details .order-item[data-title="' + title + '"]').clone(true, true)
+				$(this).parent().parent().after(clone)
 			}
-
 		})
 
-		customer = $('[name="listing_customer"]').val()
-		email = $('[name="listing_email"]').val()
+		$('body').on('change', '[name="order-status"]', function() {
+			$(this).parent().attr('data-content', $(this).find(':selected').text())
+			$(this).parents('.field-inner').next().show()
+		})
 
-		html = `
-			<div class="card" id="order-preview-details">
-				<div class="publish-fields pb-1">
-					<div class="form-group inline">
-						<div class="form-group" style="margin-bottom:0">
-							<label class="block">Customer</label>
-							<div class="customer-phone small-text"><strong>Name:</strong> <span>` + customer + `</span></div>
-							<div class="customer-email small-text"><strong>Email:</strong> <span><a href="mailto:` + email + `">` + email + `</a></span></div>
-						</div>
-						<div class="form-group" style="margin-bottom:0" id="shipping-textarea">
-							<label class="block">Shipping address</label>
-							<div class="small-text">` + details[0] + `</div>
-						</div>
-						<div class="form-group" style="margin-bottom:0" id="billing-textarea">
-							<label class="block">Billing address</label>
-							<div class="small-text">` + (details[1] ? `<textarea class="form-control mono" readonly>` + details[1] + `</textarea>` : `Same as Shipping`) + `</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		`;
+		$('body').on('change', '[name="tracking"]', function() {
+			$(this).parents('.field-inner').next().show()
+		})
 
-		if (!$('#order-preview-details').length) {
+		$('body').on('click', '#save-order-status', function() {
+			_btn = $(this)
+			_btn.text('Processing')
+			status = $(this).prev().find('[name="order-status"]').val()
+			label = $(this).prev().find('[name="order-status"] :selected').text()
 
-			if ($('.tab-order').length) {
+			title = $(this).parents('.order-item').attr('data-title')
+			id = $(this).parents('.order-item').attr('data-id')
 
-				$('#publish-meta').append(html)
+			$.post(Statamic.urlPath + '/status', { status: status, id: id, _token: $('meta#csrf-token').attr("value") }, function(res) {
+				_btn.hide()
+				_btn.text('Save')
 
-			}
+				if (res.success) {
 
-		} else {
+					originalOrderStatus = $('#orders-details .order-item[data-title="' + title + '"] [name="order-status"]')
+					originalOrderStatus.val(status)
+					originalOrderStatus.parent().attr('data-content', originalOrderStatus.find(':selected').text())
+					originalOrderStatus.parent().attr('data-selected', status)
 
-			$('#shipping-textarea > div').html(details[0])
+					$('.dossier .order-item[data-title="' + title + '"]').prev()
+						.find('.cell-listing_status')
+						.html('<span class="order-status ' + status + '">' + label + '</span>')
+				}
 
-			if (details[1]) {
+			})
+		})
 
-				$('#billing-textarea > div').html(details[1])
+		$('body').on('click', '#save-tracking', function() {
+			_btn = $(this)
+			_btn.text('Processing')
+			url = $(this).prev().find('[name="tracking"]').val()
 
-			} else {
+			title = $(this).parents('.order-item').attr('data-title')
+			id = $(this).parents('.order-item').attr('data-id')
 
-				$('#billing-textarea > div').text('Same as Shipping')
+			$.post(Statamic.urlPath + '/tracking', { url: url, id: id, _token: $('meta#csrf-token').attr("value") }, function(res) {
+				_btn.hide()
+				_btn.text('Save')
 
-			}
+				if (res.success) {
 
-		}
+					$('#orders-details .order-item[data-title="' + title + '"] [name="tracking"]').val(url)
+
+				}
+
+			})
+		})
 
 	}
 
@@ -193,11 +198,16 @@ function newXHR() {
 	var realXHR = new oldXHR();
 	realXHR.addEventListener("readystatechange", function() {
 		if(realXHR.readyState==4){
-			setTimeout(function(){
-				Statamify.changeSectionsToTabs()
-				Statamify.convertListingCells()
-				Statamify.orderPreviewCustomerDetails()
-			}, 0)
+
+			if (realXHR.responseURL.indexOf('statamify/orders/status') == -1 && realXHR.responseURL.indexOf('statamify/orders/tracking') == -1) {
+
+				setTimeout(function(){
+					Statamify.changeSectionsToTabs()
+					Statamify.convertListingCells()
+					Statamify.orderPreview()
+				}, 0)
+
+			}
 		}
 	}, false);
 	return realXHR;

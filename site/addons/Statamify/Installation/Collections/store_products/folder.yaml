@@ -1,0 +1,9 @@
+title: "Store: Products"
+fieldset: store_products
+template: store/product
+columns:
+  - title
+  - listing_image
+  - listing_inventory
+  - listing_type
+  - listing_vendor

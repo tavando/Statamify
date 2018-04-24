@@ -5,7 +5,7 @@ return [
 	'all' => 'All',
 	'analytics' => 'Analytics',
 
-	'collections' => 'Collections',
+	'categories' => 'Categories',
 	'coupons' => 'Coupons',
 	'customers' => 'Customers',
 

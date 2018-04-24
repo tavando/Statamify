@@ -3,9 +3,11 @@
 namespace Statamic\Addons\Statamify\Commands;
 
 use Statamic\Extend\Command;
+use Statamic\Addons\Statamify\Models\Emails;
 use Statamic\API\Entry;
-use Statamic\API\Stache;
-use Statamic\Addons\Statamify\Models\StatamifyEmail as Email;
+use Statamic\API\File;
+use Statamic\API\Folder;
+use Statamic\API\Storage;
 
 class EmailsCommand extends Command
 {
@@ -39,22 +41,20 @@ class EmailsCommand extends Command
 	public function handle()
 	{
 		
-		$emails = Entry::whereCollection('emails');
+		$emails = Folder::getFiles('site/storage/statamify/emails');
 
 		if ($emails) {
 
 			foreach ($emails as $email) {
 				
-				$data = $email->toArray();
+				$data = Storage::getYAML(str_replace('site/storage/', '', $email));
 
-				$e = new Email($data['title'], unserialize($data['data']), $data['email']);
+				$e = new Emails($data['title'], json_decode($data['data'], true), $data['email']);
 				$e->send();
 
-				$email->delete();
+				File::delete($email);
 
 			}
-
-			Stache::update();
 
 		}
 

@@ -343,12 +343,11 @@ This email is to confirm your order's status has been updated successfully. Go t
           <tr>
             <td class="free-text">
              This email is to confirm your order's status has been updated successfully.
-             {{ if status == 'shipped' }}
-             {{ tracking }}
-             <div class="hr"></div>
-             Your package is shipped via {{ carrier }} with number <strong>{{ number }}</strong>. You can track it <a href="{{ url }}">here</a>
+             {{ if status == 'shipped' && shipping_method.tracking }}
 
-             {{ /tracking }}
+             <div class="hr"></div>
+             You can track your order <a href="{{ shipping_method.tracking }}">here</a>
+
              {{ /if }}
             </td>
           </tr>
