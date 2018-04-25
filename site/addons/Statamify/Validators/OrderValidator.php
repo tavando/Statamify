@@ -4,12 +4,13 @@ namespace Statamic\Addons\Statamify\Validators;
 
 use Statamic\Addons\Statamify\Statamify;
 use Statamic\API\User;
+use Statamic\Addons\Statamify\Validators\CartValidator as Validate;
 use Validator;
 
 class OrderValidator
 {
 
-  public static function create($data)
+  public static function create($data, $cart)
   {
 
     $messages = [
@@ -73,6 +74,26 @@ class OrderValidator
     if (!$data['user'] && User::whereEmail($data['email'])) {
 
       return [Statamify::t('customer_exists', 'errors')];
+
+    }
+
+    // Check coupons again
+
+    $coupons = $cart['coupons'];
+
+    if (count($coupons)) {
+
+      foreach ($coupons as $coupon) {
+
+        $valid = Validate::coupon(['coupon' => $coupon, 'email' => $data['email']], $cart);
+
+        if (!is_bool($valid)) {
+
+          return [$valid];
+
+        }
+
+      }
 
     }
 

@@ -268,7 +268,49 @@ class Cart
 
 		}
 
-		//var_dump($cart['shipping']);exit;
+		// Calculate discount
+
+		if ($cart['coupons']) {
+
+			foreach ($cart['coupons'] as $coupon) {
+				
+				$coupon_entry = Entry::whereSlug($coupon, 'store_coupons');
+
+				if ($coupon_entry) {
+
+					switch ($coupon_entry->get('type')) {
+						case 'fixed':
+							
+							if ($coupon_entry->get('value') && $coupon_entry->get('value') != '') {
+
+								$cart['total']['discount'] = (float) $coupon_entry->get('value') * -1;
+
+							}
+							
+							break;
+
+						case 'free_ship':
+
+							$cart['total']['discount'] = $cart['total']['shipping'] * -1;
+							
+							break;
+						
+						default:
+							
+							if ($coupon_entry->get('value') && $coupon_entry->get('value') != '') {
+
+								$cart['total']['discount'] = $cart['total']['sub'] * ((float) $coupon_entry->get('value') / 100) * -1;
+
+							}
+
+							break;
+					}
+
+				}
+
+			}
+
+		}
 
 		// Grand total = sum of all totals
 
@@ -583,6 +625,32 @@ class Cart
 		session(['statamify.' . $this->instance => $this->session]);
 
 		return $this->session['shipping'];
+
+	}
+
+	public function addCoupon($coupon, $email = '')
+	{
+
+		$this->session['coupons'][] = $coupon;
+
+		session(['statamify.' . $this->instance => $this->session]);
+
+		return $this->get();
+
+	}
+
+	public function removeCoupon($index)
+	{
+
+		$coupons = $this->session['coupons'];
+
+		unset($coupons[$index]);
+
+		$this->session['coupons'] = array_values($coupons);
+
+		session(['statamify.' . $this->instance => $this->session]);
+
+		return $this->get();
 
 	}
 

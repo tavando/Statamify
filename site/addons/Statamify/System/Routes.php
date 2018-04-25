@@ -27,6 +27,8 @@ class Routes
       // Cart Routes
 
       'POST@statamify/cart/add' => self::cart_ctrl . '@add',
+      'POST@statamify/cart/coupon' => self::cart_ctrl . '@coupon',
+      'POST@statamify/cart/coupon-remove' => self::cart_ctrl . '@couponRemove',
       'POST@statamify/cart/default-address' => self::cart_ctrl . '@defaultAddress',
       'GET@statamify/cart/get' => self::cart_ctrl . '@get',
       'POST@statamify/cart/set-shipping' => self::cart_ctrl . '@setShipping',

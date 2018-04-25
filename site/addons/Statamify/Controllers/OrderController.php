@@ -41,7 +41,7 @@ class OrderController extends Controller
 
     }
 
-    $valid = Validate::create($data);
+    $valid = Validate::create($data, $cart->get());
 
     if (is_bool($valid)) {
 

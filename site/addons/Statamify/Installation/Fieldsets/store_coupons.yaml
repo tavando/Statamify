@@ -32,7 +32,7 @@ fields:
     type: suggest
     display: Countries
     instructions: Use only for selected countries
-    mode: Statamify
+    mode: statamify.country
     width: 50
   customers:
     type: tags

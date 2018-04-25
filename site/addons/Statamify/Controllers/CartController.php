@@ -22,6 +22,45 @@ class CartController extends Controller
 
   }
 
+  public function coupon(Cart $cart,Request $request)
+  {
+
+    $data = $request->all();
+    $cart = $cart->get();
+
+    if (!in_array($coupon, $cart['coupons'])) {
+
+      $valid = Validate::coupon($data, $cart);
+
+      if (is_bool($valid)) {
+
+        return $cart->addCoupon($data['coupon']);
+
+      } else {
+
+        return Statamify::response(500, $valid);
+
+      }
+
+    } else {
+
+      return Statamify::response(500, Statamify::t('coupon_used', 'errors'));
+
+    }
+
+  }
+
+  public function couponRemove(Cart $cart,Request $request)
+  {
+
+    $data = $request->all();
+
+    Validate::couponRemove($data);
+
+    return $cart->removeCoupon($data['index']);
+
+  }
+
   public function defaultAddress(Cart $cart, Request $request)
   {
 
