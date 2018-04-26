@@ -15,6 +15,7 @@ fields:
 	store_address:
 		type: redactor
 		display: Store Address
+		settings: Standard
 	order_id_format:
 		type: text
 		display: Order ID Format
@@ -201,11 +202,51 @@ fields:
 				validate: numeric
 		mode: table
 		add_row: Add Currency
-	gateway_cheque_info:
-		type: textarea
-		display: Cheque Gateway Information
-		width: 50
-	gateway_cheque_active:
-		type: toggle
-		display: Cheque Gateway Enable
-		width: 50
+	
+	gateways:
+		type: replicator
+		display: Payment Gateways
+		sets:
+			cheque:
+				display: Cheque
+				fields:
+					active:
+						type: toggle
+						display: Active
+						width: 25
+						replicator_preview: false
+					info:
+						type: textarea
+						display: Info
+						width: 75
+						replicator_preview: false
+			stripe:
+				display: Stripe
+				fields:
+					active:
+						type: toggle
+						display: Active
+						width: 25
+						replicator_preview: false
+					test:
+						type: toggle
+						display: Test Mode
+						width: 25
+						width: 75
+						replicator_preview: false
+					keys:
+						type: array
+						display: Live API keys
+						keys:
+							public: Public
+							secret: Secret
+						width: 50
+						replicator_preview: false
+					test_keys:
+						type: array
+						display: Test API keys
+						keys:
+							public: Public
+							secret: Secret
+						width: 50
+						replicator_preview: false

@@ -69,6 +69,13 @@ class StatamifyTags extends Tags
 
   }
 
+  public function gateways()
+  {
+
+     return $this->parseLoop($this->getConfig('gateways'));
+
+  }
+
   public function location()
   {
 

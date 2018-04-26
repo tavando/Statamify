@@ -17,7 +17,7 @@ class MoneyModifier extends Modifier
 	 */
 	public function index($value, $params, $context) {
 
-		return return join(explode('|', $value), ', '); 
+		return join(explode('|', $value), ', '); 
 		
 	}
 

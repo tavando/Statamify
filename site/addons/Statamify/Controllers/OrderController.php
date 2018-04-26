@@ -27,27 +27,35 @@ class OrderController extends Controller
   public function create(Cart $cart, Order $order, Request $request)
   {
 
-    $data = $request->all();
+    $input = $request->all();
     $user = User::getCurrent();
 
     if ($user) {
 
-      $data['user'] = $user->get('id');
-      $data['email'] = $user->email();
+      $input['user'] = $user->get('id');
+      $input['email'] = $user->email();
 
     } else {
 
-      $data['user'] = null;
+      $input['user'] = null;
 
     }
 
-    $valid = Validate::create($data, $cart->get());
+    $valid = Validate::create($input, $cart->get());
 
     if (is_bool($valid)) {
 
-      unset($data['_token'], $data['addresso']);
+      $data = $order->create($input);
 
-      $data = $order->create($data);
+      if (isset($data['errors'])) {
+
+        return redirect('/store/checkout')->withInput([
+          'errors' => $data['errors'],
+          'data' => $input
+        ]);
+
+      }
+
       $cart->clear();
 
       $email_order_new = new Emails('order-new', $data, $data['listing_email']);
@@ -56,7 +64,15 @@ class OrderController extends Controller
       $email_admin_order_new = new Emails('admin-order-new', $data);
       $email_admin_order_new->sendEmail();
 
-      return redirect('/account/order/' . $data['slug'])->withInput($data);
+      if (isset($data['redirect'])) {
+
+        return $data['redirect'];
+
+      } else {
+
+        return redirect('/account/order/' . $data['slug'])->withInput($data);
+        
+      }
 
     } else {
 

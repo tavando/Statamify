@@ -7,6 +7,7 @@ use Statamic\API\Asset;
 use Statamic\Addons\Statamify\Models\Cart;
 use Statamic\API\Entry;
 use Statamic\API\File;
+use Statamic\Addons\Statamify\Models\Gateway;
 use Statamic\API\Stache;
 use Statamic\Addons\Statamify\Statamify;
 use Statamic\API\Storage;
@@ -33,13 +34,22 @@ class Order
 
 		$this->data['title'] = str_replace('[id]', $order_next_id, $order_id_format);
 
+		// Charge and Update Payment for Summary
+
+		$payment = new Gateway($this->data, $this->cart);
+
+		if ($payment->errors()) {
+
+			return ['errors' => $payment->errors()];
+
+		}
+
+		$this->data['status'] = $payment->getStatus();
+		$this->data['payment_method'] = $payment->getData();
+
 		// Update Shipping for Summary
 
 		$this->updateShippingMethods();
-
-		// Charge and Update Payment for Summary
-
-		$this->updatePaymentMethods();
 
 		// Create User if doesn't exist
 
@@ -130,7 +140,8 @@ class Order
 		$this->data['listing_customer'] = $customer->get('title') . ' <a href="/cp/collections/entries/store_customers/' . $this->user->get('id') . '" class="statamify-link"><span class="icon icon-forward"></span></a>';
 
 		$this->data['listing_email'] = $this->data['email'];
-		unset($this->data['email']);
+
+		unset($this->data['email'], $data['_token'], $data['addresso']);
 
 		/*
 
@@ -165,6 +176,12 @@ class Order
 		$customer->save();
 
 		Stache::update();
+
+		if ($payment->redirect()) {
+
+			$this->data['redirect'] = $payment->redirect();
+
+		}
 
 		return $this->data;
 
@@ -253,42 +270,6 @@ class Order
 			'name' => $shipping_method[1],
 			'rate' => $this->cart['total']['shipping']
 		];
-
-	}
-
-	private function updatePaymentMethods() {
-
-		switch ($this->data['payment_method']) {
-
-			case 'cheque':
-				$this->data['status'] = 'awaiting_payment';
-				$this->data['payment_method'] = ['name' => 'Cheque', 'fee' => 0];
-			break;
-
-			case 'paypal':
-				$this->data['status'] = 'awaiting_payment';
-				$this->data['payment_method'] = ['name' => 'PayPal', 'fee' => 0];
-			break;
-
-			case 'stripe':
-
-				$charge = $this->statamic->api('StatamifyStripe')->charge($this->data, $this->cart);
-
-				$this->data['status'] = 'pending';
-				$this->data['payment_method'] = [
-					'name' => $this->statamic->api('StatamifyStripe')->getConfig('name'), 
-					'fee' => $charge->application_fee, 
-					'id' => $charge->id
-				];
-
-			break;
-			
-			default:
-				$this->data['status'] = 'pending';
-				$this->data['payment_method'] = ['name' => 'Default', 'fee' => 0];
-			break;
-
-		}
 
 	}
 
