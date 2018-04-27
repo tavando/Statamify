@@ -3,6 +3,7 @@
 namespace Statamic\Addons\Statamify\Validators;
 
 use Statamic\Addons\Statamify\Statamify;
+use Statamic\API\Storage;
 use Statamic\API\User;
 use Statamic\Addons\Statamify\Validators\CartValidator as Validate;
 use Validator;
@@ -98,6 +99,31 @@ class OrderValidator
     }
 
     return true;
+
+  }
+
+  public static function refund($data)
+  {
+
+    $validator = Validator::make($data, [
+      'amount' => 'required|numeric',
+      'id' => 'required',
+    ]);
+
+    if ($validator->fails()) {
+
+      throw new \Exception(Statamify::t('somethings_wrong', 'errors'));
+
+    }
+
+    $order = Storage::getYAML('statamify/orders/' . $data['id']);
+    $old_refund = isset($order['summary']['total']['refunded']) ? (float) $order['summary']['total']['refunded'] : 0;
+
+    if ($order['summary']['total']['grand'] < ($data['amount'] + ($old_refund*-1))) {
+
+      Statamify::response(500, Statamify::t('somethings_wrong', 'errors'));
+      
+    }
 
   }
 

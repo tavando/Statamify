@@ -3,6 +3,7 @@ Statamify = {
 	init: function() {
 
 		this.removeNavCollections()
+		this.orderRefund()
 
 	},
 
@@ -187,6 +188,75 @@ Statamify = {
 			})
 		})
 
+	},
+
+	orderRefund: function() {
+
+		$('body').on('click', '.btn.refund:not(.btn-primary)', function() {
+
+			order = $(this).parents('.order-item')
+
+			if (order.find('.refund-form').is('.on')) {
+				$(this).text('Refund')
+				order.find('.refund-form').removeClass('on')
+			} else {
+				$(this).text('Cancel')
+				order.find('.refund-form').addClass('on')
+			}
+
+			return false
+		})
+
+		$('body').on('click', '.refund-form .refund', function() {
+
+			_btn = $(this)
+			form = _btn.parents('.refund-form')
+			_btn_text = _btn.text()
+			_btn.text('Processing')
+			id = _btn.parents('.order-item').attr('data-id')
+			amount = form.find('[name="refund_amount"]').val()
+			reason = form.find('[name="refund_reason"]').val()
+
+			if (amount != '') {
+
+				$.post(Statamic.urlPath + '/refund', { amount: amount, reason: reason, id: id, _token: $('meta#csrf-token').attr("value") }, function(res) {
+					
+					_btn.text(_btn_text)
+
+					if (res.success) {
+
+						$('.order-item[data-id="' + id + '"] .refund-form').removeClass('on')
+						$('.order-item[data-id="' + id + '"] .totals.refunded .item-totals').text(money(res.amount_refunded))
+						$('.order-item[data-id="' + id + '"] .totals.refunded').show()
+
+						$('.dossier .order-item[data-id="' + id + '"]').prev().find('.cell-listing_status').html(res.listing_status)
+						$('.order-item[data-id="' + id + '"] [name="order-status"]').val(res.status)
+						statusLabel = $('.dossier .order-item[data-id="' + id + '"] [name="order-status"]').find(':selected').text()
+						$('.order-item[data-id="' + id + '"] [name="order-status"]').parent().attr('data-content', statusLabel).attr('data-selected', res.status)
+
+						$('.btn.refund').text('Refund')
+
+						if (res.status == 'refunded') {
+							$('.order-item[data-id="' + id + '"] .btn.refund, .order-item[data-id="' + id + '"] .refund-form').remove()
+						}
+
+						if (reason != '') {
+							$('.order-item[data-id="' + id + '"] .refund-reason').show().find('span').text(reason)
+						}
+
+					} else {
+
+						alert(res.errors)
+
+					}
+
+				})
+
+			}
+
+			return false
+		})
+
 	}
 
 }
@@ -199,7 +269,8 @@ function newXHR() {
 	realXHR.addEventListener("readystatechange", function() {
 		if(realXHR.readyState==4){
 
-			if (realXHR.responseURL.indexOf('statamify/orders/status') == -1 && realXHR.responseURL.indexOf('statamify/orders/tracking') == -1) {
+			if (realXHR.responseURL.indexOf('statamify/orders/status') == -1 && realXHR.responseURL.indexOf('statamify/orders/tracking') == -1
+				&& realXHR.responseURL.indexOf('statamify/orders/refund') == -1) {
 
 				setTimeout(function(){
 					Statamify.changeSectionsToTabs()

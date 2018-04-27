@@ -17,300 +17,290 @@ use Statamic\API\YAML;
 class Order
 {
 
-	public function __construct(Cart $cart) {
+  public function __construct(Cart $cart) {
 
-		$this->cart = $cart->get();
+    $this->cart = $cart->get();
 
-	}
+  }
 
-	public function create($data) {
+  public function create($data) {
 
-		$this->data = $data;
+    $this->data = $data;
 
-		$order_next_id = (int) Statamify::config('order_next_id', 1000);
-		$order_id_format = Statamify::config('order_id_format', '#[id]');
+    $order_next_id = (int) Statamify::config('order_next_id', 1000);
+    $order_id_format = Statamify::config('order_id_format', '#[id]');
 
-		// Create Entry / Order title based on the format in the settings
+    // Create Entry / Order title based on the format in the settings
 
-		$this->data['title'] = str_replace('[id]', $order_next_id, $order_id_format);
+    $this->data['title'] = str_replace('[id]', $order_next_id, $order_id_format);
 
-		// Charge and Update Payment for Summary
+    // Charge and Update Payment for Summary
 
-		$payment = new Gateway($this->data, $this->cart);
+    $payment = new Gateway($this->data, $this->cart);
 
-		if ($payment->errors()) {
+    if ($payment->errors()) {
 
-			return ['errors' => $payment->errors()];
+      return ['errors' => $payment->errors()];
 
-		}
+    }
 
-		$this->data['status'] = $payment->getStatus();
-		$this->data['payment_method'] = $payment->getData();
+    $this->data['status'] = $payment->getStatus();
+    $this->data['payment_method'] = $payment->getData();
 
-		// Update Shipping for Summary
+    // Update Shipping for Summary
 
-		$this->updateShippingMethods();
+    $this->updateShippingMethods();
 
-		// Create User if doesn't exist
+    // Create User if doesn't exist
 
-		if ($this->data['user']) {
+    if ($this->data['user']) {
 
-			$this->user = User::getCurrent();
+      $this->user = User::getCurrent();
 
-		} else {
+    } else {
 
-			$this->createUser();
+      $this->createUser();
 
-		}
+    }
 
-		// Get Customer or create one if doesn't exist
+    // Get Customer or create one if doesn't exist
 
-		$customer = $this->getCustomer();
+    $customer = $this->getCustomer();
 
-		// Create summary that will be populated in StatamifyOrderSummary addon
+    // Create summary that will be populated in StatamifyOrderSummary addon
 
-		$this->data['summary'] = [
-			'items' => [],
-			'total' => $this->cart['total']
-		];
+    $this->data['summary'] = [
+      'items' => [],
+      'coupons' => $this->cart['coupons'],
+      'total' => $this->cart['total']
+    ];
 
-		foreach ($this->cart['items'] as $item) {
+    foreach ($this->cart['items'] as $item) {
 
-			// Update inventory for products
-			
-			$this->updateProductInventory($item);
+      // Update inventory for products
 
-			// Add image based on the class and crop it with Glide
+      $this->updateProductInventory($item);
 
-			if ($item['variant']) {
+      // Add image based on the class and crop it with Glide
 
-				foreach ($item['product']['gallery'] as $img) {
+      if ($item['variant']) {
 
-					$asset = Asset::find($img);
+        foreach ($item['product']['gallery'] as $img) {
 
-					if ($asset && $asset->get('title') == $item['variant']['sku']) {
+          $asset = Asset::find($img);
 
-						$image = $asset->manipulate(['w' => 50, 'h' => 50, 'fit' => 'crop']);
-						$image_original = $img;
+          if ($asset && $asset->get('title') == $item['variant']['sku']) {
 
-					}
+            $image = $asset->manipulate(['w' => 50, 'h' => 50, 'fit' => 'crop']);
+            $image_original = $img;
 
-				}
+          }
 
-			}
+        }
 
-			if (!isset($image)) {
+      }
 
-				if (isset($item['product']['image'])) {
+      if (!isset($image)) {
 
-					$asset = Asset::find($item['product']['image']);
+        if (isset($item['product']['image'])) {
 
-					if ($asset) {
+          $asset = Asset::find($item['product']['image']);
 
-						$image = $asset->manipulate(['w' => 50, 'h' => 50, 'fit' => 'crop']);
-						$image_original = $item['product']['image'];
+          if ($asset) {
 
-					}
+            $image = $asset->manipulate(['w' => 50, 'h' => 50, 'fit' => 'crop']);
+            $image_original = $item['product']['image'];
 
-				}
+          }
 
-			}
+        }
 
-			// Transform data to match Statamify Order Summary addon
-			
-			$this->data['summary']['items'][] = [
-				'id' => $item['item_id'],
-				'name' => $item['product']['title'],
-				'variant' => $item['variant'] ? $item['variant']['attrs'] : false,
-				'sku' => $item['variant'] ? @$item['variant']['sku'] : @$item['product']['sku'],
-				'price' => $item['variant'] && @$item['variant']['price'] ? $item['variant']['price'] : @$item['product']['price'],
-				'quantity' => $item['quantity'],
-				'custom' => isset($item['custom']) && $item['custom'] ? $item['custom'] : null,
-				'image' => @$image,
-				'image_original' => @$image_original,
-				'edit_url' => '/cp/collections/entries/store_products/' . $item['product']['slug']
-			];
+      }
 
-		}
+      // Transform data to match Statamify Order Summary addon
+      
+      $this->data['summary']['items'][] = [
+        'id' => $item['item_id'],
+        'name' => $item['product']['title'],
+        'variant' => $item['variant'] ? $item['variant']['attrs'] : false,
+        'sku' => $item['variant'] ? @$item['variant']['sku'] : @$item['product']['sku'],
+        'price' => $item['variant'] && @$item['variant']['price'] ? $item['variant']['price'] : @$item['product']['price'],
+        'quantity' => $item['quantity'],
+        'custom' => isset($item['custom']) && $item['custom'] ? $item['custom'] : null,
+        'image' => @$image,
+        'image_original' => @$image_original,
+        'edit_url' => CP_ROUTE . '/collections/entries/store_products/' . $item['product']['slug']
+      ];
 
-		// Add data for order listing columns
+    }
 
-		$this->data['listing_status'] = '<span class="order-status ' . $this->data['status'] . '">' . Statamify::t('status.' . $this->data['status']) . '</span>';
-		$this->data['listing_total'] = Statamify::money($this->data['summary']['total']['grand']);
-		$this->data['listing_customer'] = $customer->get('title') . ' <a href="/cp/collections/entries/store_customers/' . $this->user->get('id') . '" class="statamify-link"><span class="icon icon-forward"></span></a>';
+    // Add data for order listing columns
 
-		$this->data['listing_email'] = $this->data['email'];
+    $this->data['listing_status'] = '<span class="order-status ' . $this->data['status'] . '">' . Statamify::t('status.' . $this->data['status']) . '</span>';
+    $this->data['listing_total'] = Statamify::money($this->data['summary']['total']['grand']);
+    $this->data['listing_customer'] = $customer->get('title') . ' <a href="' . CP_ROUTE . '/collections/entries/store_customers/' . $this->user->get('id') . '" class="statamify-link"><span class="icon icon-forward"></span></a>';
 
-		unset($this->data['email'], $data['_token'], $data['addresso']);
+    $this->data['listing_email'] = $this->data['email'];
 
-		/*
+    unset($this->data['email'], $this->data['_token'], $this->data['addresso'], $this->data['payment_token'], $this->data['coupon']);
 
-		Old Entry-based
+    $order_id = date('Y-m-d_H-i-s') . '.' . slugify($this->data['title']);
+    $this->data['date'] = date('Y-m-d H:i:s');
+    $this->data['slug'] = slugify($this->data['title']);
+    $this->data['id'] = $order_id;
 
-		$order = Entry::create(slugify($this->data['title']))
-			->collection('orders')
-			->with($this->data)
-			->published(false)
-			->date(date('Y-m-d H:i'))
-			->get();*/
+    Storage::putYAML('statamify/orders/' . $order_id, $this->data);
 
-		$order_id = date('Y-m-d_H-i-s') . '.' . slugify($this->data['title']);
-		$this->data['date'] = date('Y-m-d H:i:s');
-		$this->data['slug'] = slugify($this->data['title']);
-		$this->data['id'] = $order_id;
+    // Update ID of the next order in settings
 
-		Storage::putYAML('statamify/orders/' . $order_id, $this->data);
+    $settings_file = File::get('site/settings/addons/statamify.yaml');
+    $settings = YAML::parse($settings_file);
+    $settings['order_next_id'] = $order_next_id + 1;
+    File::put('site/settings/addons/statamify.yaml', YAML::dump($settings));
 
-		// Update ID of the next order in settings
+    // Add order to customer's field Orders
 
-		$settings_file = File::get('site/settings/addons/statamify.yaml');
-		$settings = YAML::parse($settings_file);
-		$settings['order_next_id'] = $order_next_id + 1;
-		File::put('site/settings/addons/statamify.yaml', YAML::dump($settings));
+    $customers_orders = $customer->get('orders');
+    $customers_orders[] = ['id' => $this->data['title'], 'slug' => $order_id];
+    $customer->set('orders', $customers_orders);
+    $customer->save();
 
-		// Add order to customer's field Orders
+    Stache::update();
 
-		$customers_orders = $customer->get('orders');
-		$customers_orders[] = ['id' => $this->data['title'], 'slug' => $order_id];
-		$customer->set('orders', $customers_orders);
-		$customer->save();
+    if ($payment->redirect()) {
 
-		Stache::update();
+      $this->data['redirect'] = $payment->redirect();
 
-		if ($payment->redirect()) {
+    }
 
-			$this->data['redirect'] = $payment->redirect();
+    return $this->data;
 
-		}
+  }
 
-		return $this->data;
+  private function createUser() {
 
-	}
+    $user_data = [
+      'first_name' => $this->data['shipping']['first_name'],
+      'last_name' => $this->data['shipping']['last_name'],
+      'password' => $this->data['password']
+    ];
 
-	private function createUser() {
+    $user = User::create()
+    ->with($user_data)
+    ->email($this->data['email'])
+    ->get();
 
-		$user_data = [
-			'first_name' => $this->data['shipping']['first_name'],
-			'last_name' => $this->data['shipping']['last_name'],
-			'password' => $this->data['password']
-		];
+    $user->save();
+    $this->user = $user;
+    $this->data['user'] = $user->get('id');
 
-		$user = User::create()
-		->with($user_data)
-		->email($this->data['email'])
-		->get();
+    unset($this->data['password'], $this->data['password_confirmation']);
 
-		$user->save();
-		$this->user = $user;
-		$this->data['user'] = $user->get('id');
+    Auth::loginUsingId($user->id());
 
-		unset($this->data['password'], $this->data['password_confirmation']);
+  }
 
-		Auth::loginUsingId($user->id());
+  private function getCustomer() {
 
-	}
+    $customer = Entry::whereSlug($this->user->get('id'), 'store_customers');
 
-	private function getCustomer() {
+    if (!$customer) {
 
-		$customer = Entry::whereSlug($this->user->get('id'), 'store_customers');
+      // Create default address from shipping details
 
-		if (!$customer) {
+      $address = $this->data['shipping'];
+      $address['default'] = true;
 
-			// Create default address from shipping details
+      $customer_data = [
+        'user' => $this->data['user'],
+        'title' => $this->user->get('first_name') . ' ' . $this->user->get('last_name'),
+        'listing_orders' => 1,
+        'listing_spent' => '<span data-total="' . $this->cart['total']['grand'] . '">' . Statamify::money($this->cart['total']['grand']) . '</span>',
+        'addresses' => $address,
+        'orders' => []
+      ];
 
-			$address = $this->data['shipping'];
-			$address['default'] = true;
+      $customer = Entry::create($this->user->get('id'))
+      ->collection('store_customers')
+      ->with($customer_data)
+      ->published(true)
+      ->get();
 
-			$customer_data = [
-				'user' => $this->data['user'],
-				'title' => $this->user->get('first_name') . ' ' . $this->user->get('last_name'),
-				'listing_orders' => 1,
-				'listing_spent' => '<span data-total="' . $this->cart['total']['grand'] . '">' . Statamify::money($this->cart['total']['grand']) . '</span>',
-				'addresses' => $address,
-				'orders' => []
-			];
+    } else {
 
-			$customer = Entry::create($this->user->get('id'))
-			->collection('store_customers')
-			->with($customer_data)
-			->published(true)
-			->get();
+      $customer->set('listing_orders', $customer->get('listing_orders') + 1);
+      $spent = explode('"', $customer->get('listing_spent'));
+      $spent[1] = $spent[1] + $this->cart['total']['grand'];
+      $spent[2] = '>' . Statamify::money($spent[1]) . '</span>';
+      $customer->set('listing_spent', join($spent, '"'));
 
-		} else {
+    }
 
-			$customer->set('listing_orders', $customer->get('listing_orders') + 1);
-			$spent = explode('"', $customer->get('listing_spent'));
-			$spent[1] = $spent[1] + $this->cart['total']['grand'];
-			$spent[2] = '>' . Statamify::money($spent[1]) . '</span>';
-			$customer->set('listing_spent', join($spent, '"'));
+    return $customer;
 
-		}
+  }
 
-		return $customer;
+  private function updateShippingMethods() {
 
-	}
+    if (isset($this->data['billing_diff']) && $this->data['billing_diff'] == '1') {
 
-	private function updateShippingMethods() {
+      $this->data['billing_diff'] = true;
 
-		if (isset($this->data['billing_diff']) && $this->data['billing_diff'] == '1') {
+    }
 
-			$this->data['billing_diff'] = true;
+    unset($this->data['saved_addresses']);
 
-		}
+    $shipping_zones = Statamify::config('shipping_zones');
 
-		unset($this->data['saved_addresses']);
+    $shipping_method = explode('|', $this->data['shipping_method']);
+    $zone = $shipping_zones[$shipping_method[0]];
 
-		$shipping_zones = Statamify::config('shipping_zones');
+    $this->data['shipping_method'] = [
+      'zone' => $zone['name'],
+      'name' => $shipping_method[1],
+      'rate' => $this->cart['total']['shipping']
+    ];
 
-		$shipping_method = explode('|', $this->data['shipping_method']);
-		$zone = $shipping_zones[$shipping_method[0]];
+  }
 
-		$this->data['shipping_method'] = [
-			'zone' => $zone['name'],
-			'name' => $shipping_method[1],
-			'rate' => $this->cart['total']['shipping']
-		];
+  private function updateProductInventory($item) {
 
-	}
+    $product = Entry::find($item['product']['id']);
 
-	private function updateProductInventory($item) {
+    if ($product->get('track_inventory')) {
 
-		$product = Entry::find($item['product']['id']);
+      switch ($product->get('class')) {
 
-		if ($product->get('track_inventory')) {
+        case 'complex':
 
-			switch ($product->get('class')) {
+        $variants = $product->get('variants');
 
-				case 'complex':
+        foreach ($variants as $variant_key => $variant) {
 
-				$variants = $product->get('variants');
+          if (isset($variant['id']) && $variant['id'] == $item['variant']['id']) {
 
-				foreach ($variants as $variant_key => $variant) {
+            $variants[$variant_key]['inventory'] = $variants[$variant_key]['inventory'] - $item['quantity'];
+            $product->set('variants', $variants);
+            $product->save();
 
-					if (isset($variant['id']) && $variant['id'] == $item['variant']['id']) {
+            break;
 
-						$variants[$variant_key]['inventory'] = $variants[$variant_key]['inventory'] - $item['quantity'];
-						$product->set('variants', $variants);
-						$product->save();
+          }
 
-						break;
+        }
 
-					}
+        break;
 
-				}
+        default:
 
-				break;
+        $product->set('inventory', $product->get('inventory') - $item['quantity']);
+        $product->save();
 
-				default:
+        break;
+      }
 
-				$product->set('inventory', $product->get('inventory') - $item['quantity']);
-				$product->save();
+    }
 
-				break;
-			}
-
-		}
-
-	}
+  }
 
 }

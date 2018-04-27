@@ -36,9 +36,25 @@ class System
   public static function response($code, $msg)
   {
 
-    header('HTTP/1.1 ' . $code . ' Internal Server Error');
+    if ($code >= 400) {
+
+      $data = [
+        'type' => 'Error',
+        'response' => ['error' => $msg] 
+      ];
+
+    } else {
+
+      $data = [
+        'type' => '',
+        'response' => ['message' => $msg] 
+      ];
+
+    }
+
+    header('HTTP/1.1 ' . $code . ' ' . $data['type']);
     header('Content-Type: application/json; charset=UTF-8');
-    die(json_encode(array('message' => $msg)));
+    die(json_encode($data['response']));
 
   }
 

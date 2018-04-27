@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Statamify\Commands;
 
-use Statamic\Extend\Command;
+use Statamic\Extend\Command; 
 use Statamic\Addons\Statamify\Models\Emails;
 use Statamic\API\Entry;
 use Statamic\API\File;
@@ -49,7 +49,7 @@ class EmailsCommand extends Command
 				
 				$data = Storage::getYAML(str_replace('site/storage/', '', $email));
 
-				$e = new Emails($data['title'], json_decode($data['data'], true), $data['email']);
+				$e = new Emails($data['title'], unserialize($data['data']), $data['email']);
 				$e->send();
 
 				File::delete($email);

@@ -287,6 +287,10 @@ table.order-summary .item-image > div::after {
 	height: calc(100% + 6px);
 }
 
+table.order-summary .item-line a {
+	font-size: 14px;
+}
+
 table.order-summary .item-line p {
 	margin: 0;
 	font-size: 11px;
@@ -310,12 +314,48 @@ table.order-summary .text-right {
 	color: #637381;
 }
 
+table.order-summary tr.totals {
+	border-bottom: 0;
+}
+
+table.order-summary tr.totals:not(.noborder) td {
+	padding-top: 15px;
+}
+
+table.order-summary tr.totals.grand td {
+	padding-bottom: 8px!important;
+}
+
 table.order-summary tr.totals td {
-	padding-bottom: 0;
+	padding-bottom: 0!important;
 }
 
 table.order-summary tr.totals strong {
 	color: #212b35;
+}
+
+table.order-summary tr.totals.refunded td {
+	border-top: 1px solid #e0e0e0
+}
+
+table.order-summary tr.totals.refunded td {
+	padding-top: 8px;
+}
+
+table.order-summary a.refund {
+	font-size: 13px;
+}
+
+.refund-form {
+	display: none;
+}
+
+.refund-form.on {
+	display: table-row
+}
+
+.refund-form input {
+	width: 49%;
 }
 
 .statamify-analytics .card-body h2 {
@@ -377,7 +417,7 @@ table.order-summary tr.totals strong {
 }
 
 .statamify-orders .order-item td {
-	vertical-align: top;
+	vertical-align: middle;
 	padding-right: 10px;
 	padding-left: 10px;
 }

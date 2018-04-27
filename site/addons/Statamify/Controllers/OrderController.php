@@ -10,6 +10,7 @@ use Statamic\Addons\Statamify\Models\Emails;
 use Statamic\API\Entry;
 use Statamic\API\File;
 use Statamic\API\Folder;
+use Statamic\Addons\Statamify\Models\Gateway;
 use Statamic\API\Helper;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Statamic\Addons\Statamify\Models\Order;
@@ -184,6 +185,40 @@ class OrderController extends Controller
         "refunded_partially" => "Refunded Partially"
       ]
     ]);
+
+  }
+
+  public function refund(Request $request)
+  {
+
+    $this->authorize('super');
+
+    $data = $request->all();
+
+    Validate::refund($data);
+
+    $order = Storage::getYAML('statamify/orders/' . $data['id']);
+    $payment = new Gateway($order);
+
+    $response = $payment->refund(number_format($data['amount'], 2, '.', ''), $data['reason']);
+
+    if (isset($response['success'])) {
+
+      $email_order_new = new Emails('order-refund', $response['data'], $order['listing_email']);
+      $email_order_new->sendEmail();
+
+      return [
+        'success' => true, 
+        'amount_refunded' => $response['data']['summary']['total']['refunded'],
+        'listing_status' => $response['data']['listing_status'],
+        'status' => $response['data']['status'],
+      ];
+
+    } else {
+
+      return ['errors' => $response];
+
+    }
 
   }
 

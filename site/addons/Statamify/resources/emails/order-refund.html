@@ -1,6 +1,6 @@
 Your order's status was updated!
 ===================
-This email is to confirm your order's status has been updated successfully. Go to {{ site_url}}/account to check the details.
+This email is to confirm that your order was refunded partially or fully. Go to {{ site_url}}/account to check the details.
 
 ---
 
@@ -337,18 +337,14 @@ This email is to confirm your order's status has been updated successfully. Go t
         <table cellspacing="0" cellpadding="0" width="600" class="w320">
           <tr>
             <td class="header-lg">
-              Your order has new status <br/>{{ listing_status }}
+              Your order has been refunded <br/>
             </td>
           </tr>
           <tr>
             <td class="free-text">
-             This email is to confirm your order's status has been updated successfully.
-             {{ if status == 'shipped' && shipping_method.tracking }}
-
-             <div class="hr"></div>
-             You can track your order <a href="{{ shipping_method.tracking }}">here</a>
-
-             {{ /if }}
+              This email is to confirm your order has been <span style="text-transform: lowercase">{{ listing_status }}</span> <br/>
+              Current amount of refund: {{ summary.total.refunded | statamify.money }}
+              {{ if payment_method.refund_reason }}<br/>Reason for refund: {{ payment_method.refund_reason }}{{ /if }}
             </td>
           </tr>
           <tr>

@@ -21,3 +21,6 @@ routes:
   delete@orders/delete: 
     uses: OrderController@delete
     as: statamify.orders.delete
+  post@orders/refund: 
+    uses: OrderController@refund
+    as: statamify.orders.refund

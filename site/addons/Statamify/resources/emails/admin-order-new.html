@@ -451,7 +451,7 @@ This email is to confirm your order has been placed successfully, and will be pr
 	                    {{ quantity }}
                     </td>
                     <td class="item-col" style="text-align: right">
-                      {{ price | multiply:quantity | statamify:money }}
+                      {{ price | multiply:quantity | statamify.money }}
                     </td>
                   </tr>
                   {{ /summary.items }}
@@ -473,10 +473,10 @@ This email is to confirm your order has been placed successfully, and will be pr
                       <span class="total-space" style="font-weight: bold; color: #4d4d4d">Total</span>
                     </td>
                     <td class="item-col price" style="text-align: right; border-top: 1px solid #cccccc;">
-                      <span class="total-space">{{ summary.total.sub | statamify:money }}</span> <br />
-                      <span class="total-space">{{ summary.total.shipping | statamify:money }}</span>  <br />
-                      <span class="total-space">{{ summary.total.discount | statamify:money }}</span>  <br />
-                      <span class="total-space" style="font-weight:bold; color: #4d4d4d">{{ summary.total.grand | statamify:money }}</span>
+                      <span class="total-space">{{ summary.total.sub | statamify.money }}</span> <br />
+                      <span class="total-space">{{ summary.total.shipping | statamify.money }}</span>  <br />
+                      <span class="total-space">{{ summary.total.discount | statamify.money }}</span>  <br />
+                      <span class="total-space" style="font-weight:bold; color: #4d4d4d">{{ summary.total.grand | statamify.money }}</span>
                     </td>
                   </tr>  
                 </table>

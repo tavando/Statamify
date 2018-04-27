@@ -42,8 +42,16 @@ class Emails
 				$attrs['subject'] = 'Order ' . $this->data['title'] . ' is now ' . strtolower(strip_tags($this->data['listing_status'])); 
 
 				break;
+
+			case 'order-refund':
+				
+				$attrs['subject'] = 'Order ' . $this->data['title'] . ' has been refunded'; 
+
+				break;
 			
 			default:
+
+				$attrs['subject'] = 'New message from the store'; 
 				
 				break;
 		}
@@ -60,7 +68,7 @@ class Emails
 		$email_id = date('Y-m-d_H-i-s') . '.' . $this->template;
 		$email_data = [
 			'title' => $this->template, 
-			'data' => json_encode($this->data), 
+			'data' => serialize($this->data), 
 			'email' => $this->to,
 			'id' => $email_id,
 			'date' => date('Y-m-d H:i:s')

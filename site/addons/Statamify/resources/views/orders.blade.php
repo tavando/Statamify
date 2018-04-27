@@ -67,6 +67,7 @@
                                   <a href="@{{ item.edit_url }}">@{{ item.name }}</a>
                                   <p v-if="item.variant">Variant: @{{ item.variant }}</p>
                                   <p>SKU: @{{ item.sku || '-' }}</p>
+                                  <p v-if="item.custom">@{{ item.custom }}</p>
                                 </td>
                                 <td class="item-totals">@{{ item.price | money }}</td>
                                 <td class="item-totals">×</td>
@@ -78,16 +79,31 @@
                                 <td class="item-totals">@{{ order.summary.total.sub | money }}</td>
                               </tr>
                               <tr class="noborder totals">
-                                <td colspan="5" class="text-right">Shipping</td>
-                                <td class="item-totals">@{{ order.summary.total.shipping | money }}</td>
-                              </tr>
-                              <tr class="noborder totals">
                                 <td colspan="5" class="text-right">Discount</td>
                                 <td class="item-totals">@{{ order.summary.total.discount | money }}</td>
                               </tr>
                               <tr class="noborder totals">
-                                <td colspan="5" class="text-right"><strong>Total</strong></td>
+                                <td colspan="5" class="text-right">Shipping</td>
+                                <td class="item-totals">@{{ order.summary.total.shipping | money }}</td>
+                              </tr>
+                              <tr class="noborder totals grand">
+                                <td colspan="2"><a href="" class="btn refund" v-if="order.status != 'refunded'">Refund</a></td>
+                                <td colspan="3" class="text-right"><strong>Total</strong></td>
                                 <td class="item-totals"><strong>@{{ order.summary.total.grand | money }}</strong></td>
+                              </tr>
+                              <tr class="totals refunded" v-show="order.status == 'refunded' || order.status == 'refunded_partially'">
+                                <td colspan="2"></td>
+                                <td colspan="3" class="text-right">Refunded</td>
+                                <td class="item-totals">@{{ order.summary.total.refunded | money }}</td>
+                              </tr>
+                              <tr class="noborder totals refund-form" v-if="order.status != 'refunded'">
+                                <td colspan="3"><input placeholder="Amount to refund" name="refund_amount"> <input placeholder="Reason (optional)" name="refund_reason"></td>
+                                <td class="item-totals text-right" colspan="3">
+                                  <a href="" class="btn btn-primary refund">Refund 
+                                    <span v-if="order.payment_method.name == 'Cheque'">manually</span>
+                                    <span v-else>via @{{ order.payment_method.name }}</span>
+                                  </a>
+                                </td>
                               </tr>
                             </tbody>
                           </table>
@@ -169,6 +185,7 @@
                             <strong>Name:</strong> @{{ order.payment_method.name }}<br>
                             <strong>Fee:</strong> @{{ order.payment_method.fee | money }}<br>
                             <strong>Id:</strong> @{{ order.payment_method.id || '-' }}<br>
+                            <div class="refund-reason" v-show="order.payment_method.refund_reason"><strong>Refund Reason:</strong> <span>@{{ order.payment_method.refund_reason }}</span></div>
                           </div>
                         </div>
                       </div>
@@ -190,13 +207,25 @@
 
 <script>
 
-  Vue.filter('money', function(price) {
+  function money(price) {
+
+    minus = false
+    if (price < 0) {
+      price *= -1
+      minus = true
+    }
 
     price = parseFloat(price).toFixed(2)
     price = {!! $moneyFormatFn !!}
     formatMoney = '{{ $moneyFormat }}'
 
-    return formatMoney.replace('[symbol]', '{!! $moneySymbol !!}').replace('[price]', price)
+    return (minus ? '-' : '') + formatMoney.replace('[symbol]', '{!! $moneySymbol !!}').replace('[price]', price)
+
+  }
+
+  Vue.filter('money', function(price) {
+
+    return money(price)
 
   })
 
