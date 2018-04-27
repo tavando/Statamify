@@ -172,6 +172,7 @@ class OrderController extends Controller
     $this->authorize('super');
 
     return $this->view('orders', [
+      'title' => 'Store: Orders',
       'moneyFormat' => Statamify::money(null, 'format'),
       'moneyFormatFn' => Statamify::money(null, 'formatPriceJS'),
       'moneySymbol' => Statamify::money(null, 'symbol'),

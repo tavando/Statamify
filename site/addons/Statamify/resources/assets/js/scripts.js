@@ -496,12 +496,12 @@ Vue.component('statamify-analytics', {
 				if (type == 'totalOrders') {
 					item.sub = money(_.reduce(item.value, function(sum, order) { return sum + order.summary.total.sub }, 0))
 					item.discount = money(_.reduce(item.value, function(sum, order) { return sum + order.summary.total.discount }, 0))
-					item.returns = money(_.reduce(item.value, function(sum, order) { return sum + (order.summary.total.returns ? order.summary.total.returns : 0) }, 0))
-					item.net = money(_.reduce(item.value, function(sum, order) { return sum + order.summary.total.grand - parseFloat(order.summary.total.shipping) }, 0))
+					item.refunded = money(_.reduce(item.value, function(sum, order) { return sum + (order.summary.total.refunded ? order.summary.total.refunded : 0) }, 0))
+					item.net = money(_.reduce(item.value, function(sum, order) { return sum + order.summary.total.grand - parseFloat(order.summary.total.shipping) + parseFloat(order.summary.total.refunded ? order.summary.total.refunded : 0) }, 0))
 					item.shipping = money(_.reduce(item.value, function(sum, order) { return sum + parseFloat(order.summary.total.shipping) }, 0))
 				}
 
-				grand = _.reduce(item.value, function(sum, order) { return sum + order.summary.total.grand }, 0)
+				grand = _.reduce(item.value, function(sum, order) { return sum + order.summary.total.grand + parseFloat(order.summary.total.refunded ? order.summary.total.refunded : 0) }, 0)
 				item.grand = money(grand)
 				item.value = item.value ? item.value.length : item.value
 
@@ -515,6 +515,8 @@ Vue.component('statamify-analytics', {
 	},
 	ready: function() {
 		vm = this
+
+		this.$set('data', initialData)
 
 		$j('input[name="daterange"]').daterangepicker({
 			locale: {

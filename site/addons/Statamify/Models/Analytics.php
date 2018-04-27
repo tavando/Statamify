@@ -4,7 +4,9 @@ namespace Statamic\Addons\Statamify\Models;
 
 use Statamic\API\Collection;
 use Statamic\API\Entry;
+use Statamic\API\Folder;
 use Statamic\Addons\Statamify\Statamify;
+use Statamic\API\Storage;
 
 class Analytics
 {
@@ -35,20 +37,22 @@ class Analytics
 	private function summary($range, $split) {
 
 		$format = $split == 'perhour' ? 'H' : 'Y-m-d';
-		$orders = collect(Entry::whereCollection('orders')->toArray());
+		$orders = collect(Folder::getFiles('site/storage/statamify/orders'))->map(function($path) {
+			return Storage::getYAML(str_replace('site/storage/', '', $path));
+		});
 
 		$filtered = $orders->filter(function($order) use ($range) {
 
 			$start = $range[0];
 			$end = $range[1];
 
-			return $order['datestamp'] >= $start && $order['datestamp'] <= $end;
+			return strtotime($order['date']) >= $start && strtotime($order['date']) <= $end;
 
 		});
 
 		$grouped = $filtered->groupBy(function ($order) use ($format) {
 
-			return date($format, $order['datestamp']);
+			return date($format, strtotime($order['date']));
 
 		});
 

@@ -78,7 +78,7 @@
 										<th class="pr-16 text-right" v-if="popup.type == 'averageOrderValue'">Average Order Value</th>
 										<th class="pr-16 text-right" v-if="popup.type == 'totalOrders'">Gross Sales</th>
 										<th class="pr-16 text-right" v-if="popup.type == 'totalOrders'">Discounts</th>
-										<th class="pr-16 text-right" v-if="popup.type == 'totalOrders'">Returns</th>
+										<th class="pr-16 text-right" v-if="popup.type == 'totalOrders'">Refunds</th>
 										<th class="pr-16 text-right" v-if="popup.type == 'totalOrders'">Net Sales</th>
 										<th class="pr-16 text-right" v-if="popup.type == 'totalOrders'">Shipping</th>
 										<th class="pr-24 text-right" v-if="popup.type == 'totalOrders'">Total</th>
@@ -92,7 +92,7 @@
 										<td class="pr-24 text-right" v-if="popup.type == 'averageOrderValue'">@{{ order.avg }}</td>
 										<td class="pr-16 text-right" v-if="popup.type == 'totalOrders'">@{{ order.sub }}</td>
 										<td class="pr-16 text-right" v-if="popup.type == 'totalOrders'">@{{ order.discount }}</td>
-										<td class="pr-16 text-right" v-if="popup.type == 'totalOrders'">@{{ order.returns }}</td>
+										<td class="pr-16 text-right" v-if="popup.type == 'totalOrders'">@{{ order.refunded }}</td>
 										<td class="pr-16 text-right" v-if="popup.type == 'totalOrders'">@{{ order.net }}</td>
 										<td class="pr-16 text-right" v-if="popup.type == 'totalOrders'">@{{ order.shipping }}</td>
 										<td class="pr-24 text-right" v-if="popup.type == 'totalOrders'">@{{ order.grand }}</td>
@@ -148,11 +148,17 @@
 
 	function money(price) {
 
-		price = parseFloat(price).toFixed(2)
+		minus = false
+    if (price < 0) {
+      price *= -1
+      minus = true
+    }
+
+    price = parseFloat(price).toFixed(2)
     price = {!! $moneyFormatFn !!}
     formatMoney = '{{ $moneyFormat }}'
 
-    return formatMoney.replace('[symbol]', '{!! $moneySymbol !!}').replace('[price]', price)
+    return (minus ? '-' : '') + formatMoney.replace('[symbol]', '{!! $moneySymbol !!}').replace('[price]', price)
 
 	}
 
