@@ -58,6 +58,49 @@ class System
 
   }
 
+  public static function route($as, $type, $add)
+  {
+
+    $routes = Config::getRoutes();
+
+    if (is_array($type)) {
+
+      $collection = collect($routes[$add]);
+
+    } else {
+
+      $collection = collect($routes[$type]);
+
+    }
+
+    $url = $collection->search(function($route) use ($as) {
+      return isset($route['as']) && $route['as'] == $as;
+    });
+
+    if ($url) {
+
+      if (is_array($type)) {
+
+        foreach ($type as $key => $value) {
+          
+          $url = str_replace('{' . $key . '}', $value, $url);
+
+        }
+
+      }
+
+      return $url;
+
+    } else {
+
+      return $as;
+
+    }
+    
+    return $url ?: $as;
+
+  }
+
   public static function wrapGlobals($data)
   {
 

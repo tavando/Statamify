@@ -50,7 +50,7 @@ class OrderController extends Controller
 
       if (isset($data['errors'])) {
 
-        return redirect('/store/checkout')->withInput([
+        return redirect(Statamify::route('statamify.store.checkout'))->withInput([
           'errors' => $data['errors'],
           'data' => $input
         ]);
@@ -71,15 +71,25 @@ class OrderController extends Controller
 
       } else {
 
-        return redirect('/account/order/' . $data['slug'])->withInput($data);
+        if (!$data['user']) {
+
+          $url = Statamify::route('statamify.store.summary', ['slug' => $data['slug']]);
+
+        } else {
+
+          $url = Statamify::route('statamify.account.order', ['slug' => $data['slug']]);
+
+        }
+
+        return redirect($url)->withInput($data);
         
       }
 
     } else {
 
-      return redirect('/store/checkout')->withInput([
+      return redirect(Statamify::route('statamify.store.checkout'))->withInput([
         'errors' => $valid,
-        'data' => $data
+        'data' => $input
       ]);
 
     }

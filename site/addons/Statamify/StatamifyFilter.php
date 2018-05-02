@@ -56,6 +56,7 @@ class StatamifyFilter extends Filter
 
 					$fieldset = Fieldset::get(Collection::whereHandle('store_products')->get('fieldset'));
 					$fieldset_data = $fieldset->toArray();
+					$param['field'] = str_replace(['store_types', 'store_vendors', 'store_categories'], ['type', 'vendor', 'categories'], $param['field']);
 					$key = array_search($param['field'], array_column($fieldset_data['fields'], 'name'));
 
 					if (!is_bool($key) && $fieldset_data['fields'][$key]['type'] == 'collection') {
@@ -72,7 +73,7 @@ class StatamifyFilter extends Filter
 
 					}
 
-					// ADD TAGS TO CHECK
+					$param['field'] = str_replace(['store_types', 'store_vendors', 'store_categories'], ['type', 'vendor', 'categories'], $param['field']);
 
 					return $param;
 

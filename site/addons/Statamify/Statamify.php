@@ -37,6 +37,13 @@ class Statamify
 
   }
 
+  public static function route($as = '', $type = 'routes', $add = 'routes')
+  {
+
+    return System::route($as, $type, $add);
+
+  }
+
   public static function routes()
   {
 

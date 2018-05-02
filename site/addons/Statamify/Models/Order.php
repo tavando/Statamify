@@ -59,7 +59,11 @@ class Order
 
     } else {
 
-      $this->createUser();
+      if (!Statamify::config('guest_checkout')) {
+
+        $this->createUser();
+
+      }
 
     }
 
@@ -138,11 +142,19 @@ class Order
 
     $this->data['listing_status'] = '<span class="order-status ' . $this->data['status'] . '">' . Statamify::t('status.' . $this->data['status']) . '</span>';
     $this->data['listing_total'] = Statamify::money($this->data['summary']['total']['grand']);
-    $this->data['listing_customer'] = $customer->get('title') . ' <a href="' . CP_ROUTE . '/collections/entries/store_customers/' . $this->user->get('id') . '" class="statamify-link"><span class="icon icon-forward"></span></a>';
+    $this->data['listing_customer'] = $customer->get('title') . ' <a href="' . CP_ROUTE . '/collections/entries/store_customers/' . (property_exists($this, 'user') ? $this->user->get('id') : $this->data['email']) . '" class="statamify-link"><span class="icon icon-forward"></span></a>';
 
     $this->data['listing_email'] = $this->data['email'];
 
-    unset($this->data['email'], $this->data['_token'], $this->data['addresso'], $this->data['payment_token'], $this->data['coupon']);
+    unset(
+      $this->data['email'], 
+      $this->data['_token'], 
+      $this->data['addresso'], 
+      $this->data['payment_token'], 
+      $this->data['coupon'],
+      $this->data['password'], 
+      $this->data['password_confirmation']
+    );
 
     $order_id = date('Y-m-d_H-i-s') . '.' . slugify($this->data['title']);
     $this->data['date'] = date('Y-m-d H:i:s');
@@ -202,7 +214,15 @@ class Order
 
   private function getCustomer() {
 
-    $customer = Entry::whereSlug($this->user->get('id'), 'store_customers');
+    if (property_exists($this, 'user')) {
+
+      $customer = Entry::whereSlug($this->user->get('id'), 'store_customers');
+
+    } else {
+
+      $customer = Entry::whereSlug($this->data['email'], 'store_customers');
+
+    }
 
     if (!$customer) {
 
@@ -211,16 +231,30 @@ class Order
       $address = $this->data['shipping'];
       $address['default'] = true;
 
+      if (property_exists($this, 'user')) {
+
+        $first_name = $this->user->get('first_name');
+        $last_name = $this->user->get('last_name');
+        $slug = $this->user->get('id');
+
+      } else {
+
+        $first_name = $this->data['shipping']['first_name'];
+        $last_name = $this->data['shipping']['last_name'];
+        $slug = $this->data['email'];
+
+      }
+
       $customer_data = [
         'user' => $this->data['user'],
-        'title' => $this->user->get('first_name') . ' ' . $this->user->get('last_name'),
+        'title' => $first_name . ' ' . $last_name,
         'listing_orders' => 1,
         'listing_spent' => '<span data-total="' . $this->cart['total']['grand'] . '">' . Statamify::money($this->cart['total']['grand']) . '</span>',
-        'addresses' => $address,
+        'addresses' => [$address],
         'orders' => []
       ];
 
-      $customer = Entry::create($this->user->get('id'))
+      $customer = Entry::create($slug)
       ->collection('store_customers')
       ->with($customer_data)
       ->published(true)

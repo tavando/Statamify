@@ -74,7 +74,7 @@ class Orders
 
 		} else {
 
-			return redirect('/account/login');
+			return redirect(Statamify::route('statamify.account.login'));
 
 		}
 

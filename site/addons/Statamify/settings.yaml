@@ -21,18 +21,23 @@ fields:
 		display: Order ID Format
 		instructions: Remember to use [id] inside the format
 		default: '#[id]'
-		width: 33
+		width: 25
 	order_next_id:
 		type: text
 		display: Next Order ID
 		instructions: Incremental value for every order
-		width: 33
+		width: 25
 		default: 1000
+	guest_checkout:
+		type: toggle
+		display: Guest Checkout
+		instructions: Allow non-registered users to checkout
+		width: 25
 	queue_emails:
 		type: toggle
 		display: Queue Emails
 		instructions: Delay emails after order created - use Cron to send them
-		width: 33
+		width: 25
 	shipping:
 		type: section
 		display: Shipping

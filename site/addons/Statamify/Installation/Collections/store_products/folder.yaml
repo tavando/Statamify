@@ -1,6 +1,8 @@
 title: "Store: Products"
 fieldset: store_products
 template: store/product
+order: number
+sort_dir: desc
 columns:
   - title
   - listing_image

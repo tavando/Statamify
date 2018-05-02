@@ -68,11 +68,11 @@ class AccountController extends Controller
 
         if ($index == 'new') {
 
-          return redirect('/account');
+          return redirect(Statamify::route('statamify.account'));
 
         } else {
 
-          return redirect('/account/address/' . $index);
+          return redirect(Statamify::route('statamify.account.address') . '/' . $index);
 
         }
 
@@ -104,7 +104,7 @@ class AccountController extends Controller
           $customer->set('addresses', array_values($addresses));
           $customer->save();
 
-          return redirect('/account');
+          return redirect(Statamify::route('statamify.account'));
 
         }
 

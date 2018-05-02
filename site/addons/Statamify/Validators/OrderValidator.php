@@ -59,8 +59,8 @@ class OrderValidator
       'shipping_method' => 'required',
       'payment_method' => 'required',
 
-      'password' => 'confirmed|required_if:user,',
-      'password_confirmation' => 'required_if:user,',
+      'password' => Statamify::config('guest_checkout') ? '' : 'confirmed|required_if:user,',
+      'password_confirmation' => Statamify::config('guest_checkout') ? '' : 'required_if:user,',
 
       'payment_token' => 'required_if:payment_method,stripe',
 

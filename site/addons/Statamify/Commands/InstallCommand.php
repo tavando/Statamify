@@ -32,6 +32,7 @@ class InstallCommand extends Command
     $store_routes = [
       '/account' => [
         'template' => 'account/account',
+        'as' => 'statamify.account',
         'protect' => [
           'type' => 'logged_in',
           'login_url' => '/account/login'
@@ -39,6 +40,7 @@ class InstallCommand extends Command
       ],
       '/account/order/{slug}' => [
         'template' => 'account/order',
+        'as' => 'statamify.account.order',
         'protect' => [
           'type' => 'logged_in',
           'login_url' => '/account/login'
@@ -46,20 +48,45 @@ class InstallCommand extends Command
       ],
       '/account/address/{address_index}' => [
         'template' => 'account/address',
+        'as' => 'statamify.account.address',
         'protect' => [
           'type' => 'logged_in',
           'login_url' => '/account/login'
         ]
       ],
-      '/account/login' => 'account/login',
-      '/account/register' => 'account/register',
-      '/account/forgotten' => 'account/forgotten',
-      '/account/reset' => 'account/reset',
+      '/account/login' => [
+        'template' => 'account/login',
+        'as' => 'statamify.account.login'
+      ],
+      '/account/register' => [
+        'template' => 'account/register',
+        'as' => 'statamify.account.register'
+      ],
+      '/account/forgotten' => [
+        'template' => 'account/forgotten',
+        'as' => 'statamify.account.forgotten'
+      ],
+      '/account/reset' => [
+        'template' => 'account/reset',
+        'as' => 'statamify.account.reset'
+      ],
 
-      '/store' => 'store/store',
-      '/store/cart' => 'store/cart',
-      '/store/checkout' => 'store/checkout',
-      '/store/summary' => 'store/summary',
+      '/store' => [
+        'template' => 'store/store',
+        'as' => 'statamify.store'
+      ],
+      '/store/cart' => [
+        'template' => 'store/cart',
+        'as' => 'statamify.store.cart'
+      ],
+      '/store/checkout' => [
+        'template' => 'store/checkout',
+        'as' => 'statamify.store.checkout'
+      ],
+      '/store/summary' => [
+        'template' => 'store/summary',
+        'as' => 'statamify.store.summary'
+      ],
     ];
 
     $store_collections = [

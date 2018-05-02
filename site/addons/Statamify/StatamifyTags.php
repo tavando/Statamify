@@ -16,6 +16,12 @@ class StatamifyTags extends Tags
 
   public function index()
   {
+
+    $get = $this->get('get');
+
+    if ($get) {
+      return $get;
+    }
     
     return '';
 
@@ -76,6 +82,13 @@ class StatamifyTags extends Tags
 
   }
 
+  public function guest()
+  {
+
+    return $this->getConfigBool('guest_checkout');
+
+  }
+
   public function location()
   {
 
@@ -110,6 +123,21 @@ class StatamifyTags extends Tags
         return $this->parseLoop($orders);
 
       }
+
+    }
+
+  }
+
+  public function sort()
+  {
+
+    if (isset($_GET['sort'])) {
+
+      return $_GET['sort'];
+
+    } else {
+
+      return 'order:desc';
 
     }
 
