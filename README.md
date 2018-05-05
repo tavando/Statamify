@@ -5,12 +5,12 @@ Statamify is **FREE** Shopify-like ecommerce addon for Statamic.
 
 Check demo: http://demo.statamify.com/
 
-Currently it's not production ready and fully working eCommerce store. It's still in development.
-
 To install:
 - Copy the `site` folder and put in respective place
 - Open command and type: `php please statamify:install`. This will add all necessary routes, fieldsets and collections
 - Go to `site/statamic/` folder and install OmniPay plugins (currently only Stripe is integrated: `composer require omnipay/stripe:~2.0`)
+
+Docs will be added soon - keep in touch!
 
 ## Screenshots
 ![All products](/screenshot-products.jpg?raw=true "All products")

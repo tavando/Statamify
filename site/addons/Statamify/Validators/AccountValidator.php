@@ -34,7 +34,7 @@ class AccountValidator
 
     if ($validator->fails()) {
 
-      throw new \Exception(Statamify::t('somethings_wrong', 'errors'));
+      Statamify::response(400, (Statamify::t('somethings_wrong', 'errors')));
 
     }
 

@@ -40,7 +40,7 @@ class System
 
       $data = [
         'type' => 'Error',
-        'response' => ['error' => $msg] 
+        'response' => ['message' => $msg] 
       ];
 
     } else {

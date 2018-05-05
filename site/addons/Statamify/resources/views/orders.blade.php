@@ -79,7 +79,9 @@
                                 <td class="item-totals">@{{ order.summary.total.sub | money }}</td>
                               </tr>
                               <tr class="noborder totals">
-                                <td colspan="5" class="text-right">Discount</td>
+                                <td colspan="2" v-if="order.summary.total.discount">Coupon used: <strong>@{{ order.summary.coupons.join(', ') }}</strong></td>
+                                <td colspan="2" v-else></td>
+                                <td colspan="3" class="text-right">Discount</td>
                                 <td class="item-totals">@{{ order.summary.total.discount | money }}</td>
                               </tr>
                               <tr class="noborder totals">
@@ -115,7 +117,7 @@
                           <h2>Shipping Address</h2>
                           <div class="small-text">
                             <strong>Name:</strong> @{{ order.shipping.first_name }} @{{ order.shipping.last_name }}<br>
-                            <template v-if="order.shipping.company"><strong>Company: </strong>Tavando<br></template>
+                            <template v-if="order.shipping.company"><strong>Company: </strong>@{{ order.shipping.company }}<br></template>
                             <strong>Address:</strong> @{{ order.shipping.address }}<template v-if="order.shipping.address_2">, @{{ order.shipping.address_2 }} </template><br>
                             <strong>City:</strong> @{{ order.shipping.city }} <br/>
                             <strong>Postal:</strong> @{{ order.shipping.postal }}<template v-if="order.shipping.region">, @{{ order.shipping.region }} </template> <br>
@@ -128,7 +130,7 @@
                           <h2>Billing Address</h2>
                           <div class="small-text" v-if="order.billing_diff">
                             <strong>Name:</strong> @{{ order.billing.first_name }} @{{ order.billing.last_name }}<br>
-                            <template v-if="order.billing.company"><strong>Company: </strong>Tavando<br></template>
+                            <template v-if="order.billing.company"><strong>Company: </strong>@{{ order.billing.company }}<br></template>
                             <strong>Address:</strong> @{{ order.billing.address }}<template v-if="order.billing.address_2">, @{{ order.billing.address_2 }} </template><br>
                             <strong>City:</strong> @{{ order.billing.city }} <br/>
                             <strong>Postal:</strong> @{{ order.billing.postal }}<template v-if="order.billing.region">, @{{ order.billing.region }} </template> <br>

@@ -15,12 +15,12 @@ class CartValidator
 
     $validator = Validator::make($data, [
       'product' => 'required',
-      'quantity' => 'required',
+      'quantity' => 'required'
     ]);
 
     if ($validator->fails()) {
 
-      throw new \Exception(Statamify::t('somethings_wrong', 'errors'));
+      Statamify::response(400, (Statamify::t('somethings_wrong', 'errors')));
 
     }
 
@@ -176,7 +176,7 @@ class CartValidator
 
     if ($validator->fails()) {
 
-      throw new \Exception(Statamify::t('somethings_wrong', 'errors'));
+      Statamify::response(400, (Statamify::t('somethings_wrong', 'errors')));
 
     }
 
@@ -191,7 +191,7 @@ class CartValidator
 
     if ($validator->fails()) {
 
-      throw new \Exception(Statamify::t('somethings_wrong', 'errors'));
+      Statamify::response(400, (Statamify::t('somethings_wrong', 'errors')));
 
     }
 
@@ -207,7 +207,7 @@ class CartValidator
 
     if ($validator->fails()) {
 
-      throw new \Exception(Statamify::t('somethings_wrong', 'errors'));
+      Statamify::response(400, (Statamify::t('somethings_wrong', 'errors')));
 
     }
 
@@ -222,7 +222,7 @@ class CartValidator
 
     if ($validator->fails()) {
 
-      throw new \Exception(Statamify::t('somethings_wrong', 'errors'));
+      Statamify::response(400, (Statamify::t('somethings_wrong', 'errors')));
 
     }
 
@@ -237,7 +237,7 @@ class CartValidator
 
     if ($validator->fails()) {
 
-      throw new \Exception(Statamify::t('somethings_wrong', 'errors'));
+      Statamify::response(400, (Statamify::t('somethings_wrong', 'errors')));
 
     }
 

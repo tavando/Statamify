@@ -330,7 +330,7 @@ class Cart
 
 				// If there are too many items of the product in cart, throws error
 
-				if ($product->get('inventory') < $item['quantity']) Statamify::response(500, Statamify::t('product_too_many', 'errors'));
+				if ($product->get('inventory') < $item['quantity']) Statamify::response(400, Statamify::t('product_too_many', 'errors'));
 
 			} elseif ($product->get('class') == 'complex') {
 
@@ -350,7 +350,7 @@ class Cart
 
 						// If there are too many items of the product's variant in cart, throws error
 
-						if (!$variant['inventory'] || $variant['inventory'] < $item['quantity']) Statamify::response(500, Statamify::t('product_too_many', 'errors'));
+						if (!$variant['inventory'] || $variant['inventory'] < $item['quantity']) Statamify::response(400, Statamify::t('product_too_many', 'errors'));
 
 					}
 
@@ -386,10 +386,6 @@ class Cart
 			if (!is_bool($key) && isset($addresses[$key])) {
 
 				$address = $addresses[$key];
-
-				$parts = explode(';', $address['country']);
-				$address['country'] = $parts[0];
-				$address['region'] = @$parts[1];
 
 				session(['statamify.default_address' => [
 					'defaultKey' => $key,
@@ -455,7 +451,7 @@ class Cart
 
 					if (!isset($item['variant']) || !$item['variant']) {
 
-						Statamify::response(500, Statamify::t('variant_required', 'errors'));
+						Statamify::response(400, Statamify::t('variant_required', 'errors'));
 
 					} else {
 
@@ -463,7 +459,7 @@ class Cart
 
 						$variant_key = array_search($item['variant'], array_column($product->get('variants'), 'id'));
 
-						if (is_bool($variant_key)) Statamify::response(500, Statamify::t('variant_not_found', 'errors'));
+						if (is_bool($variant_key)) Statamify::response(404, Statamify::t('variant_not_found', 'errors'));
 
 					}
 
@@ -489,7 +485,7 @@ class Cart
 
 			} else {
 
-				Statamify::response(500, Statamify::t('product_not_found', 'errors'));
+				Statamify::response(404, Statamify::t('product_not_found', 'errors'));
 
 			}
 
@@ -553,7 +549,7 @@ class Cart
 
 				} else {
 
-					Statamify::response(500, Statamify::t('product_not_found', 'errors'));
+					Statamify::response(404, Statamify::t('product_not_found', 'errors'));
 
 				}
 

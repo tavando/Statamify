@@ -12,28 +12,47 @@ class Location
 
     $countries = Statamify::location();
 		$regions = Statamify::location('regions');
-		
-		$is_part = strpos($s->get('country'), ';') !== false;
 
-		if ($s->get('country') && $is_part) {
+		if (isset($s->context['country'])) {
 
-			$country = $s->get('country');
-
-		} else {
-
-			$country = session('statamify.shipping_country');
+			$country = $s->context['country'];
+			$region = $s->context['region'];
 
 		}
 
-		if ($country) {
+		if (isset($s->context['defaultKey'])) {
 
-			if ($is_part) {
+			$country = $s->context['default']['country'];
+			$region = $s->context['default']['region'];
 
-				$parts = explode(';', $country);
-				$country = $parts[0];
-				$region = $parts[1];
+			if (session('statamify.shipping_country')) {
+
+				$country = session('statamify.shipping_country');
+				$region = '';
 
 			}
+
+		}
+
+		if (isset($s->context['old']['data'])) {
+
+			if (isset($s->context['defaultKey'])) {
+
+				$country = $s->context['old']['data']['shipping']['country'];
+				$region = $s->context['old']['data']['shipping']['region'];
+
+			} else {
+
+				$country = $s->context['old']['data']['billing']['country'];
+				$region = $s->context['old']['data']['billing']['region'];
+
+			}
+			
+		}
+
+		$countries = reset($countries);
+
+		if (isset($country)) {
 
 			$regions = reset($regions);
 
@@ -47,22 +66,23 @@ class Location
 
 			}
 
+			return [ 
+				'countries' => $countries, 
+				'regions' => $regions,
+				'country' => $countries[$country],
+				'region' => $regions ? (isset($regions[$region]) ? $regions[$region] : $region) : $region,
+				'country_code' => $country,
+				'region_code' => @$region
+			];
+
 		} else {
 
-			$regions = false;
+			return [ 
+				'countries' => $countries, 
+				'regions' => ''
+			];
 
 		}
-
-		$countries = reset($countries);
-
-		return [ 
-			'countries' => $countries, 
-			'regions' => $regions,
-			'country' => $is_part ? $countries[$country] : $country,
-			'region' => $is_part ? (isset($regions[$region]) ? $regions[$region] : $region) : null,
-			'country_code' => $country,
-			'region_code' => @$region
-		];
 
   }
 

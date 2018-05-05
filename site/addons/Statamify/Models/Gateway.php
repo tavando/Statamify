@@ -147,7 +147,7 @@ class Gateway
     $request = $gateway->purchase([
       'amount' => $this->cart['total']['grand'],
       'currency' => 'USD',
-      'description' => $this->order['title'],
+      'description' => $this->order['title'] . ' ' . env('STATAMIFY_PAYMENT_DESC', ''),
       'source' => $token
     ]);
 

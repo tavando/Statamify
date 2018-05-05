@@ -2,6 +2,7 @@
 
 return [
 
+	'coupon_cant_multiple' => 'You can\'t add more coupons',
 	'coupon_not_found' => 'Coupon doesn\'t exist',
 	'coupon_not_valid' => 'Coupon is not valid',
 	'coupon_used' => 'Coupon already used',

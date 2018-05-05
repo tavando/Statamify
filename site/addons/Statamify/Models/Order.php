@@ -87,7 +87,9 @@ class Order
 
       // Add image based on the class and crop it with Glide
 
-      if ($item['variant']) {
+      $variant_image = false;
+
+      if ($item['variant'] && isset($item['product']['gallery'])) {
 
         foreach ($item['product']['gallery'] as $img) {
 
@@ -97,6 +99,7 @@ class Order
 
             $image = $asset->manipulate(['w' => 50, 'h' => 50, 'fit' => 'crop']);
             $image_original = $img;
+            $variant_image = true;
 
           }
 
@@ -104,7 +107,7 @@ class Order
 
       }
 
-      if (!isset($image)) {
+      if (!$variant_image) {
 
         if (isset($item['product']['image'])) {
 
@@ -116,6 +119,10 @@ class Order
             $image_original = $item['product']['image'];
 
           }
+
+        } else {
+
+          $image = $image_original = '';
 
         }
 
@@ -279,6 +286,10 @@ class Order
     if (isset($this->data['billing_diff']) && $this->data['billing_diff'] == '1') {
 
       $this->data['billing_diff'] = true;
+
+    } else {
+
+      $this->data['billing'] = [];
 
     }
 

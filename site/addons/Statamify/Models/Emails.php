@@ -98,7 +98,7 @@ class Emails
 	public function sendEmail()
 	{
 
-		if (Statamify::config('queue_emails')) {
+		if (env('STATAMIFY_QUEUE_EMAILS', false)) {
 
 			$this->create();
 

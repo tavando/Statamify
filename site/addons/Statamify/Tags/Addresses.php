@@ -25,9 +25,6 @@ class Addresses
 				$addresses = $customer->get('addresses');
 
 				foreach ($addresses as $key => $address) {
-					$parts = explode(';', $address['country']);
-					$address['country'] = $parts[0];
-					$address['region'] = @$parts[1];
 
 					if (!$default_address && $address['default']) {
 

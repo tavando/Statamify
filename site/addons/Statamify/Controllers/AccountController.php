@@ -6,6 +6,7 @@ use Statamic\Addons\Statamify\Validators\AccountValidator as Validate;
 use Statamic\Extend\Controller;
 use Statamic\API\Entry;
 use Illuminate\Http\Request;
+use Statamic\Addons\Statamify\Statamify;
 use Statamic\API\User;
 
 class AccountController extends Controller
@@ -27,10 +28,9 @@ class AccountController extends Controller
 
         $addresses = $customer->get('addresses');
 
-        $data['country'] = $data['country'] . ';' . $data['region'];
         $index = $data['address_index'];
 
-        unset($data['region'], $data['_token'], $data['address_index'], $data['addresso']);
+        unset($data['_token'], $data['address_index'], $data['addresso']);
 
         if ($data['default'] == 'true') {
 
@@ -72,7 +72,7 @@ class AccountController extends Controller
 
         } else {
 
-          return redirect(Statamify::route('statamify.account.address') . '/' . $index);
+          return redirect(Statamify::route('statamify.account.address', ['address_index' => $index]));
 
         }
 

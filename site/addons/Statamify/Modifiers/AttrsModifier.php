@@ -5,7 +5,7 @@ namespace Statamic\Addons\Statamify\Modifiers;
 use Statamic\Extend\Modifier;
 use Statamic\Addons\Statamify\Statamify;
 
-class MoneyModifier extends Modifier
+class AttrsModifier extends Modifier
 {
 	/**
 	 * Modify a value

@@ -26,11 +26,17 @@ class CartController extends Controller
   {
 
     $data = $request->all();
-    $cart = $cart->get();
+    $c = $cart->get();
 
-    if (!in_array($coupon, $cart['coupons'])) {
+    if (count($c['coupons']) && Statamify::config('coupons_multiple', false)) {
 
-      $valid = Validate::coupon($data, $cart);
+      return Statamify::response(400, Statamify::t('coupon_cant_multiple', 'errors'));
+      
+    }
+
+    if (!in_array($data['coupon'], $c['coupons'])) {
+
+      $valid = Validate::coupon($data, $c);
 
       if (is_bool($valid)) {
 
@@ -38,13 +44,13 @@ class CartController extends Controller
 
       } else {
 
-        return Statamify::response(500, $valid);
+        return Statamify::response(400, $valid);
 
       }
 
     } else {
 
-      return Statamify::response(500, Statamify::t('coupon_used', 'errors'));
+      return Statamify::response(400, Statamify::t('coupon_used', 'errors'));
 
     }
 
@@ -116,7 +122,7 @@ class CartController extends Controller
 
   }
 
-  public function setShippingMethod(Request $request) {
+  public function setShippingMethod(Request $request, Cart $cart) {
 
     Validate::setShippingMethod($request->all());
 
@@ -124,7 +130,7 @@ class CartController extends Controller
 
     session(['statamify.shipping_method' => isset($shipping[1]) ? $shipping[1] : 0]);
 
-    $this->get();
+    return $cart->get();
 
   }
 

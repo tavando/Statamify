@@ -27,6 +27,15 @@ fields:
       simple: Simple
       complex: Complex
     default: simple
+    width: 50
+  date:
+    type: date
+    display: Date
+    allow_blank: false
+    allow_time: true
+    require_time: false
+    earliest_date: January 1, 1900
+    width: 50
   price:
     type: text
     display: Price

@@ -3,6 +3,7 @@
 namespace Statamic\Addons\Statamify;
 
 use Statamic\Addons\Statamify\Tags\Addresses;
+use Statamic\Addons\Statamify\Tags\Available;
 use Statamic\Addons\Statamify\Tags\Cart;
 use Statamic\Addons\Statamify\Tags\Customer;
 use Statamic\Addons\Statamify\Tags\Location;
@@ -20,7 +21,7 @@ class StatamifyTags extends Tags
     $get = $this->get('get');
 
     if ($get) {
-      return $get;
+      return $this->getConfig($get);
     }
     
     return '';
@@ -44,6 +45,13 @@ class StatamifyTags extends Tags
 
   }
 
+  public function available()
+  {
+
+    return Available::tag($this);
+
+  }
+
   public function cart()
   {
 
@@ -53,12 +61,12 @@ class StatamifyTags extends Tags
 
   public function cheque() {
 
-    return [
+    $gateways = collect($this->getConfig('gateways'));
+    $index = $gateways->search(function($gateway) {
+      return $gateway['type'] == 'cheque';
+    });
 
-      'active' => $this->getConfig('gateway_cheque_active'), 
-      'info' => $this->getConfig('gateway_cheque_info')
-
-    ];
+    return $gateways->get($index);
 
   }
 

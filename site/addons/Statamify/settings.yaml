@@ -33,11 +33,12 @@ fields:
 		display: Guest Checkout
 		instructions: Allow non-registered users to checkout
 		width: 25
-	queue_emails:
+	coupons_multiple:
 		type: toggle
-		display: Queue Emails
-		instructions: Delay emails after order created - use Cron to send them
+		display: Multiple Coupons
+		instructions: Allow adding more than one coupon
 		width: 25
+		default: false
 	shipping:
 		type: section
 		display: Shipping
