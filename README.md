@@ -3,7 +3,7 @@
 
 Statamify is **FREE** Shopify-like ecommerce addon for Statamic. 
 
-Check demo: http://demo.statamify.com/
+Check demo: https://github.com/sellfino/Statamify-Demo
 
 To install:
 - Copy the `site` folder and put in respective place
