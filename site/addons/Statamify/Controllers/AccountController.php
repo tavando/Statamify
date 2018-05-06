@@ -24,57 +24,74 @@ class AccountController extends Controller
 
       $customer = Entry::whereSlug($user->id(), 'store_customers');
 
-      if ($customer) {
+      if (!$customer) {
 
-        $addresses = $customer->get('addresses');
+        $customer_data = [
+          'user' => $user->id(),
+          'title' => $user->get('first_name') . ' ' . $user->get('last_name'),
+          'listing_orders' => 0,
+          'listing_spent' => '<span data-total="0">' . Statamify::money(0) . '</span>',
+          'addresses' => [],
+          'orders' => []
+        ];
 
-        $index = $data['address_index'];
+        $customer = Entry::create($user->id())
+        ->collection('store_customers')
+        ->with($customer_data)
+        ->published(true)
+        ->get();
 
-        unset($data['_token'], $data['address_index'], $data['addresso']);
-
-        if ($data['default'] == 'true') {
-
-          foreach ($addresses as $key => $addr) {
-            
-            $addresses[$key]['default'] = false;
-
-          }
-
-          $data['default'] = true;
-          session()->forget('statamify.default_address');
-
-        } else {
-
-          $data['default'] = false;
-
-        }
-
-        if ($index == 'new') {
-
-          $addresses[] = $data;
-
-        } else {
-
-          if (isset($addresses[$index - 1])) {
-
-            $addresses[$index - 1] = $data;
-
-          }
-
-        }
-
-        $customer->set('addresses', array_values($addresses));
         $customer->save();
 
-        if ($index == 'new') {
+      }
 
-          return redirect(Statamify::route('statamify.account'));
+      $addresses = $customer->get('addresses');
 
-        } else {
+      $index = $data['address_index'];
 
-          return redirect(Statamify::route('statamify.account.address', ['address_index' => $index]));
+      unset($data['_token'], $data['address_index'], $data['addresso']);
+
+      if ($data['default'] == 'true') {
+
+        foreach ($addresses as $key => $addr) {
+
+          $addresses[$key]['default'] = false;
 
         }
+
+        $data['default'] = true;
+        session()->forget('statamify.default_address');
+
+      } else {
+
+        $data['default'] = false;
+
+      }
+
+      if ($index == 'new') {
+
+        $addresses[] = $data;
+
+      } else {
+
+        if (isset($addresses[$index - 1])) {
+
+          $addresses[$index - 1] = $data;
+
+        }
+
+      }
+
+      $customer->set('addresses', array_values($addresses));
+      $customer->save();
+
+      if ($index == 'new') {
+
+        return redirect(Statamify::route('statamify.account'));
+
+      } else {
+
+        return redirect(Statamify::route('statamify.account.address', ['address_index' => $index]));
 
       }
 
