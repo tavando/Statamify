@@ -149,7 +149,7 @@ class Order
 
     $this->data['listing_status'] = '<span class="order-status ' . $this->data['status'] . '">' . Statamify::t('status.' . $this->data['status']) . '</span>';
     $this->data['listing_total'] = Statamify::money($this->data['summary']['total']['grand']);
-    $this->data['listing_customer'] = $customer->get('title') . ' <a href="' . CP_ROUTE . '/collections/entries/store_customers/' . (property_exists($this, 'user') ? $this->user->get('id') : $this->data['email']) . '" class="statamify-link"><span class="icon icon-forward"></span></a>';
+    $this->data['listing_customer'] = $customer->get('title') . ' <a href="/' . CP_ROUTE . '/collections/entries/store_customers/' . (property_exists($this, 'user') ? $this->user->get('id') : $this->data['email']) . '" class="statamify-link"><span class="icon icon-forward"></span></a>';
 
     $this->data['listing_email'] = $this->data['email'];
 
