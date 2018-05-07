@@ -50,6 +50,17 @@ class Location
 			
 		}
 
+		if (!isset($country)) {
+
+			if (session('statamify.shipping_country')) {
+
+				$country = session('statamify.shipping_country');
+				$region = '';
+
+			}
+			
+		}
+
 		$countries = reset($countries);
 
 		if (isset($country)) {
