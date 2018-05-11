@@ -142,17 +142,34 @@ class Gateway
     $config = $this->config->get($index);
 
     $gateway->setApiKey($config[($config['test'] ? 'test_keys' : 'keys')]['secret']);
+
+    /*$response = $gateway->createCustomer(array(
+       'description' => 'Test Customer',
+       'email' => $_POST['stripeEmail'],
+       'source'  => $token
+     ))->send();*/
     
     $token = $this->order['payment_token'];
+    $currency = session('statamify.currency');
+    $amount = $this->cart['total']['grand'];
+
+    if ($currency['rate'] != '1') {
+
+      $amount *= (float) $currency['rate'];
+
+    }
+
     $request = $gateway->purchase([
-      'amount' => $this->cart['total']['grand'],
-      'currency' => 'USD',
+      'amount' => number_format($amount, 2, '.', ''),
+      'currency' => $currency['code'],
       'description' => $this->order['title'] . ' ' . env('STATAMIFY_PAYMENT_DESC', ''),
       'source' => $token
     ]);
 
     $request_data = $request->getData();
     $request_data['expand[]'] = 'balance_transaction';
+
+    // 'customerReference' => $customer_id,
 
     $response = $request->sendData($request_data);
 

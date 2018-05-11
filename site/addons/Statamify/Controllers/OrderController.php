@@ -183,9 +183,9 @@ class OrderController extends Controller
 
     return $this->view('orders', [
       'title' => 'Store: Orders',
-      'moneyFormat' => Statamify::money(null, 'format'),
-      'moneyFormatFn' => Statamify::money(null, 'formatPriceJS'),
-      'moneySymbol' => Statamify::money(null, 'symbol'),
+      'moneyFormat' => Statamify::money(null, 'format', 'noexchange'),
+      'moneyFormatFn' => Statamify::money(null, 'formatPriceJS', 'noexchange'),
+      'moneySymbol' => Statamify::money(null, 'symbol', 'noexchange'),
       'orderStatuses' => [
         "awaiting_payment" => "Awaiting Payment",
         "pending" => "Pending",

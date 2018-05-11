@@ -299,6 +299,7 @@ table.order-summary .item-line p {
 table.order-summary .item-totals {
 	width: 50px;
 	text-align: center;
+	white-space: nowrap;
 }
 
 table.order-summary .item-totals:last-child {

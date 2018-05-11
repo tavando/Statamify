@@ -76,7 +76,11 @@ class Order
     $this->data['summary'] = [
       'items' => [],
       'coupons' => $this->cart['coupons'],
-      'total' => $this->cart['total']
+      'total' => $this->cart['total'],
+      'currency' => [
+        'code' => session('statamify.currency')['code'],
+        'rate' => session('statamify.currency')['rate']
+      ]
     ];
 
     foreach ($this->cart['items'] as $item) {
@@ -148,7 +152,7 @@ class Order
     // Add data for order listing columns
 
     $this->data['listing_status'] = '<span class="order-status ' . $this->data['status'] . '">' . Statamify::t('status.' . $this->data['status']) . '</span>';
-    $this->data['listing_total'] = Statamify::money($this->data['summary']['total']['grand']);
+    $this->data['listing_total'] = Statamify::money($this->data['summary']['total']['grand'], 'noexchange') . (session('statamify.currency')['rate'] != '1' ? ' (' . Statamify::money($this->data['summary']['total']['grand']) . ')' : '');
     $this->data['listing_customer'] = $customer->get('title') . ' <a href="/' . CP_ROUTE . '/collections/entries/store_customers/' . (property_exists($this, 'user') ? $this->user->get('id') : $this->data['email']) . '" class="statamify-link"><span class="icon icon-forward"></span></a>';
 
     $this->data['listing_email'] = $this->data['email'];
@@ -256,7 +260,7 @@ class Order
         'user' => $this->data['user'],
         'title' => $first_name . ' ' . $last_name,
         'listing_orders' => 1,
-        'listing_spent' => '<span data-total="' . $this->cart['total']['grand'] . '">' . Statamify::money($this->cart['total']['grand']) . '</span>',
+        'listing_spent' => '<span data-total="' . $this->cart['total']['grand'] . '">' . Statamify::money($this->cart['total']['grand'], 'noexchange') . '</span>',
         'addresses' => [$address],
         'orders' => []
       ];
@@ -272,7 +276,7 @@ class Order
       $customer->set('listing_orders', $customer->get('listing_orders') + 1);
       $spent = explode('"', $customer->get('listing_spent'));
       $spent[1] = $spent[1] + $this->cart['total']['grand'];
-      $spent[2] = '>' . Statamify::money($spent[1]) . '</span>';
+      $spent[2] = '>' . Statamify::money($spent[1], 'noexchange') . '</span>';
       $customer->set('listing_spent', join($spent, '"'));
 
     }

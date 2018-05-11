@@ -23,6 +23,7 @@ class Routes
       // Base Routes
 
       'GET@statamify/countries' => self::base_ctrl . '@countries',
+      'POST@statamify/currency' => self::base_ctrl . '@currency',
 
       // Cart Routes
 

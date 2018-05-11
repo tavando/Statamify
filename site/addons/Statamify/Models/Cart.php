@@ -380,6 +380,14 @@ class Cart
 
 			}
 
+			// If there are addresses, but not a single one is set as default
+
+			if (is_bool($key) && count($addresses)) {
+
+				$key = 0;
+
+			}
+
 			// If we found address for logged in user, we format country / region
 			// and set sessions
 

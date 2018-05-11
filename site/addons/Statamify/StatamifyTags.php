@@ -5,6 +5,7 @@ namespace Statamic\Addons\Statamify;
 use Statamic\Addons\Statamify\Tags\Addresses;
 use Statamic\Addons\Statamify\Tags\Available;
 use Statamic\Addons\Statamify\Tags\Cart;
+use Statamic\Addons\Statamify\Tags\Currencies;
 use Statamic\Addons\Statamify\Tags\Customer;
 use Statamic\Addons\Statamify\Tags\Location;
 use Statamic\Addons\Statamify\Tags\Money;
@@ -67,6 +68,13 @@ class StatamifyTags extends Tags
     });
 
     return $gateways->get($index);
+
+  }
+
+  public function currencies()
+  {
+
+    return Currencies::tag($this);
 
   }
 

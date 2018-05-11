@@ -33,7 +33,7 @@ class System
 
   }
 
-  public static function response($code, $msg)
+  public static function response($code, $msg = '')
   {
 
     if ($code >= 400) {

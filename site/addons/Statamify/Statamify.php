@@ -23,10 +23,10 @@ class Statamify
 
   }
 
-  public static function money($value, $get = null)
+  public static function money($value, $get = null, $exchange = null)
   {
 
-     return Helpers::money($value, $get);
+     return Helpers::money($value, $get, $exchange);
 
   }
 
