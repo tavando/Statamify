@@ -73,11 +73,11 @@ class OrderController extends Controller
 
         if (!$data['user']) {
 
-          $url = Statamify::route('statamify.store.summary', ['slug' => $data['slug']]);
+          $url = Statamify::route('statamify.store.summary', ['slug' => $data['slug'], 'locale' => $data['locale']]);
 
         } else {
 
-          $url = Statamify::route('statamify.account.order', ['slug' => $data['slug']]);
+          $url = Statamify::route('statamify.account.order', ['slug' => $data['slug'], 'locale' => $data['locale']]);
 
         }
 
@@ -187,14 +187,15 @@ class OrderController extends Controller
       'moneyFormatFn' => Statamify::money(null, 'formatPriceJS', 'noexchange'),
       'moneySymbol' => Statamify::money(null, 'symbol', 'noexchange'),
       'orderStatuses' => [
-        "awaiting_payment" => "Awaiting Payment",
-        "pending" => "Pending",
-        "completed" => "Completed",
-        "shipped" => "Shipped",
-        "cancelled" => "Cancelled",
-        "refunded" => "Refunded",
-        "refunded_partially" => "Refunded Partially"
-      ]
+        "awaiting_payment" => Statamify::t('status.awaiting_payment'),
+        "pending" => Statamify::t('status.pending'),
+        "completed" => Statamify::t('status.completed'),
+        "shipped" => Statamify::t('status.shipped'),
+        "cancelled" => Statamify::t('status.cancelled'),
+        "refunded" => Statamify::t('status.refunded'),
+        "refunded_partially" => Statamify::t('status.refunded_partially')
+      ],
+      't' => Statamify::t()
     ]);
 
   }

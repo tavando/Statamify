@@ -5,7 +5,7 @@ namespace Statamic\Addons\Statamify\Modifiers;
 use Statamic\Extend\Modifier;
 use Statamic\Addons\Statamify\Statamify;
 
-class AttrsModifier extends Modifier
+class TModifier extends Modifier
 {
 	/**
 	 * Modify a value
@@ -17,15 +17,7 @@ class AttrsModifier extends Modifier
 	 */
 	public function index($value, $params, $context) {
 
-		$values = explode('|', $value);
-
-		if (class_exists('\Statamic\Addons\T\TAPI')) {
-			$values = array_map(function($string) {
-				return app(\Statamic\Addons\T\TAPI::class)->api('T')->string($string);
-			}, $values);
-		}
-		
-		return join($values, ', '); 
+		return Statamify::t_settings($value);
 		
 	}
 

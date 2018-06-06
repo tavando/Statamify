@@ -58,7 +58,7 @@ class Statamify
 
   }
 
-  public static function t($string, $space = 'statamify', $params = [])
+  public static function t($string = null, $space = 'statamify', $params = [])
   {
 
     return System::t($string, $space, $params);

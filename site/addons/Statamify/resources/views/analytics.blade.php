@@ -5,7 +5,7 @@
 <statamify-analytics inline-template>
 <div class="dashboard statamify-analytics" id="statamify-analytics" :data-type="split">
 	<div class="flexy mb-24">
-		<h1 class="fill">Analytics</h1>
+		<h1 class="fill">{{ $t['analytics'] }}</h1>
 		<input name="daterange">
 	</div>
 
@@ -14,8 +14,8 @@
 		<div class="widget">
 			<div class="card flush">
 				<div class="card-body pad-16">
-					<a class="btn btn-primary" @click.prevent="reportTotalOrders">Report</a>
-					<h2>Total Orders</h2>
+					<a class="btn btn-primary" @click.prevent="reportTotalOrders">{{ $t['report'] }}</a>
+					<h2>{{ $t['total_orders'] }}</h2>
 					<h1>@{{ totalOrdersSum }}</h1>
 					<line-chart name="total-orders"></line-chart>
 				</div>
@@ -25,7 +25,7 @@
 		<div class="widget">
 			<div class="card flush">
 				<div class="card-body pad-16">
-					<h2>Total Sales</h2>
+					<h2>{{ $t['total_sales'] }}</h2>
 					<h1>@{{ totalSalesSum }}</h1>
 					<line-chart name="total-sales"></line-chart>
 				</div>
@@ -35,8 +35,8 @@
 		<div class="widget">
 			<div class="card flush">
 				<div class="card-body pad-16">
-					<a href="" class="btn btn-primary" @click.prevent="reportAvgOrderVal">Report</a>
-					<h2>Average Order Value</h2>
+					<a href="" class="btn btn-primary" @click.prevent="reportAvgOrderVal">{{ $t['report'] }}</a>
+					<h2>{{ $t['total_avg'] }}</h2>
 					<h1>@{{ totalAvgOrderValueSum }}</h1>
 					<line-chart name="average-order-value"></line-chart>
 				</div>
@@ -46,7 +46,7 @@
 		<div class="widget">
 			<div class="card flush">
 				<div class="card-body pad-16">
-					<h2>Repeat Customer Rate</h2>
+					<h2>{{ $t['total_repeat'] }}</h2>
 					<h1>@{{ totalRepeatRate }}%</h1>
 					<donut-chart name="repeat-rate"></donut-chart>
 				</div>
@@ -60,7 +60,7 @@
 			<div class="asset-browser card">
 				<div class="asset-browser-main">
 					<div class="asset-browser-header">
-						<h1 class="mb-24">Report. @{{ popup.range }}</h1>
+						<h1 class="mb-24">{{ $t['report'] }}. @{{ popup.range }}</h1>
 						<div class="asset-browser-actions flexy wrap">
 							<button type="button" class="btn action mb-24" @click="closeReport">
 								Close
@@ -72,16 +72,16 @@
 							<table>
 								<thead>
 									<tr>
-										<th class="pl-24">Date</th>
-										<th class="pr-24 text-right" v-if="popup.type == 'averageOrderValue'">Total</th>
-										<th class="pr-16 text-right">Orders</th>
-										<th class="pr-16 text-right" v-if="popup.type == 'averageOrderValue'">Average Order Value</th>
-										<th class="pr-16 text-right" v-if="popup.type == 'totalOrders'">Gross Sales</th>
-										<th class="pr-16 text-right" v-if="popup.type == 'totalOrders'">Discounts</th>
-										<th class="pr-16 text-right" v-if="popup.type == 'totalOrders'">Refunds</th>
-										<th class="pr-16 text-right" v-if="popup.type == 'totalOrders'">Net Sales</th>
-										<th class="pr-16 text-right" v-if="popup.type == 'totalOrders'">Shipping</th>
-										<th class="pr-24 text-right" v-if="popup.type == 'totalOrders'">Total</th>
+										<th class="pl-24">{{ $t['date'] }}</th>
+										<th class="pr-24 text-right" v-if="popup.type == 'averageOrderValue'">{{ $t['total'] }}</th>
+										<th class="pr-16 text-right">{{ $t['orders'] }}</th>
+										<th class="pr-16 text-right" v-if="popup.type == 'averageOrderValue'">{{ $t['total_avg'] }}</th>
+										<th class="pr-16 text-right" v-if="popup.type == 'totalOrders'">{{ $t['gross_sales'] }}</th>
+										<th class="pr-16 text-right" v-if="popup.type == 'totalOrders'">{{ $t['discounts'] }}</th>
+										<th class="pr-16 text-right" v-if="popup.type == 'totalOrders'">{{ $t['refunds'] }}</th>
+										<th class="pr-16 text-right" v-if="popup.type == 'totalOrders'">{{ $t['net_sales'] }}</th>
+										<th class="pr-16 text-right" v-if="popup.type == 'totalOrders'">{{ $t['shipping'] }}</th>
+										<th class="pr-24 text-right" v-if="popup.type == 'totalOrders'">{{ $t['total'] }}</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -132,7 +132,7 @@
 		repeatRate: {!! $repeat_rate !!},
 		popup: {
 			active: 0,
-			title: 'Total Orders',
+			title: '{{ $t['total_orders'] }}',
 			type: 'totalOrders',
 			range: 'Today'
 		}

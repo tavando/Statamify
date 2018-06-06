@@ -80,7 +80,7 @@ class Location
 			return [ 
 				'countries' => $countries, 
 				'regions' => $regions,
-				'country' => $countries[$country],
+				'country' => @$countries[$country],
 				'region' => $regions ? (isset($regions[$region]) ? $regions[$region] : $region) : $region,
 				'country_code' => $country,
 				'region_code' => @$region

@@ -115,7 +115,7 @@ Vue.component('statamify-variants-fieldtype', {
 
   template: `
     <div class="flex">
-    <div class="form-group grid-field grid-mode-table width-75" v-show="hasData">
+    <div class="form-group grid-field grid-mode-table w-3/4" v-show="hasData">
        <table v-if="hasData" class="grid-table bordered-table">
         <thead>
          <tr>
@@ -157,7 +157,7 @@ Vue.component('statamify-variants-fieldtype', {
        
     </div>
 
-    <div class="form-group width-25">
+    <div class="form-group w-1/4">
       <button type="button" class="btn btn-default add-row" @click="addRow" v-el:add-row-button>
         Option <i class="icon icon-plus icon-right"></i>
        </button>

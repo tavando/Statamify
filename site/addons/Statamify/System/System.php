@@ -89,6 +89,12 @@ class System
 
       }
 
+      if (isset($type['locale'])) {
+        if ($type['locale'] != default_locale()) {
+          $url = '/' . $type['locale'] . $url;
+        }
+      }
+
       return $url;
 
     } else {
@@ -120,7 +126,15 @@ class System
   public static function t($string, $space, $params)
   {
 
-    return app('translator')->trans('addons.Statamify::' . $space . '.' . $string, $params);
+    if ($string) {
+
+      return app('translator')->trans('addons.Statamify::' . $space . '.' . $string, $params);
+
+    } else {
+      
+      return app('translator')->trans('addons.Statamify::' . $space);
+
+    }
 
   }
 

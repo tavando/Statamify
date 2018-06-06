@@ -12,6 +12,7 @@ use Statamic\Addons\Statamify\Tags\Money;
 use Statamic\Addons\Statamify\Tags\Orders;
 use Statamic\Addons\Statamify\Tags\QueryUrl;
 use Statamic\Extend\Tags;
+use Statamic\Addons\Statamify\Tags\Translate;
 
 class StatamifyTags extends Tags
 {
@@ -156,6 +157,13 @@ class StatamifyTags extends Tags
       return 'order:desc';
 
     }
+
+  }
+
+  public function t()
+  {
+
+    return Translate::tag($this);
 
   }
 

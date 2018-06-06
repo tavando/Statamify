@@ -56,6 +56,19 @@ class StatamifyFilter extends Filter
 
 					$fieldset = Fieldset::get(Collection::whereHandle('store_products')->get('fieldset'));
 					$fieldset_data = $fieldset->toArray();
+
+					if (isset($fieldset_data['sections'])) {
+
+						$fieldset_data_replace = [];
+
+						foreach ($fieldset_data['sections'] as $section) {
+							$fieldset_data_replace = array_merge($fieldset_data_replace, $section['fields']);
+						}
+
+						$fieldset_data['fields'] = $fieldset_data_replace;
+
+					}
+
 					$param['field'] = str_replace(['store_types', 'store_vendors', 'store_categories'], ['type', 'vendor', 'categories'], $param['field']);
 					$key = array_search($param['field'], array_column($fieldset_data['fields'], 'name'));
 
@@ -84,16 +97,18 @@ class StatamifyFilter extends Filter
 					$meet = true;
 
 					foreach ($params as $param) {
+
+						$entry_field = $entry->in(site_locale())->get($param['field'], $entry->in(default_locale())->get($param['field']));
 						
-						if (is_array($entry->get($param['field']))) {
+						if (is_array($entry_field)) {
 
 							switch ($param['type']) {
 								case 'AND':
-									if (array_diff($param['values'], $entry->get($param['field']))) { $meet = false; }
+									if (array_diff($param['values'], $entry_field)) { $meet = false; }
 								break;
 
 								case 'OR':
-									if (!array_intersect($param['values'], $entry->get($param['field']))) { $meet = false; }
+									if (!array_intersect($param['values'], $entry_field)) { $meet = false; }
 								break;
 								
 								default:
@@ -105,19 +120,19 @@ class StatamifyFilter extends Filter
 
 							switch ($param['type']) {
 								case 'AND':
-									if (reset($param['values']) != $entry->get($param['field'])) { $meet = false; }
+									if (reset($param['values']) != $entry_field) { $meet = false; }
 								break;
 
 								case 'OR':
-									if (!in_array($entry->get($param['field']), $param['values'])) { $meet = false; }
+									if (!in_array($entry_field, $param['values'])) { $meet = false; }
 								break;
 
 								case '>':
-									if ($param['values'] > $entry->get($param['field'])) { $meet = false; }
+									if ($param['values'] > $entry_field) { $meet = false; }
 								break;
 
 								case '<':
-									if ($param['values'] < $entry->get($param['field'])) { $meet = false; }
+									if ($param['values'] < $entry_field) { $meet = false; }
 								break;
 								
 								default:

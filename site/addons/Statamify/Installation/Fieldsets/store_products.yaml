@@ -1,132 +1,150 @@
-taxonomies: false
-title: "Store: Products"
-fields:
-  title:
-    type: title
-    display: Title
-    localizable: true
-  listing_image:
-    type: hidden
-    display: Listing Image
-  listing_inventory:
-    type: hidden
-    display: Listing Inventory
-  listing_type:
-    type: hidden
-    display: Listing Type
-  listing_vendor:
-    type: hidden
-    display: Listing Vendor
+title: 'Store: Products'
+sections:
   general:
-    type: section
     display: General
-  class:
-    type: select
-    display: Class
-    options:
-      simple: Simple
-      complex: Complex
-    default: simple
-    width: 50
-  date:
-    type: date
-    display: Date
-    allow_blank: false
-    allow_time: true
-    require_time: false
-    earliest_date: January 1, 1900
-    width: 50
-  price:
-    type: text
-    display: Price
-    validate: numeric
-    width: 33
-  compare_at_price:
-    type: text
-    display: Compare at price
-    width: 33
-    validate: numeric
-  weight:
-    type: text
-    display: Weight
-    width: 33
-    validate: numeric
-  sku:
-    type: text
-    display: SKU
-    width: 25
-  barcode:
-    type: text
-    display: Barcode
-    width: 25
-  inventory:
-    type: integer
-    display: Inventory
-    width: 25
-    show_when:
-      track_inventory: true
-      class: simple
-  track_inventory:
-    type: toggle
-    display: Track Inventory
-    width: 25
-  variants:
-    type: statamify.variants
-    display: Variants
     fields:
-      - 
+      listing_image:
+        type: hidden
+        display: Listing Image
+      listing_inventory:
+        type: hidden
+        display: Listing Inventory
+      listing_type:
+        type: hidden
+        display: Listing Type
+      listing_vendor:
+        type: hidden
+        display: Listing Vendor
+      class:
+        type: select
+        display: Class
+        options:
+          simple: Simple
+          complex: Complex
+        default: simple
+        width: 50
+      date:
+        type: date
+        display: Date
+        allow_blank: false
+        allow_time: true
+        require_time: false
+        earliest_date: January 1, 1900
+        width: 50
+      price:
         type: text
-        display: Option Name
-        name: option_name
-      - 
-        type: tags
-        display: Option Values
-        name: option_values
-    show_when:
-      class: complex
+        display: Price
+        validate: numeric
+        width: 33
+      compare_at_price:
+        type: text
+        display: Compare at price
+        width: 33
+        validate: numeric
+      weight:
+        type: text
+        display: Weight
+        width: 33
+        validate: numeric
+      sku:
+        type: text
+        display: SKU
+        width: 25
+      barcode:
+        type: text
+        display: Barcode
+        width: 25
+      inventory:
+        type: integer
+        display: Inventory
+        width: 25
+        show_when:
+          track_inventory: true
+          class: simple
+      track_inventory:
+        type: toggle
+        display: Track Inventory
+        width: 25
+      variants:
+        type: statamify.variants
+        display: Variants
+        fields:
+          - 
+            type: text
+            display: Option Name
+            name: option_name
+          - 
+            type: tags
+            display: Option Values
+            name: option_values
+        show_when:
+          class: complex
   relation:
-    type: section
     display: Relation
-  type:
-    type: collection
-    display: Type
-    collection:
-      - store_types
-    max_items: "1"
-    width: 50
-  vendor:
-    type: collection
-    display: Vendor
-    collection:
-      - store_vendors
-    max_items: "1"
-    width: 50
-  categories:
-    type: collection
-    display: Categories
-    collection:
-      - store_categories
+    fields:
+      type:
+        type: collection
+        display: Type
+        collection:
+          - store_types
+        max_items: "1"
+        width: 50
+      vendor:
+        type: collection
+        display: Vendor
+        collection:
+          - store_vendors
+        max_items: "1"
+        width: 50
+      categories:
+        type: collection
+        display: Categories
+        collection:
+          - store_categories
   images:
-    type: section
     display: Images
-  image:
-    type: assets
-    display: Image
-    container: main
-    folder: /
-    max_files: 1
-    mode: list
-    width: 50
-  gallery:
-    type: assets
-    display: Gallery
-    container: main
-    folder: /
-    mode: list
-    width: 50
+    fields:
+      images:
+        type: section
+        display: Images
+      image:
+        type: assets
+        display: Image
+        container: main
+        folder: /
+        max_files: 1
+        mode: list
+        width: 50
+        restrict: false
+      gallery:
+        type: assets
+        display: Gallery
+        container: main
+        folder: /
+        mode: list
+        width: 50
+        restrict: false
   content:
-    type: section
     display: Content
-  description:
-    type: redactor
-    display: Description
+    fields:
+      description:
+        type: redactor
+        display: Description
+        restrict_assets: false
+        localizable: true
+  sidebar:
+    display: Sidebar
+    fields:
+      title:
+        display: Title
+        type: text
+      slug:
+        display: Slug
+        type: text
+      date:
+        display: Date
+        type: date
+        allow_blank: false
+        allow_time: true
+        require_time: false
+        earliest_date: January 1, 1900

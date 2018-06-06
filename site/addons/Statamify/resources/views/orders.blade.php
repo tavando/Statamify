@@ -1,5 +1,4 @@
 @extends('layout')
-@section('content-class', 'publishing')
 
 @section('content')
 
@@ -19,14 +18,7 @@
         <div class="listing entry-listing statamify-orders">
 
           <div class="flex flex-wrap justify-between lg_flex-no-wrap items-center mb-24">
-            <h1 class="flex-1 mb-8 lg_mb-0">Store: Orders</h1>
-            <div class="controls flex items-center w-full lg_w-auto">
-              <search :keyword.sync="searchTerm" class="w-full lg_w-auto"></search>
-
-              <div class="btn-group ml-8" v-if="locales.length > 1">
-                <select-fieldtype :data.sync="locale" :options="locales"></select-fieldtype>
-              </div>
-            </div>
+            <h1 class="flex-1 mb-8 lg_mb-0">{{ $t['store'] }}: {{ $t['orders'] }}</h1>
           </div>
 
           <div class="card flush">
@@ -38,7 +30,7 @@
                 </template>
                 <template v-else>
                   <span class="icon icon-documents"></span>
-                  <h2>{{ trans('cp.entries_empty_heading', ['type' => 'Store: Orders']) }}</h2>
+                  <h2>{{ trans('cp.entries_empty_heading', ['type' => $t['store'] . ': ' . $t['orders']]) }}</h2>
                   <h3>{{ trans('cp.entries_empty') }}</h3>
                   <a href="/addons/statamify/orders/create" class="btn btn-default btn-lg">{{ trans('cp.create_entry_button') }}</a>
                 </template>
@@ -58,14 +50,14 @@
                     <div class="summaries">
                       <div class="column">
                         <div class="inside">
-                          <h2>Summary</h2>
+                          <h2>{{ $t['summary'] }}</h2>
                           <table class="order-summary">
                             <tbody>
                               <tr data-id="@{{ item.id }}" v-for="item in order.summary.items">
                                 <td class="item-image"><div style="background-image: url(@{{ item.image }})"></div></td>
                                 <td class="item-line">
                                   <a href="@{{ item.edit_url }}">@{{ item.name }}</a>
-                                  <p v-if="item.variant">Variant: @{{ item.variant }}</p>
+                                  <p v-if="item.variant">{{ $t['variant'] }}: @{{ item.variant }}</p>
                                   <p>SKU: @{{ item.sku || '-' }}</p>
                                   <p v-if="item.custom">@{{ item.custom }}</p>
                                 </td>
@@ -75,35 +67,35 @@
                                 <td class="item-totals">@{{ item.quantity * item.price | money }}</td>
                               </tr>
                               <tr class="totals">
-                                <td colspan="5" class="text-right">Subtotal</td>
+                                <td colspan="5" class="text-right">{{ $t['subtotal'] }}</td>
                                 <td class="item-totals">@{{ order.summary.total.sub | money }}</td>
                               </tr>
                               <tr class="noborder totals">
-                                <td colspan="2" v-if="order.summary.total.discount">Coupon used: <strong>@{{ order.summary.coupons.join(', ') }}</strong></td>
+                                <td colspan="2" v-if="order.summary.total.discount">{{ $t['coupon_used'] }}: <strong>@{{ order.summary.coupons.join(', ') }}</strong></td>
                                 <td colspan="2" v-else></td>
-                                <td colspan="3" class="text-right">Discount</td>
+                                <td colspan="3" class="text-right">{{ $t['discount'] }}</td>
                                 <td class="item-totals">@{{ order.summary.total.discount | money }}</td>
                               </tr>
                               <tr class="noborder totals">
-                                <td colspan="5" class="text-right">Shipping</td>
+                                <td colspan="5" class="text-right">{{ $t['shipping'] }}</td>
                                 <td class="item-totals">@{{ order.summary.total.shipping | money }}</td>
                               </tr>
                               <tr class="noborder totals grand">
-                                <td colspan="2"><a href="" class="btn refund" v-if="order.status != 'refunded'">Refund</a></td>
-                                <td colspan="3" class="text-right"><strong>Total</strong></td>
+                                <td colspan="2"><a href="" class="btn refund" v-if="order.status != 'refunded'">{{ $t['refund'] }}</a></td>
+                                <td colspan="3" class="text-right"><strong>{{ $t['total'] }}</strong></td>
                                 <td class="item-totals"><strong>@{{ order.summary.total.grand | money }}</strong></td>
                               </tr>
                               <tr class="totals refunded" v-show="order.status == 'refunded' || order.status == 'refunded_partially'">
                                 <td colspan="2"></td>
-                                <td colspan="3" class="text-right">Refunded</td>
+                                <td colspan="3" class="text-right">{{ $t['refunded'] }}</td>
                                 <td class="item-totals">@{{ order.summary.total.refunded | money }}</td>
                               </tr>
                               <tr class="noborder totals refund-form" v-if="order.status != 'refunded'">
-                                <td colspan="3"><input placeholder="Amount to refund" name="refund_amount"> <input placeholder="Reason (optional)" name="refund_reason"></td>
+                                <td colspan="3"><input placeholder="{{ $t['refund_amount'] }}" name="refund_amount"> <input placeholder="{{ $t['reason_optional'] }}" name="refund_reason"></td>
                                 <td class="item-totals text-right" colspan="3">
-                                  <a href="" class="btn btn-primary refund">Refund 
-                                    <span v-if="order.payment_method.name == 'Cheque'">manually</span>
-                                    <span v-else>via @{{ order.payment_method.name }}</span>
+                                  <a href="" class="btn btn-primary refund">{{ $t['refund'] }} 
+                                    <span v-if="order.payment_method.name == 'Cheque'">{{ $t['manually'] }}</span>
+                                    <span v-else>{{ $t['via'] }} @{{ order.payment_method.name }}</span>
                                   </a>
                                 </td>
                               </tr>
@@ -114,14 +106,14 @@
    
                       <div class="column">
                         <div class="inside">
-                          <h2>Shipping Address</h2>
+                          <h2>{{ $t['address_shipping'] }}</h2>
                           <div class="small-text">
-                            <strong>Name:</strong> @{{ order.shipping.first_name }} @{{ order.shipping.last_name }}<br>
-                            <template v-if="order.shipping.company"><strong>Company: </strong>@{{ order.shipping.company }}<br></template>
-                            <strong>Address:</strong> @{{ order.shipping.address }}<template v-if="order.shipping.address_2">, @{{ order.shipping.address_2 }} </template><br>
-                            <strong>City:</strong> @{{ order.shipping.city }} <br/>
-                            <strong>Postal:</strong> @{{ order.shipping.postal }}<template v-if="order.shipping.region">, @{{ order.shipping.region }} </template> <br>
-                            <strong>Country:</strong> @{{ order.shipping.country }}</div>
+                            <strong>{{ $t['address_name'] }}:</strong> @{{ order.shipping.first_name }} @{{ order.shipping.last_name }}<br>
+                            <template v-if="order.shipping.company"><strong>{{ $t['address_company'] }}: </strong>@{{ order.shipping.company }}<br></template>
+                            <strong>{{ $t['address'] }}:</strong> @{{ order.shipping.address }}<template v-if="order.shipping.address_2">, @{{ order.shipping.address_2 }} </template><br>
+                            <strong>{{ $t['address_city'] }}:</strong> @{{ order.shipping.city }} <br/>
+                            <strong>{{ $t['address_postal'] }}:</strong> @{{ order.shipping.postal }}<template v-if="order.shipping.region">, @{{ order.shipping.region }} </template> <br>
+                            <strong>{{ $t['address_country'] }}:</strong> @{{ order.shipping.country }}</div>
                           </div>
                       </div>
 
@@ -129,13 +121,13 @@
                         <div class="inside">
                           <h2>Billing Address</h2>
                           <div class="small-text" v-if="order.billing_diff">
-                            <strong>Name:</strong> @{{ order.billing.first_name }} @{{ order.billing.last_name }}<br>
-                            <template v-if="order.billing.company"><strong>Company: </strong>@{{ order.billing.company }}<br></template>
-                            <strong>Address:</strong> @{{ order.billing.address }}<template v-if="order.billing.address_2">, @{{ order.billing.address_2 }} </template><br>
-                            <strong>City:</strong> @{{ order.billing.city }} <br/>
-                            <strong>Postal:</strong> @{{ order.billing.postal }}<template v-if="order.billing.region">, @{{ order.billing.region }} </template> <br>
-                            <strong>Country:</strong> @{{ order.billing.country }}</div>
-                            <div class="small-text" v-else>Same as Shipping</div>
+                            <strong>{{ $t['address_name'] }}:</strong> @{{ order.billing.first_name }} @{{ order.billing.last_name }}<br>
+                            <template v-if="order.billing.company"><strong>{{ $t['address_company'] }}: </strong>@{{ order.billing.company }}<br></template>
+                            <strong>{{ $t['address'] }}:</strong> @{{ order.billing.address }}<template v-if="order.billing.address_2">, @{{ order.billing.address_2 }} </template><br>
+                            <strong>{{ $t['address_city'] }}:</strong> @{{ order.billing.city }} <br/>
+                            <strong>{{ $t['address_postal'] }}:</strong> @{{ order.billing.postal }}<template v-if="order.billing.region">, @{{ order.billing.region }} </template> <br>
+                            <strong>{{ $t['address_country'] }}:</strong> @{{ order.billing.country }}</div>
+                            <div class="small-text" v-else>{{ $t['address_same'] }}</div>
                         </div>
                       </div>
 
@@ -159,7 +151,7 @@
 
                       <div class="column">
                         <div class="inside">
-                          <h2>Tracking URL</h2>
+                          <h2>{{ $t['address_tracking'] }}</h2>
                           <div class="field-inner text-fieldtype">
                             <input name="tracking" tabindex="0" class="form-control type-text" type="text" :value="order.shipping_method.tracking">
                           </div>
@@ -171,21 +163,21 @@
 
                       <div class="column">
                         <div class="inside">
-                          <h2>Shipping Method</h2>
+                          <h2>{{ $t['address_shipping'] }}</h2>
                           <div class="small-text">
-                            <strong>Zone:</strong> @{{ order.shipping_method.zone }}<br>
-                            <strong>Name:</strong> @{{ order.shipping_method.name }}<br>
-                            <strong>Rate:</strong> @{{ order.shipping_method.rate | money }}<br>
+                            <strong>{{ $t['zone'] }}:</strong> @{{ order.shipping_method.zone }}<br>
+                            <strong>{{ $t['address_name'] }}:</strong> @{{ order.shipping_method.name }}<br>
+                            <strong>{{ $t['rate'] }}:</strong> @{{ order.shipping_method.rate | money }}<br>
                           </div>
                         </div>
                       </div>
 
                       <div class="column">
                         <div class="inside">
-                          <h2>Payment Method</h2>
+                          <h2>{{ $t['address_payment'] }}</h2>
                           <div class="small-text">
-                            <strong>Name:</strong> @{{ order.payment_method.name }}<br>
-                            <strong>Fee:</strong> @{{ order.payment_method.fee | money }}<br>
+                            <strong>{{ $t['address_name'] }}:</strong> @{{ order.payment_method.name }}<br>
+                            <strong>{{ $t['fee'] }}:</strong> @{{ order.payment_method.fee | money }}<br>
                             <strong>Id:</strong> @{{ order.payment_method.id || '-' }}<br>
                             <div class="refund-reason" v-show="order.payment_method.refund_reason"><strong>Refund Reason:</strong> <span>@{{ order.payment_method.refund_reason }}</span></div>
                           </div>

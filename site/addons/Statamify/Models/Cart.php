@@ -12,650 +12,675 @@ use Statamic\API\User;
 class Cart
 {
 
-	public function __construct($instance = 'cart', $recalculated = true) {
+  public function __construct($instance = 'cart', $recalculated = true) {
 
-		$this->instance = $instance;
-		$this->recalculated = $recalculated;
+    $this->instance = $instance;
+    $this->recalculated = $recalculated;
 
-		$base = [
-			'cart_id' => Helper::makeUuid(),
-			'items' => [],
-			'coupons' => [],
-			'shipping' => false,
-			'total' => [
-				'sub' => 0,
-				'discount' => 0,
-				'shipping' => 0,
-				'tax' => 0,
-				'grand' => 0,
-				'weight' => 0
-			]
-		];
+    $base = [
+      'cart_id' => Helper::makeUuid(),
+      'items' => [],
+      'coupons' => [],
+      'shipping' => false,
+      'total' => [
+        'sub' => 0,
+        'discount' => 0,
+        'shipping' => 0,
+        'tax' => 0,
+        'grand' => 0,
+        'weight' => 0
+      ]
+    ];
 
-		$this->session = session('statamify.' . $instance) ?: $base;
+    $this->session = session('statamify.' . $instance) ?: $base;
 
-	}
+  }
 
-	private function removeExtraValues($entry) {
+  private function removeExtraValues($entry) {
 
-		$blacklist = [
-			'columns', 'products', 'is_entry', 'order', 'order_type',
-			'content', 'content_raw',
-			'listing_image', 'listing_type', 'listing_vendor', 'listing_inventory',
-			'edit_url', 'uri', 'url_path'
-		];
+    $blacklist = [
+      'columns', 'products', 'is_entry', 'order', 'order_type',
+      'content', 'content_raw',
+      'listing_image', 'listing_type', 'listing_vendor', 'listing_inventory',
+      'edit_url', 'uri', 'url_path'
+    ];
 
-		return array_diff_key($entry, array_flip($blacklist));
+    return array_diff_key($entry, array_flip($blacklist));
 
-	}
+  }
 
-	private function recalculate() {
+  private function recalculate() {
 
-		$cart = $this->session;
+    $cart = $this->session;
 
-		// Reset totals
+    // Reset totals
 
-		$cart['total'] = [
-			'sub' => 0,
-			'discount' => 0,
-			'shipping' => 0,
-			'tax' => 0,
-			'grand' => 0,
-			'weight' => 0
-		];
+    $cart['total'] = [
+      'sub' => 0,
+      'discount' => 0,
+      'shipping' => 0,
+      'tax' => 0,
+      'grand' => 0,
+      'weight' => 0
+    ];
 
-		// Get product's fieldset - we will transform IDs to objects of data
+    // Get product's fieldset - we will transform IDs to objects of data
 
-		$fieldset = Fieldset::get(Collection::whereHandle('store_products')->get('fieldset'));
-		$fieldset_data = $fieldset->toArray();
+    $fieldset = Fieldset::get(Collection::whereHandle('store_products')->get('fieldset'));
+    $fieldset_data = $fieldset->toArray();
 
-		foreach ($cart['items'] as $item_key => $item) {
+    if (isset($fieldset_data['sections'])) {
 
-			$product = Entry::find($item['product']);
+      $fieldset_data_replace = [];
 
-			if ($product) {
+      foreach ($fieldset_data['sections'] as $section) {
+        $fieldset_data_replace = array_merge($fieldset_data_replace, $section['fields']);
+      }
 
-				// Remove product data that shouldn't be visible on frontend
+      $fieldset_data['fields'] = $fieldset_data_replace;
 
-				$product = $product->toArray();
-				$cart['items'][$item_key]['product'] = $this->removeExtraValues($product);
+    }
 
-				// Replace all relations' IDs with objects of data
+    foreach ($cart['items'] as $item_key => $item) {
 
-				foreach ($fieldset_data['fields'] as $field_key => $field) {
+      $product = Entry::find($item['product']);
 
-					// Replace ID with object only if field's type is Statamic Collection
+      if ($product) {
 
-					if ($field['type'] == 'collection') {
+        // Remove product data that shouldn't be visible on frontend
 
-						$type = $field['name'];
+        $product = $product->in(site_locale())->toArray();
+        $cart['items'][$item_key]['product'] = $this->removeExtraValues($product);
 
-						// Check if field is empty in product
+        // Replace all relations' IDs with objects of data
 
-						if (isset($product[$type])) {
+        foreach ($fieldset_data['fields'] as $field_key => $field) {
 
-							// Check whether field contains one or array of IDs (i.e. Type and Vendor are single choice, Collections is array)
+          // Replace ID with object only if field's type is Statamic Collection
 
-							if (isset($field['max_items']) && $field['max_items'] == '1') {
+          if ($field['type'] == 'collection') {
 
-								$relation = Entry::find($product[$type]);
+            $type = $field['name'];
 
-								if ($relation) {
+            // Check if field is empty in product
 
-									$relation = $relation->toArray();
-									$cart['items'][$item_key]['product'][$type] = $this->removeExtraValues($relation);
+            if (isset($product[$type])) {
 
-								}
+              // Check whether field contains one or array of IDs (i.e. Type and Vendor are single choice, Collections is array)
 
-							} else {
+              if (isset($field['max_items']) && $field['max_items'] == '1') {
 
-								// If field can contain more IDs, then we need to replace all elements of array
+                $relation = Entry::find($product[$type]);
 
-								foreach ($product[$type] as $collection_key => $id) {
+                if ($relation) {
 
-									$relation = Entry::find($id);
+                  $relation = $relation->toArray();
+                  $cart['items'][$item_key]['product'][$type] = $this->removeExtraValues($relation);
 
-									if ($relation) {
+                }
 
-										$relation = $relation->toArray();
-										$cart['items'][$item_key]['product'][$type][$collection_key] = $this->removeExtraValues($relation);
+              } else {
 
-									}
+                // If field can contain more IDs, then we need to replace all elements of array
 
-								}
+                foreach ($product[$type] as $collection_key => $id) {
 
-							}
+                  $relation = Entry::find($id);
 
-						}
+                  if ($relation) {
 
-					}
+                    $relation = $relation->toArray();
+                    $cart['items'][$item_key]['product'][$type][$collection_key] = $this->removeExtraValues($relation);
 
-				}
+                  }
 
-				if ($item['variant']) {
+                }
 
-					// Find position of selected variant in product's variants and replace id with object of data
+              }
 
-					$variant_key = array_search($item['variant'], array_column($product['variants'], 'id'));
-					if (!is_bool($variant_key)) $cart['items'][$item_key]['variant'] = $product['variants'][$variant_key];
+            }
 
-					// Add price from variant instead of product
+          }
 
-					$price = @$product['variants'][$variant_key]['price'] ? (float) $product['variants'][$variant_key]['price'] : (float) $product['price'];
+        }
 
-				} else {
+        if ($item['variant']) {
 
-					// If you not set price, product will not be counted in totals
+          // Find position of selected variant in product's variants and replace id with object of data
 
-					if (@$product['price']) {
+          $variant_key = array_search($item['variant'], array_column($product['variants'], 'id'));
+          
+          if (!is_bool($variant_key)) {
+            $var = $product['variants'][$variant_key];
 
-						$price = (float) $product['price'];
+            if (site_locale() != default_locale() && class_exists('\Statamic\Addons\T\TAPI')) {
+              $attrs = explode('|', $var['attrs']);
+              $attrs = array_map(function($attr) {
+                return app(\Statamic\Addons\T\TAPI::class)->api('T')->string($attr);
+              }, $attrs);
+              $var['attrs'] = join($attrs, '|');
+            }
 
-					} else {
+            $cart['items'][$item_key]['variant'] = $var;
+          }
 
-						$price = 0;
+          // Add price from variant instead of product
 
-					}
+          $price = @$product['variants'][$variant_key]['price'] ? (float) $product['variants'][$variant_key]['price'] : (float) $product['price'];
 
-				}
+        } else {
 
-				// Sum totals based on the quantity
+          // If you not set price, product will not be counted in totals
 
-				$cart['total']['sub'] += $price * $item['quantity'];
-				$cart['total']['weight'] += @$product['weight'] ? ((float) $product['weight']) * $item['quantity'] : 0;
+          if (@$product['price']) {
 
-			}
+            $price = (float) $product['price'];
 
-		}
+          } else {
 
-		// We need to set default address for logged in customer
+            $price = 0;
 
-		if (User::getCurrent() && !session('statamify.default_address')) {
+          }
 
-			$this->setDefaultAddress('default');
-			$cart['shipping'] = $this->setShipping();
+        }
 
-		}
+        // Sum totals based on the quantity
 
-		// If shipping country was set but there were some circumstances that removed shipping from cart, we set it again to default
+        $cart['total']['sub'] += $price * $item['quantity'];
+        $cart['total']['weight'] += @$product['weight'] ? ((float) $product['weight']) * $item['quantity'] : 0;
 
-		if (!$cart['shipping'] && session('statamify.shipping_country')) {
+      }
 
-			$cart['shipping'] = $this->setShipping();
+    }
 
-		}
+    // We need to set default address for logged in customer
 
-		if ($cart['shipping']) {
+    if (User::getCurrent() && !session('statamify.default_address')) {
 
-			$shipping_methods = [];
-			$shipping_zones = Statamify::config('shipping_zones');
-			$shipping_zone = $shipping_zones[$cart['shipping']['zone']];
+      $this->setDefaultAddress('default');
+      $cart['shipping'] = $this->setShipping();
 
-			// We need to add all rates - if cart matches both price and weight rates, both methods will be visible
+    }
 
-			$bases = ['price_rates', 'weight_rates'];
+    // If shipping country was set but there were some circumstances that removed shipping from cart, we set it again to default
 
-			foreach ($bases as $base) {
+    if (!$cart['shipping'] && session('statamify.shipping_country')) {
 
-				if (isset($shipping_zone[$base])) {
+      $cart['shipping'] = $this->setShipping();
 
-					// Choose which total to compare
+    }
 
-					$compare = $base == 'price_rates' ? 'sub' : 'weight';
+    if ($cart['shipping']) {
 
-					foreach ($shipping_zone[$base] as $key => $method) {
+      $shipping_methods = [];
+      $shipping_zones = Statamify::config('shipping_zones');
+      $shipping_zone = $shipping_zones[$cart['shipping']['zone']];
 
-						$condition = true;
+      // We need to add all rates - if cart matches both price and weight rates, both methods will be visible
 
-						if (isset($method['min']) && $method['min']) {
+      $bases = ['price_rates', 'weight_rates'];
 
-							if ($cart['total'][$compare] < $method['min']) {
+      foreach ($bases as $base) {
 
-								$condition = false;
+        if (isset($shipping_zone[$base])) {
 
-							}
+          // Choose which total to compare
 
-						}
+          $compare = $base == 'price_rates' ? 'sub' : 'weight';
 
-						if (isset($method['max']) && $method['max']) {
+          foreach ($shipping_zone[$base] as $key => $method) {
 
-							if ($cart['total'][$compare] > $method['max']) {
+            $condition = true;
 
-								$condition = false;
+            if (isset($method['min']) && $method['min']) {
 
-							}
+              if ($cart['total'][$compare] < $method['min']) {
 
-						}
+                $condition = false;
 
-						// If method matches criteria, add it to cart's shipping methods
+              }
 
-						if ($condition) {
+            }
 
-							$shipping_methods[$method['name']] = $method;
+            if (isset($method['max']) && $method['max']) {
 
-						}
+              if ($cart['total'][$compare] > $method['max']) {
 
-					}
+                $condition = false;
 
-				}
+              }
 
-			}
+            }
 
-			if (count($shipping_methods)) {
+            // If method matches criteria, add it to cart's shipping methods
 
-				$shipping_method = session('statamify.shipping_method');
+            if ($condition) {
 
-				// Check whether shipping method was already set or selected is available. If not, set first one
+              $shipping_methods[$method['name']] = $method;
 
-				if (!$shipping_method || !isset($shipping_methods[$shipping_method])) {
+            }
 
-					$keys = array_keys($shipping_methods);
-					$first = reset($keys);
-					$shipping_method = $first;
+          }
 
-					session(['statamify.shipping_method' => $shipping_method]);
-					
+        }
 
-				}
+      }
 
-				// Calculate totals for shipping and set shipping method
+      if (count($shipping_methods)) {
 
-				$cart['shipping']['methods'] = $shipping_methods;
-				$cart['shipping']['methods'][$shipping_method]['active'] = true;
-				$cart['total']['shipping'] = isset($shipping_methods[$shipping_method]['rate']) ? (float) $shipping_methods[$shipping_method]['rate'] : 0;
+        $shipping_method = session('statamify.shipping_method');
 
-			}
+        // Check whether shipping method was already set or selected is available. If not, set first one
 
-		}
+        if (!$shipping_method || !isset($shipping_methods[$shipping_method])) {
 
-		// Calculate discount
+          $keys = array_keys($shipping_methods);
+          $first = reset($keys);
+          $shipping_method = $first;
 
-		if ($cart['coupons']) {
+          session(['statamify.shipping_method' => $shipping_method]);
+          
 
-			foreach ($cart['coupons'] as $coupon) {
-				
-				$coupon_entry = Entry::whereSlug($coupon, 'store_coupons');
+        }
 
-				if ($coupon_entry) {
+        // Calculate totals for shipping and set shipping method
 
-					switch ($coupon_entry->get('type')) {
-						case 'fixed':
-							
-							if ($coupon_entry->get('value') && $coupon_entry->get('value') != '') {
+        $cart['shipping']['methods'] = $shipping_methods;
+        $cart['shipping']['methods'][$shipping_method]['active'] = true;
+        $cart['total']['shipping'] = isset($shipping_methods[$shipping_method]['rate']) ? (float) $shipping_methods[$shipping_method]['rate'] : 0;
 
-								$cart['total']['discount'] = (float) $coupon_entry->get('value') * -1;
+      }
 
-							}
-							
-							break;
+    }
 
-						case 'free_ship':
+    // Calculate discount
 
-							$cart['total']['discount'] = $cart['total']['shipping'] * -1;
-							
-							break;
-						
-						default:
-							
-							if ($coupon_entry->get('value') && $coupon_entry->get('value') != '') {
+    if ($cart['coupons']) {
 
-								$cart['total']['discount'] = $cart['total']['sub'] * ((float) $coupon_entry->get('value') / 100) * -1;
+      foreach ($cart['coupons'] as $coupon) {
+        
+        $coupon_entry = Entry::whereSlug($coupon, 'store_coupons');
 
-							}
+        if ($coupon_entry) {
 
-							break;
-					}
+          switch ($coupon_entry->get('type')) {
+            case 'fixed':
+              
+              if ($coupon_entry->get('value') && $coupon_entry->get('value') != '') {
 
-				}
+                $cart['total']['discount'] = (float) $coupon_entry->get('value') * -1;
 
-			}
+              }
+              
+              break;
 
-		}
+            case 'free_ship':
 
-		// Grand total = sum of all totals
+              $cart['total']['discount'] = $cart['total']['shipping'] * -1;
+              
+              break;
+            
+            default:
+              
+              if ($coupon_entry->get('value') && $coupon_entry->get('value') != '') {
 
-		$cart['total']['grand'] = $cart['total']['sub'] + $cart['total']['discount'] + $cart['total']['shipping'] + $cart['total']['tax'];
+                $cart['total']['discount'] = $cart['total']['sub'] * ((float) $coupon_entry->get('value') / 100) * -1;
 
-		return $cart;
+              }
 
-	}
+              break;
+          }
 
-	private function checkInventory($product, $item) {
+        }
 
-		// Check if product tracks inventory. Do nothing if not
+      }
 
-		if ($product->get('track_inventory')) {
+    }
 
-			if ($product->get('class') == 'simple') {
+    // Grand total = sum of all totals
 
-				// If there are too many items of the product in cart, throws error
+    $cart['total']['grand'] = $cart['total']['sub'] + $cart['total']['discount'] + $cart['total']['shipping'] + $cart['total']['tax'];
 
-				if ($product->get('inventory') < $item['quantity']) Statamify::response(400, Statamify::t('product_too_many', 'errors'));
+    return $cart;
 
-			} elseif ($product->get('class') == 'complex') {
+  }
 
-				if (!isset($item['variant'])) {
+  private function checkInventory($product, $item) {
 
-					foreach ($this->session['items'] as $cart_item_key => $cart_item) {
+    // Check if product tracks inventory. Do nothing if not
 
-						if ($item['item_id'] == $cart_item['item_id']) $item['variant'] = $cart_item['variant'];
+    if ($product->get('track_inventory')) {
 
-					}
+      if ($product->get('class') == 'simple') {
 
-				}
+        // If there are too many items of the product in cart, throws error
 
-				foreach ($product->get('variants') as $variant_key => $variant) {
+        if ($product->get('inventory') < $item['quantity']) Statamify::response(400, Statamify::t('product_too_many', 'errors'));
 
-					if (isset($variant['id']) && $variant['id'] == $item['variant']) {
+      } elseif ($product->get('class') == 'complex') {
 
-						// If there are too many items of the product's variant in cart, throws error
+        if (!isset($item['variant'])) {
 
-						if (!$variant['inventory'] || $variant['inventory'] < $item['quantity']) Statamify::response(400, Statamify::t('product_too_many', 'errors'));
+          foreach ($this->session['items'] as $cart_item_key => $cart_item) {
 
-					}
+            if ($item['item_id'] == $cart_item['item_id']) $item['variant'] = $cart_item['variant'];
 
-				}
+          }
 
-			}
+        }
 
-		}
+        foreach ($product->get('variants') as $variant_key => $variant) {
 
-	}
+          if (isset($variant['id']) && $variant['id'] == $item['variant']) {
 
-	public function setDefaultAddress($key) {
+            // If there are too many items of the product's variant in cart, throws error
 
-		$user = User::getCurrent();
+            if (!$variant['inventory'] || $variant['inventory'] < $item['quantity']) Statamify::response(400, Statamify::t('product_too_many', 'errors'));
 
-		// Find customer in Customer Collection based on the slug (email is slug)
+          }
 
-		$customer = Entry::whereSlug($user->id(), 'store_customers');
+        }
 
-		if ($customer) {
+      }
 
-			$addresses = $customer->get('addresses');
+    }
 
-			if (!isset($addresses[$key])) {
+  }
 
-				$key = array_search(true, array_column($addresses, 'default'));
+  public function setDefaultAddress($key) {
 
-			}
+    $user = User::getCurrent();
 
-			// If there are addresses, but not a single one is set as default
+    // Find customer in Customer Collection based on the slug (email is slug)
 
-			if (is_bool($key) && count($addresses)) {
+    $customer = Entry::whereSlug($user->id(), 'store_customers');
 
-				$key = 0;
+    if ($customer) {
 
-			}
+      $addresses = $customer->get('addresses');
 
-			// If we found address for logged in user, we format country / region
-			// and set sessions
+      if (!isset($addresses[$key])) {
 
-			if (!is_bool($key) && isset($addresses[$key])) {
+        $key = array_search(true, array_column($addresses, 'default'));
 
-				$address = $addresses[$key];
+      }
 
-				session(['statamify.default_address' => [
-					'defaultKey' => $key,
-					'default' => $address
-				]]);
-				session(['statamify.shipping_country' => $address['country']]);
+      // If there are addresses, but not a single one is set as default
 
-				$this->setShipping();
+      if (is_bool($key) && count($addresses)) {
 
-			}
+        $key = 0;
 
-		}
+      }
 
-	}
+      // If we found address for logged in user, we format country / region
+      // and set sessions
 
-	public function get() {
+      if (!is_bool($key) && isset($addresses[$key])) {
 
-		// Check if we want cart session object or full format
+        $address = $addresses[$key];
 
-		if ($this->recalculated) {
+        session(['statamify.default_address' => [
+          'defaultKey' => $key,
+          'default' => $address
+        ]]);
+        session(['statamify.shipping_country' => $address['country']]);
 
-			return $this->recalculate();
+        $this->setShipping();
 
-		}
+      }
 
-		return $this->session;
+    }
 
-	}
+  }
 
-	public function add($item) {
+  public function get() {
 
-		$found = false;
+    // Check if we want cart session object or full format
 
-		// Check if product is already in cart - compare ID of product if simple + ID of variant if complex
+    if ($this->recalculated) {
 
-		foreach ($this->session['items'] as $cart_item_key => $cart_item) {
+      return $this->recalculate();
 
-			if ($item['variant']) {
+    }
 
-				if ($cart_item['product'] == $item['product'] && $cart_item['variant'] == $item['variant']) $found = $cart_item_key;
+    return $this->session;
 
-			} else {
+  }
 
-				if ($cart_item['product'] == $item['product']) $found = $cart_item_key;
+  public function add($item) {
 
-			}
+    $found = false;
 
-		}
+    // Check if product is already in cart - compare ID of product if simple + ID of variant if complex
 
-		// is_bool returns false - we add product, returns true - we update it on position $found
+    foreach ($this->session['items'] as $cart_item_key => $cart_item) {
 
-		if ( is_bool($found) ) {
+      if ($item['variant']) {
 
-			$product = Entry::find($item['product']);
+        if ($cart_item['product'] == $item['product'] && $cart_item['variant'] == $item['variant']) $found = $cart_item_key;
 
-			// Check if product exists in store
+      } else {
 
-			if ($product) {
+        if ($cart_item['product'] == $item['product']) $found = $cart_item_key;
 
-				// Additional validation to check if variant ID was sent when product is actually complex one
+      }
 
-				if ($product->get('class') == 'complex') {
+    }
 
-					if (!isset($item['variant']) || !$item['variant']) {
+    // is_bool returns false - we add product, returns true - we update it on position $found
 
-						Statamify::response(400, Statamify::t('variant_required', 'errors'));
+    if ( is_bool($found) ) {
 
-					} else {
+      $product = Entry::find($item['product']);
 
-						// Check if variant's ID is correct
+      // Check if product exists in store
 
-						$variant_key = array_search($item['variant'], array_column($product->get('variants'), 'id'));
+      if ($product) {
 
-						if (is_bool($variant_key)) Statamify::response(404, Statamify::t('variant_not_found', 'errors'));
+        // Additional validation to check if variant ID was sent when product is actually complex one
 
-					}
+        if ($product->get('class') == 'complex') {
 
-				}
+          if (!isset($item['variant']) || !$item['variant']) {
 
-				// Check if there is enough quantity of the product
+            Statamify::response(400, Statamify::t('variant_required', 'errors'));
 
-				$this->checkInventory($product, $item);
+          } else {
 
-				$item = [
-					'item_id' => Helper::makeUuid(),
-					'quantity' => $item['quantity'],
-					'product' => $item['product'],
-					'variant' => $item['variant'] ?: false,
-					'custom' => isset($item['custom']) && $item['custom'] ? $item['custom'] : null // Custom is for customization / personalization, optional
-				];
+            // Check if variant's ID is correct
 
-				$this->session['items'][] = $item;
+            $variant_key = array_search($item['variant'], array_column($product->get('variants'), 'id'));
 
-				session(['statamify.' . $this->instance => $this->session]);
+            if (is_bool($variant_key)) Statamify::response(404, Statamify::t('variant_not_found', 'errors'));
 
-				return $this->get();
+          }
 
-			} else {
+        }
 
-				Statamify::response(404, Statamify::t('product_not_found', 'errors'));
+        // Check if there is enough quantity of the product
 
-			}
+        $this->checkInventory($product, $item);
 
-		} else {
+        $item = [
+          'item_id' => Helper::makeUuid(),
+          'quantity' => $item['quantity'],
+          'product' => $item['product'],
+          'variant' => $item['variant'] ?: false,
+          'custom' => isset($item['custom']) && $item['custom'] ? $item['custom'] : null // Custom is for customization / personalization, optional
+        ];
 
-			// Add quantity to product currently in cart
+        $this->session['items'][] = $item;
 
-			$item['item_id'] = $this->session['items'][$found]['item_id'];
-			$item['quantity'] += $this->session['items'][$found]['quantity'];
+        session(['statamify.' . $this->instance => $this->session]);
 
-			return $this->update($item);
+        return $this->get();
 
-		}
+      } else {
 
-	}
+        Statamify::response(404, Statamify::t('product_not_found', 'errors'));
 
-	public function update($item) {
+      }
 
-		// Find cart item by item_id
+    } else {
 
-		$item_key = array_search($item['item_id'], array_column($this->session['items'], 'item_id'));
+      // Add quantity to product currently in cart
 
-		// Update item if it's found
+      $item['item_id'] = $this->session['items'][$found]['item_id'];
+      $item['quantity'] += $this->session['items'][$found]['quantity'];
 
-		if (!is_bool($item_key)) {
+      return $this->update($item);
 
-			// Remove item from cart if quantity is zero
+    }
 
-			if ($item['quantity'] == 0) {
+  }
 
-				unset($this->session['items'][ $item_key ]);
+  public function update($item) {
 
-				// Update array keys after removing the item
+    // Find cart item by item_id
 
-				$this->session['items'] = array_values($this->session['items']);
+    $item_key = array_search($item['item_id'], array_column($this->session['items'], 'item_id'));
 
-				// If cart is empty, remove shipping methods
+    // Update item if it's found
 
-				if (count($this->session['items']) == 0) {
+    if (!is_bool($item_key)) {
 
-					$this->session['shipping'] = false;
-					session()->forget('statamify.shipping_method');
+      // Remove item from cart if quantity is zero
 
-				}
+      if ($item['quantity'] == 0) {
 
-				session(['statamify.' . $this->instance => $this->session]);
+        unset($this->session['items'][ $item_key ]);
 
-			} else {
+        // Update array keys after removing the item
 
-				$cart_item = $this->session['items'][$item_key];
-				$product = Entry::find($cart_item['product']);
+        $this->session['items'] = array_values($this->session['items']);
 
-				if ($product) {
+        // If cart is empty, remove shipping methods
 
-					// Check if you can add more items of the product
+        if (count($this->session['items']) == 0) {
 
-					$this->checkInventory($product, $item);
+          $this->session['shipping'] = false;
+          session()->forget('statamify.shipping_method');
 
-					$this->session['items'][ $item_key ]['quantity'] = $item['quantity'];
-					session(['statamify.' . $this->instance => $this->session]);
+        }
 
-				} else {
+        session(['statamify.' . $this->instance => $this->session]);
 
-					Statamify::response(404, Statamify::t('product_not_found', 'errors'));
+      } else {
 
-				}
+        $cart_item = $this->session['items'][$item_key];
+        $product = Entry::find($cart_item['product']);
 
-			}
+        if ($product) {
 
-		}
+          // Check if you can add more items of the product
 
-		return $this->get();
+          $this->checkInventory($product, $item);
 
-	}
+          $this->session['items'][ $item_key ]['quantity'] = $item['quantity'];
+          session(['statamify.' . $this->instance => $this->session]);
 
-	public function clear() {
+        } else {
 
-		$this->session = null;
+          Statamify::response(404, Statamify::t('product_not_found', 'errors'));
 
-		session()->forget('statamify.' . $this->instance);
+        }
 
-		if ($this->instance == 'cart') {
+      }
 
-			session()->forget('statamify.shipping_method');
+    }
 
-		}
+    return $this->get();
 
-	}
+  }
 
-	public function setShipping() {
+  public function clear() {
 
-		$shipping_country = session('statamify.shipping_country');
+    $this->session = null;
 
-		if ($shipping_country) {
+    session()->forget('statamify.' . $this->instance);
 
-			// Find zone for country. Customer can't select method if his/her country is not available
+    if ($this->instance == 'cart') {
 
-			$zones = Statamify::config('shipping_zones');
-			$shipping_zone = array_search('rest', array_column($zones, 'type'));
+      session()->forget('statamify.shipping_method');
 
-			foreach ($zones as $zone_key => $zone) {
-				
-				if (isset($zone['countries']) && in_array($shipping_country, $zone['countries'])) {
+    }
 
-					$shipping_zone = $zone_key;
+  }
 
-					break;
-				}
+  public function setShipping() {
 
-			}
+    $shipping_country = session('statamify.shipping_country');
 
-			// If shipping country is set in one of the zones, set this zone in shipping attribute
+    if ($shipping_country) {
 
-			if (!is_bool($shipping_zone)) {
+      // Find zone for country. Customer can't select method if his/her country is not available
 
-				$this->session['shipping'] = ['zone' => $shipping_zone];
+      $zones = Statamify::config('shipping_zones');
+      $shipping_zone = array_search('rest', array_column($zones, 'type'));
 
-			} else {
+      foreach ($zones as $zone_key => $zone) {
+        
+        if (isset($zone['countries']) && in_array($shipping_country, $zone['countries'])) {
 
-				$this->session['shipping'] = false;
+          $shipping_zone = $zone_key;
 
-			}
+          break;
+        }
 
-		} else {
+      }
 
-			$this->session['shipping'] = false;
+      // If shipping country is set in one of the zones, set this zone in shipping attribute
 
-		}
+      if (!is_bool($shipping_zone)) {
 
-		// Update sessions
+        $this->session['shipping'] = ['zone' => $shipping_zone];
 
-		session()->forget('statamify.shipping_method');
-		session(['statamify.' . $this->instance => $this->session]);
+      } else {
 
-		return $this->session['shipping'];
+        $this->session['shipping'] = false;
 
-	}
+      }
 
-	public function addCoupon($coupon, $email = '')
-	{
+    } else {
 
-		$this->session['coupons'][] = $coupon;
+      $this->session['shipping'] = false;
 
-		session(['statamify.' . $this->instance => $this->session]);
+    }
 
-		return $this->get();
+    // Update sessions
 
-	}
+    session()->forget('statamify.shipping_method');
+    session(['statamify.' . $this->instance => $this->session]);
 
-	public function removeCoupon($index)
-	{
+    return $this->session['shipping'];
 
-		$coupons = $this->session['coupons'];
+  }
 
-		unset($coupons[$index]);
+  public function addCoupon($coupon, $email = '')
+  {
 
-		$this->session['coupons'] = array_values($coupons);
+    $this->session['coupons'][] = $coupon;
 
-		session(['statamify.' . $this->instance => $this->session]);
+    session(['statamify.' . $this->instance => $this->session]);
 
-		return $this->get();
+    return $this->get();
 
-	}
+  }
+
+  public function removeCoupon($index)
+  {
+
+    $coupons = $this->session['coupons'];
+
+    unset($coupons[$index]);
+
+    $this->session['coupons'] = array_values($coupons);
+
+    session(['statamify.' . $this->instance => $this->session]);
+
+    return $this->get();
+
+  }
 
 }

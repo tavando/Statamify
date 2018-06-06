@@ -27,6 +27,7 @@ class AnalyticsController extends Controller
       'moneyFormat' => $data['moneyFormat'],
       'moneyFormatFn' => $data['moneyFormatFn'],
       'moneySymbol' => $data['moneySymbol'],
+      't' => Statamify::t()
     ]);
 
   }
@@ -51,6 +52,7 @@ class AnalyticsController extends Controller
       'moneyFormat' => $data['moneyFormat'],
       'moneyFormatFn' => $data['moneyFormatFn'],
       'moneySymbol' => $data['moneySymbol'],
+      't' => Statamify::t()
     ]);
 
   }

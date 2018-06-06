@@ -21,95 +21,6 @@ Statamify = {
 
 	},
 
-	convertListingCells: function() {
-
-		$.each($('[class^="column-listing_"]'), function() {
-			$(this).attr('data-title', $(this).text().replace('Listing ', '').trim())
-		})
-
-		$.each($('[class^="cell-listing_"]'), function() {
-			$(this).html($(this).text())
-		})
-		
-	},
-
-	changeSectionsToTabs: function() {
-
-		condition = Statamic.urlPath.indexOf('store_products') != -1 || Statamic.urlPath.indexOf('statamify/settings') != -1 || Statamic.urlPath.indexOf('store_customers') != -1
-
-		if (
-			$(".section-fieldtype").length 
-			&& !$('#publish-fields').is('.naked') 
-			&& (condition)
-			) {
-
-			$('#publish-fields').addClass('naked')
-
-			// Code from "Section" by Rudy Affandi ### https://github.com/lesaff/statamic-sections
-			$(".form-group.section-fieldtype").addClass("section-header");
-
-			$(".section-header").each(function() {
-					$(this).nextUntil(".section-header").wrapAll('<div class="tab-pane fade" />')
-			});
-
-			$(".tab-pane").each(function() {
-					$(this).children('.form-group').wrapAll('<div class="tab-flex" />')
-			});
-
-			$(".section-header").wrapAll('<ul id="section-tabs" class="nav nav-tabs" role="tablist" />')
-
-			$(".section-header").each(function() {
-					$(this).replaceWith($('<li role="presentation">' + this.innerHTML + '</li>'));
-			});
-
-			$(".nav-tabs li > div").each(function(index, element) {
-					$(this).replaceWith($('<a href="#panel' + index + '" role="tab" data-toggle="tab">' + this.innerHTML + '</a>'));
-			});
-
-			$(".nav-tabs li").first().addClass("first active");
-
-			$(".tab-pane").each(function(index, element){
-					$(this).attr({
-							'id': 'panel' + index,
-							'role': 'tabpanel',
-					});
-					$(this).addClass('tab-' + $('[href="#panel' + index + '"] label').text().trim().toLowerCase())
-			});
-
-			var tabContainer = $('<div>', {'class': 'tab-content'});
-			var panes = $(".tab-pane");
-
-			panes.sort(function(a,b){
-					var an = a.getAttribute('id'),
-							bn = b.getAttribute('id');
-
-					if(an > bn) {
-							return 1;
-					}
-
-					if(an < bn) {
-							return -1;
-					}
-
-					return 0;
-
-			});
-
-			$(".publish-fields").append(tabContainer);
-			panes.detach().appendTo(tabContainer);
-
-			tabContainer.parent().addClass('tabs-wrapper')
-
-			$(".tab-content .tab-pane").first().addClass("first active").removeClass('fade');
-
-			$(".nav-tabs li a").each(function(index, element){
-					$(this).find('small').detach().prependTo('#panel' + index);
-			});
-
-		}
-
-	},
-
 	orderPreview: function() {
 
 		$('body').on('click', '.statamify-orders .cell-title a', function() {
@@ -126,7 +37,7 @@ Statamify = {
 				originalOrder.find('[name="order-status"]').val(label)
 				originalOrder.find('[name="order-status"]').parent().attr('data-content', originalOrder.find('[name="order-status"] :selected').text())
 				clone = $('#orders-details .order-item[data-title="' + title + '"]').clone(true, true)
-				$(this).parent().parent().after(clone)
+				$(this).parent().parent().parent().after(clone)
 			}
 		})
 
@@ -273,8 +184,6 @@ function newXHR() {
 				&& realXHR.responseURL.indexOf('statamify/orders/refund') == -1) {
 
 				setTimeout(function(){
-					Statamify.changeSectionsToTabs()
-					Statamify.convertListingCells()
 					Statamify.orderPreview()
 				}, 0)
 

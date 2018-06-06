@@ -5,7 +5,10 @@ order: number
 sort_dir: desc
 columns:
   - title
-  - listing_image
-  - listing_inventory
-  - listing_type
-  - listing_vendor
+  - image.null
+  - value: listing_inventory
+    header: Inventory
+  - value: listing_type
+    header: Type
+  - value: listing_vendor
+    header: Vendor
