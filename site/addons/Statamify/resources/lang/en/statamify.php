@@ -27,6 +27,8 @@ return [
 	'all' => 'All',
 	'analytics' => 'Analytics',
 
+	'billing' => 'Billing',
+
 	'category' => 'Category',
 	'categories' => 'Categories',
 	'cheque' => 'Cheque',
@@ -46,6 +48,7 @@ return [
 
 	'gross_sales' => 'Gross Sales',
 
+	'order' => 'Order',
 	'orders' => 'Orders',
 
 	'manually' => 'manually',
@@ -60,6 +63,7 @@ return [
 
 	'rate' => 'Rate',
 	'reason_optional' => 'Reason (optional)',
+	'related_products' => 'Related Products',
 	'refund' => 'Refund',
 	'refunded' => 'Refunded',
 	'refunds' => 'Refunds',

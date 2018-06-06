@@ -27,8 +27,11 @@ return [
 	'all' => 'Wszystkie',
 	'analytics' => 'Analityka',
 
+	'billing' => 'Rozliczenie',
+
 	'category' => 'Kategoria',
 	'categories' => 'Kategorie',
+	'checkout' => 'Zamówienie',
 	'cheque' => 'Przelew',
 	'coupon' => 'Kupon',
 	'coupons' => 'Kupony',
@@ -46,6 +49,7 @@ return [
 
 	'gross_sales' => 'Sprzedaż brutto',
 
+	'order' => 'Zamówienie',
 	'orders' => 'Zamówienia',
 
 	'manually' => 'manualnie',
@@ -58,6 +62,7 @@ return [
 
 	'rate' => 'Stawka',
 	'reason_optional' => 'Powód (opcjonalnie)',
+	'related_products' => 'Podobne produkty',
 	'refund' => 'Zwrot',
 	'refunded' => 'Zwrócono',
 	'refunds' => 'Zwroty',

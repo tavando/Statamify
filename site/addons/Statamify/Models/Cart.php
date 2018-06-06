@@ -153,6 +153,8 @@ class Cart
           if (!is_bool($variant_key)) {
             $var = $product['variants'][$variant_key];
 
+            // Translate attributes if exist in T addon
+
             if (site_locale() != default_locale() && class_exists('\Statamic\Addons\T\TAPI')) {
               $attrs = explode('|', $var['attrs']);
               $attrs = array_map(function($attr) {
@@ -288,6 +290,15 @@ class Cart
         $cart['shipping']['methods'] = $shipping_methods;
         $cart['shipping']['methods'][$shipping_method]['active'] = true;
         $cart['total']['shipping'] = isset($shipping_methods[$shipping_method]['rate']) ? (float) $shipping_methods[$shipping_method]['rate'] : 0;
+
+        // Translate note if exists in T addon
+
+        if (site_locale() != default_locale() && class_exists('\Statamic\Addons\T\TAPI')) {
+          $cart['shipping']['methods'] = array_map(function($method) {
+            $method['note'] = app(\Statamic\Addons\T\TAPI::class)->api('T')->string($method['note']);
+            return $method;
+          }, $cart['shipping']['methods']);
+        }
 
       }
 

@@ -12,7 +12,18 @@ class Helpers
   public static function location($location)
   {
 
-    return YAML::parse(File::get(__DIR__ . '/../resources/location/' . $location . '.yaml'));
+    $prefix = site_locale() != 'en' ? site_locale() : '';
+    $file = File::get(__DIR__ . '/../resources/location/' . $prefix .'_' . $location . '.yaml');
+
+    if ($file) {
+
+      return YAML::parse($file);
+
+    } else {
+
+      return YAML::parse(File::get(__DIR__ . '/../resources/location/' . $location . '.yaml'));
+
+    }
 
   }
 
