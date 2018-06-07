@@ -73,11 +73,17 @@ class OrderController extends Controller
 
         if (!$data['user']) {
 
-          $url = Statamify::route('statamify.store.summary', ['slug' => $data['slug'], 'locale' => $data['locale']]);
+          $url = Statamify::route('statamify.store.summary', [
+            'slug' => $data['slug'], 
+            'locale' => isset($data['locale']) ? $data['locale'] : site_locale()
+          ]);
 
         } else {
 
-          $url = Statamify::route('statamify.account.order', ['slug' => $data['slug'], 'locale' => $data['locale']]);
+          $url = Statamify::route('statamify.account.order', [
+            'slug' => $data['slug'], 
+            'locale' => isset($data['locale']) ? $data['locale'] : site_locale()
+          ]);
 
         }
 
