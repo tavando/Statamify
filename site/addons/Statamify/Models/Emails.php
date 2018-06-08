@@ -2,7 +2,9 @@
 
 namespace Statamic\Addons\Statamify\Models;
 
+use Statamic\API\Config;
 use Statamic\API\Email;
+use Statamic\API\File;
 use Statamic\Addons\Statamify\Statamify;
 use Statamic\API\Storage;
 
@@ -84,10 +86,20 @@ class Emails
 		$email = Email::create();
 		$attrs = $this->attrs();
 
+		if (File::disk('theme')->exists('emails/' . $this->template . '.html')) {
+
+			$path = '/site/themes/' . Config::get('theming.theme') . '/emails';
+
+		} else {
+
+			$path = '/site/addons/Statamify/resources/emails';
+
+		}
+
 		$email
 			->to($this->to)
 			->subject($attrs['subject'])
-			->in('/site/addons/Statamify/resources/emails')
+			->in($path)
 			->with($this->data)
 			->template($this->template);
 
