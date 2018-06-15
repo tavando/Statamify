@@ -123,29 +123,6 @@
 
 <script>
 
-	initialData = {
-		split: '{{ $split }}',
-		allOrders: {!! $all_orders !!},
-		totalOrders: {!! $total_orders !!},
-		totalSales: {!! $total_sales !!},
-		averageOrderValue: {!! $avg_order_value !!},
-		repeatRate: {!! $repeat_rate !!},
-		popup: {
-			active: 0,
-			title: '{{ $t['total_orders'] }}',
-			type: 'totalOrders',
-			range: 'Today'
-		}
-	}
-
-</script>
-
-@stop
-
-@section('scripts')
-
-<script>
-
 	function money(price) {
 
 		minus = false
@@ -160,6 +137,25 @@
 
     return (minus ? '-' : '') + formatMoney.replace('[symbol]', '{!! $moneySymbol !!}').replace('[price]', price)
 
+	}
+
+</script>
+
+<script>
+
+	initialData = {
+		split: '{{ $split }}',
+		allOrders: {!! $all_orders !!},
+		totalOrders: {!! $total_orders !!},
+		totalSales: {!! $total_sales !!},
+		averageOrderValue: {!! $avg_order_value !!},
+		repeatRate: {!! $repeat_rate !!},
+		popup: {
+			active: 0,
+			title: '{{ $t['total_orders'] }}',
+			type: 'totalOrders',
+			range: 'Today'
+		}
 	}
 
 </script>

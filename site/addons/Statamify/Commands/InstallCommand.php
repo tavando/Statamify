@@ -98,6 +98,7 @@ class InstallCommand extends Command
 
     $routes = YAML::parse(File::get('site/settings/routes.yaml'));
     $routes['routes'] = array_merge($routes['routes'], $store_routes);
+    if (!isset($routes['collections'])) { $routes['collections'] = []; }
     $routes['collections'] = array_merge($routes['collections'], $store_collections);
 
     File::put('site/settings/routes.yaml', YAML::dump($routes));

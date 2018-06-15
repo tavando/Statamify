@@ -12,6 +12,7 @@ return [
 	'billing_info' => 'Billing information',
 	'billing_info_diff' => 'Billing informations different than shipping?',
 
+	'checkout' => 'Checkout',
 	'choose' => 'Choose an option',
 	'choose_attrs' => 'Choose all attributes before adding product to cart',
 	'color' => 'Color',

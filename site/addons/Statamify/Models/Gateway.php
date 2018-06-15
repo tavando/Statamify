@@ -141,7 +141,7 @@ class Gateway
     $index = $this->config->search(function($gateway) { return $gateway['type'] == 'stripe'; });
     $config = $this->config->get($index);
 
-    $gateway->setApiKey($config[($config['test'] ? 'test_keys' : 'keys')]['secret']);
+    $gateway->setApiKey($config[(isset($config['test']) && $config['test'] ? 'test_keys' : 'keys')]['secret']);
     
     $token = $this->order['payment_token'];
 

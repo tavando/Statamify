@@ -237,7 +237,6 @@ sections:
 							test:
 								type: toggle
 								display: Test Mode
-								width: 25
 								width: 75
 								replicator_preview: false
 							keys:

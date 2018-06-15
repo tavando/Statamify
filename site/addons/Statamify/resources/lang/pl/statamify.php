@@ -31,7 +31,6 @@ return [
 
 	'category' => 'Kategoria',
 	'categories' => 'Kategorie',
-	'checkout' => 'Zamówienie',
 	'cheque' => 'Przelew',
 	'coupon' => 'Kupon',
 	'coupons' => 'Kupony',

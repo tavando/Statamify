@@ -28,7 +28,9 @@ class Cart
         'shipping' => 0,
         'tax' => 0,
         'grand' => 0,
-        'weight' => 0
+        'weight' => 0,
+        'items' => 0,
+        'pieces' => 0
       ]
     ];
 
@@ -61,7 +63,9 @@ class Cart
       'shipping' => 0,
       'tax' => 0,
       'grand' => 0,
-      'weight' => 0
+      'weight' => 0,
+      'items' => 0,
+      'pieces' => 0
     ];
 
     // Get product's fieldset - we will transform IDs to objects of data
@@ -82,6 +86,9 @@ class Cart
     }
 
     foreach ($cart['items'] as $item_key => $item) {
+
+      $cart['total']['items']++;
+      $cart['total']['pieces'] += $item['quantity'];
 
       $product = Entry::find($item['product']);
 

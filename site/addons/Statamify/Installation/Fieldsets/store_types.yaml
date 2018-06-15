@@ -1,5 +1,6 @@
 taxonomies:
   tags: true
+hide: true
 title: "Store: Types"
 fields:
   products:

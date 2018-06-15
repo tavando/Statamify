@@ -3,6 +3,7 @@ fieldset: store_coupons
 columns:
   - title
   - slug
-  - listing_used
+  - value: listing_used
+    header: Used
   - start_date
   - end_date

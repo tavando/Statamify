@@ -12,6 +12,7 @@ return [
 	'billing_info' => 'Dane do faktury',
 	'billing_info_diff' => 'Dane do faktury inne niż do wysyłki?',
 
+	'checkout' => 'Zamówienie',
 	'choose' => 'Wybierz opcję',
 	'choose_attrs' => 'Wybierz wszystkie atrybuty zanim dodasz produkt do koszyka',
 	'color' => 'Kolor',

@@ -2,5 +2,7 @@ title: "Store: Customers"
 fieldset: "store_customers"
 columns:
   - title
-  - listing_orders
-  - listing_spent
+  - value: listing_orders
+    header: Orders
+  - value: listing_spent
+    header: Spent

@@ -1,4 +1,5 @@
 taxonomies: false
+hide: true
 title: "Store: Customers"
 sections:
   general:
