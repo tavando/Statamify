@@ -31,7 +31,7 @@ class Helpers
 
     $currencies = System::config('currency');
 
-    if (count($currencies)) {
+    if (!is_null($currencies) && count($currencies)) {
 
       $key = array_search('1', array_column($currencies, 'rate'));
 
