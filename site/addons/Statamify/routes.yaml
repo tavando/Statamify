@@ -1,6 +1,5 @@
 routes:
   countries: BaseController@countries
-  agora: AgoraController@test
   analytics:
     uses: AnalyticsController@index
     as: statamify.analytics
