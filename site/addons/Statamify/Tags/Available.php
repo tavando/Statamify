@@ -8,33 +8,33 @@ class Available
   public static function tag($s)
   {
 
-  	$product = $s->context;
+    $product = $s->context;
 
-  	if ($product['track_inventory']) {
+    if ($product['track_inventory']) {
 
-  		if ($product['class'] == 'simple') {
+      if ($product['class'] == 'simple') {
 
-  			if ($product['inventory'] < 1) {
+        if ($product['inventory'] < 1) {
 
-  				return false;
+          return false;
 
-  			} else {
+        } else {
 
-  				return true;
+          return true;
 
-  			}
+        }
 
-  		} else {
+      } else {
 
-  			return true;
+        return true;
 
-  		}
+      }
 
-  	} else {
+    } else {
 
-  		return true;
+      return true;
 
-  	}
+    }
 
   }
 

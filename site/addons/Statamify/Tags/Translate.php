@@ -14,17 +14,17 @@ class Translate
 
     if ($key) {
 
-    	if (class_exists('\Statamic\Addons\T\TAPI')) {
+      if (class_exists('\Statamic\Addons\T\TAPI')) {
 
-    		$overwrite = $s->api('T')->string($key);
+        $overwrite = $s->api('T')->string($key);
 
-    		if ($overwrite != $key) {
+        if ($overwrite != $key) {
 
-    			return $overwrite;
+          return $overwrite;
 
-    		}
+        }
 
-    	}
+      }
 
       $string = Statamify::t($key, 'theme');
 

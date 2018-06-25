@@ -10,8 +10,8 @@ class Cart
   public static function tag($s)
   {
 
-  	$cart = new Model();
-  	
+    $cart = new Model();
+    
     return $cart->get($s->get('instance') ?: 'cart');
 
   }

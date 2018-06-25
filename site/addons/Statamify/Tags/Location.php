@@ -11,89 +11,89 @@ class Location
   {
 
     $countries = Statamify::location();
-		$regions = Statamify::location('regions');
+    $regions = Statamify::location('regions');
 
-		if (isset($s->context['country'])) {
+    if (isset($s->context['country'])) {
 
-			$country = $s->context['country'];
-			$region = $s->context['region'];
+      $country = $s->context['country'];
+      $region = $s->context['region'];
 
-		}
+    }
 
-		if (isset($s->context['defaultKey'])) {
+    if (isset($s->context['defaultKey'])) {
 
-			$country = $s->context['default']['country'];
-			$region = $s->context['default']['region'];
+      $country = $s->context['default']['country'];
+      $region = $s->context['default']['region'];
 
-			if (session('statamify.shipping_country')) {
+      if (session('statamify.shipping_country')) {
 
-				$country = session('statamify.shipping_country');
-				$region = '';
+        $country = session('statamify.shipping_country');
+        $region = '';
 
-			}
+      }
 
-		}
+    }
 
-		if (isset($s->context['old']['data'])) {
+    if (isset($s->context['old']['data'])) {
 
-			if (isset($s->context['defaultKey'])) {
+      if (isset($s->context['defaultKey'])) {
 
-				$country = $s->context['old']['data']['shipping']['country'];
-				$region = $s->context['old']['data']['shipping']['region'];
+        $country = $s->context['old']['data']['shipping']['country'];
+        $region = $s->context['old']['data']['shipping']['region'];
 
-			} else {
+      } else {
 
-				$country = $s->context['old']['data']['billing']['country'];
-				$region = $s->context['old']['data']['billing']['region'];
+        $country = $s->context['old']['data']['billing']['country'];
+        $region = $s->context['old']['data']['billing']['region'];
 
-			}
-			
-		}
+      }
+      
+    }
 
-		if (!isset($country)) {
+    if (!isset($country)) {
 
-			if (session('statamify.shipping_country')) {
+      if (session('statamify.shipping_country')) {
 
-				$country = session('statamify.shipping_country');
-				$region = '';
+        $country = session('statamify.shipping_country');
+        $region = '';
 
-			}
-			
-		}
+      }
+      
+    }
 
-		$countries = reset($countries);
+    $countries = reset($countries);
 
-		if (isset($country)) {
+    if (isset($country)) {
 
-			$regions = reset($regions);
+      $regions = reset($regions);
 
-			if (isset($regions[$country])) {
+      if (isset($regions[$country])) {
 
-				$regions = $regions[$country];
+        $regions = $regions[$country];
 
-			} else {
+      } else {
 
-				$regions = false;
+        $regions = false;
 
-			}
+      }
 
-			return [ 
-				'countries' => $countries, 
-				'regions' => $regions,
-				'country' => @$countries[$country],
-				'region' => $regions ? (isset($regions[$region]) ? $regions[$region] : $region) : $region,
-				'country_code' => $country,
-				'region_code' => @$region
-			];
+      return [ 
+        'countries' => $countries, 
+        'regions' => $regions,
+        'country' => @$countries[$country],
+        'region' => $regions ? (isset($regions[$region]) ? $regions[$region] : $region) : $region,
+        'country_code' => $country,
+        'region_code' => @$region
+      ];
 
-		} else {
+    } else {
 
-			return [ 
-				'countries' => $countries, 
-				'regions' => ''
-			];
+      return [ 
+        'countries' => $countries, 
+        'regions' => ''
+      ];
 
-		}
+    }
 
   }
 

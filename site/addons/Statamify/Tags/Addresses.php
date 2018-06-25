@@ -15,46 +15,46 @@ class Addresses
 
     $user = User::getCurrent();
 
-		if ($user) {
+    if ($user) {
 
-			$customer = Entry::whereSlug($user->id(), 'store_customers');
+      $customer = Entry::whereSlug($user->id(), 'store_customers');
 
-			if ($customer) {
+      if ($customer) {
 
-				$default_address = session('statamify.default_address');
-				$addresses = $customer->get('addresses');
+        $default_address = session('statamify.default_address');
+        $addresses = $customer->get('addresses');
 
-				foreach ($addresses as $key => $address) {
+        foreach ($addresses as $key => $address) {
 
-					if (!$default_address && $address['default']) {
+          if (!$default_address && $address['default']) {
 
-						$default_address = $key;
-						session(['statamify.default_address' => [
-							'defaultKey' => $key,
-							'default' => $address
-						]]);
-						session(['statamify.shipping_country' => $address['country']]);
+            $default_address = $key;
+            session(['statamify.default_address' => [
+              'defaultKey' => $key,
+              'default' => $address
+            ]]);
+            session(['statamify.shipping_country' => $address['country']]);
 
-						$cart = new CartModel();
-						$cart->setShipping();
+            $cart = new CartModel();
+            $cart->setShipping();
 
-					}
+          }
 
-				}
+        }
 
-				return $customer->get('addresses');
+        return $customer->get('addresses');
 
-			} else {
+      } else {
 
-				return ['no_results' => true];
+        return ['no_results' => true];
 
-			}
+      }
 
-		} else {
+    } else {
 
-			return ['no_results' => true];
+      return ['no_results' => true];
 
-		}
+    }
 
   }
 

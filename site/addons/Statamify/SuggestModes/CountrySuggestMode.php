@@ -8,21 +8,21 @@ use Statamic\Addons\Statamify\Statamify;
 class CountrySuggestMode extends AbstractMode
 {
 
-	public function suggestions()
-	{
+  public function suggestions()
+  {
 
-		switch ($this->request->input('name')) {
+    switch ($this->request->input('name')) {
 
-			case 'countries':
-				
-				$countries = Statamify::location();
+      case 'countries':
+        
+        $countries = Statamify::location();
 
-				return array_map(function($code, $name) {
-					return [ 'value' => $code, 'text' => $name ];	
-				}, array_keys(reset($countries)), reset($countries));
+        return array_map(function($code, $name) {
+          return [ 'value' => $code, 'text' => $name ]; 
+        }, array_keys(reset($countries)), reset($countries));
 
-			break;
-		}
-	}
-	
+      break;
+    }
+  }
+  
 }

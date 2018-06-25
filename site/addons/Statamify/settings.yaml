@@ -1,257 +1,257 @@
 sections:
-	general:
-		display: General
-		fields:
-			owner_email:
-				type: text
-				display: Owner's Email
-				instructions: Email address for receiving emails from store
-				width: 50
-			store_name:
-				type: text
-				display: Store Name
-				instructions: Name of the store used in website and emails
-				width: 50
-			store_address:
-				type: redactor
-				display: Store Address
-				settings: Standard
-			order_id_format:
-				type: text
-				display: Order ID Format
-				instructions: Remember to use [id] inside the format
-				default: '#[id]'
-				width: 25
-			order_next_id:
-				type: text
-				display: Next Order ID
-				instructions: Incremental value for every order
-				width: 25
-				default: 1000
-			guest_checkout:
-				type: toggle
-				display: Guest Checkout
-				instructions: Allow non-registered users to checkout
-				width: 25
-			coupons_multiple:
-				type: toggle
-				display: Multiple Coupons
-				instructions: Allow adding more than one coupon
-				width: 25
-				default: false
-	shipping:
-		display: Shipping
-		fields:
-			shipping_zones:
-				type: replicator
-				display: Zones
-				sets:
-					zone:
-						display: Zone
-						fields:
-							name:
-								type: text
-								display: Name
-								width: 25
-							countries:
-								type: suggest
-								display: Countries
-								mode: Statamify.Country
-								width: 75
-							price_rates:
-								type: grid
-								display: Price Based Rates
-								replicator_preview: false
-								width: 50
-								fields:
-									name:
-										type: text
-										display: Name
-									min:
-										type: text
-										display: Minimum
-										validate: numeric
-									max:
-										type: text
-										display: Maximum
-										validate: numeric
-									rate:
-										type: text
-										display: Rate
-										validate: numeric
-									note:
-										type: text
-										display: Note
-								mode: table
-								add_row: Add Rate
-							weight_rates:
-								type: grid
-								display: Weight Based Rates
-								replicator_preview: false
-								width: 50
-								fields:
-									name:
-										type: text
-										display: Name
-									min:
-										type: text
-										display: Minimum
-										validate: numeric
-									max:
-										type: text
-										display: Maximum
-										validate: numeric
-									rate:
-										type: text
-										display: Rate
-										validate: numeric
-									note:
-										type: text
-										display: Note
-								mode: table
-								add_row: Add Rate
-					rest:
-						display: Rest of world
-						instructions: This zone includes any countries not already defined in zones.
-						fields:
-							name:
-								type: text
-								display: Name
-							price_rates:
-								type: grid
-								display: Price Based Rates
-								replicator_preview: false
-								width: 50
-								fields:
-									name:
-										type: text
-										display: Name
-									min:
-										type: text
-										display: Minimum
-										validate: numeric
-									max:
-										type: text
-										display: Maximum
-										validate: numeric
-									rate:
-										type: text
-										display: Rate
-										validate: numeric
-									note:
-										type: text
-										display: Note
-								mode: table
-								add_row: Add Rate
-							weight_rates:
-								type: grid
-								display: Weight Based Rates
-								replicator_preview: false
-								width: 50
-								fields:
-									name:
-										type: text
-										display: Name
-									min:
-										type: text
-										display: Minimum
-										validate: numeric
-									max:
-										type: text
-										display: Maximum
-										validate: numeric
-									rate:
-										type: text
-										display: Rate
-										validate: numeric
-								mode: table
-								add_row: Add Rate
-			shipping_package_weight:
-				type: text
-				display: Package Weight
-				validate: numeric
-				instructions: This weight will be added to total weight of the cart
-	payments:
-		display: Payments
-		fields:
-			currency:
-				type: grid
-				display: Currency
-				instructions: Set rate to 1 for **default currency**. Use `[symbol]` and `[price]` for formatting the display price
-				fields:
-					code:
-						type: text
-						display: Code
-					symbol:
-						type: text
-						display: Symbol
-					format:
-						type: text
-						display: Format
-						default: '[symbol][price]'
-					formatPrice:
-						type: select
-						display: Price Format
-						default: 4
-						options:
-							1: 1,000
-							2: 1 000
-							3: 1,000.50
-							4: 1 000.50
-							5: 1 000,50
-							6: 1000
-							7: 1000.50
-							8: 1000,50
-					rate:
-						type: text
-						display: Rate
-						validate: numeric
-				mode: table
-				add_row: Add Currency
-			
-			gateways:
-				type: replicator
-				display: Payment Gateways
-				sets:
-					cheque:
-						display: Cheque
-						fields:
-							active:
-								type: toggle
-								display: Active
-								width: 25
-								replicator_preview: false
-							info:
-								type: textarea
-								display: Info
-								width: 75
-								replicator_preview: false
-					stripe:
-						display: Stripe
-						fields:
-							active:
-								type: toggle
-								display: Active
-								width: 25
-								replicator_preview: false
-							test:
-								type: toggle
-								display: Test Mode
-								width: 75
-								replicator_preview: false
-							keys:
-								type: array
-								display: Live API keys
-								keys:
-									public: Public
-									secret: Secret
-								width: 50
-								replicator_preview: false
-							test_keys:
-								type: array
-								display: Test API keys
-								keys:
-									public: Public
-									secret: Secret
-								width: 50
-								replicator_preview: false
+  general:
+    display: General
+    fields:
+      owner_email:
+        type: text
+        display: Owner's Email
+        instructions: Email address for receiving emails from store
+        width: 50
+      store_name:
+        type: text
+        display: Store Name
+        instructions: Name of the store used in website and emails
+        width: 50
+      store_address:
+        type: redactor
+        display: Store Address
+        settings: Standard
+      order_id_format:
+        type: text
+        display: Order ID Format
+        instructions: Remember to use [id] inside the format
+        default: '#[id]'
+        width: 25
+      order_next_id:
+        type: text
+        display: Next Order ID
+        instructions: Incremental value for every order
+        width: 25
+        default: 1000
+      guest_checkout:
+        type: toggle
+        display: Guest Checkout
+        instructions: Allow non-registered users to checkout
+        width: 25
+      coupons_multiple:
+        type: toggle
+        display: Multiple Coupons
+        instructions: Allow adding more than one coupon
+        width: 25
+        default: false
+  shipping:
+    display: Shipping
+    fields:
+      shipping_zones:
+        type: replicator
+        display: Zones
+        sets:
+          zone:
+            display: Zone
+            fields:
+              name:
+                type: text
+                display: Name
+                width: 25
+              countries:
+                type: suggest
+                display: Countries
+                mode: Statamify.Country
+                width: 75
+              price_rates:
+                type: grid
+                display: Price Based Rates
+                replicator_preview: false
+                width: 50
+                fields:
+                  name:
+                    type: text
+                    display: Name
+                  min:
+                    type: text
+                    display: Minimum
+                    validate: numeric
+                  max:
+                    type: text
+                    display: Maximum
+                    validate: numeric
+                  rate:
+                    type: text
+                    display: Rate
+                    validate: numeric
+                  note:
+                    type: text
+                    display: Note
+                mode: table
+                add_row: Add Rate
+              weight_rates:
+                type: grid
+                display: Weight Based Rates
+                replicator_preview: false
+                width: 50
+                fields:
+                  name:
+                    type: text
+                    display: Name
+                  min:
+                    type: text
+                    display: Minimum
+                    validate: numeric
+                  max:
+                    type: text
+                    display: Maximum
+                    validate: numeric
+                  rate:
+                    type: text
+                    display: Rate
+                    validate: numeric
+                  note:
+                    type: text
+                    display: Note
+                mode: table
+                add_row: Add Rate
+          rest:
+            display: Rest of world
+            instructions: This zone includes any countries not already defined in zones.
+            fields:
+              name:
+                type: text
+                display: Name
+              price_rates:
+                type: grid
+                display: Price Based Rates
+                replicator_preview: false
+                width: 50
+                fields:
+                  name:
+                    type: text
+                    display: Name
+                  min:
+                    type: text
+                    display: Minimum
+                    validate: numeric
+                  max:
+                    type: text
+                    display: Maximum
+                    validate: numeric
+                  rate:
+                    type: text
+                    display: Rate
+                    validate: numeric
+                  note:
+                    type: text
+                    display: Note
+                mode: table
+                add_row: Add Rate
+              weight_rates:
+                type: grid
+                display: Weight Based Rates
+                replicator_preview: false
+                width: 50
+                fields:
+                  name:
+                    type: text
+                    display: Name
+                  min:
+                    type: text
+                    display: Minimum
+                    validate: numeric
+                  max:
+                    type: text
+                    display: Maximum
+                    validate: numeric
+                  rate:
+                    type: text
+                    display: Rate
+                    validate: numeric
+                mode: table
+                add_row: Add Rate
+      shipping_package_weight:
+        type: text
+        display: Package Weight
+        validate: numeric
+        instructions: This weight will be added to total weight of the cart
+  payments:
+    display: Payments
+    fields:
+      currency:
+        type: grid
+        display: Currency
+        instructions: Set rate to 1 for **default currency**. Use `[symbol]` and `[price]` for formatting the display price
+        fields:
+          code:
+            type: text
+            display: Code
+          symbol:
+            type: text
+            display: Symbol
+          format:
+            type: text
+            display: Format
+            default: '[symbol][price]'
+          formatPrice:
+            type: select
+            display: Price Format
+            default: 4
+            options:
+              1: 1,000
+              2: 1 000
+              3: 1,000.50
+              4: 1 000.50
+              5: 1 000,50
+              6: 1000
+              7: 1000.50
+              8: 1000,50
+          rate:
+            type: text
+            display: Rate
+            validate: numeric
+        mode: table
+        add_row: Add Currency
+      
+      gateways:
+        type: replicator
+        display: Payment Gateways
+        sets:
+          cheque:
+            display: Cheque
+            fields:
+              active:
+                type: toggle
+                display: Active
+                width: 25
+                replicator_preview: false
+              info:
+                type: textarea
+                display: Info
+                width: 75
+                replicator_preview: false
+          stripe:
+            display: Stripe
+            fields:
+              active:
+                type: toggle
+                display: Active
+                width: 25
+                replicator_preview: false
+              test:
+                type: toggle
+                display: Test Mode
+                width: 75
+                replicator_preview: false
+              keys:
+                type: array
+                display: Live API keys
+                keys:
+                  public: Public
+                  secret: Secret
+                width: 50
+                replicator_preview: false
+              test_keys:
+                type: array
+                display: Test API keys
+                keys:
+                  public: Public
+                  secret: Secret
+                width: 50
+                replicator_preview: false

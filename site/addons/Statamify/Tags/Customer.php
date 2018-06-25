@@ -13,25 +13,25 @@ class Customer
 
     $user = User::getCurrent();
 
-		if ($user) {
+    if ($user) {
 
-			$customer = Entry::whereSlug($user->get('id'), 'store_customers');
+      $customer = Entry::whereSlug($user->get('id'), 'store_customers');
 
-			if ($customer) {
+      if ($customer) {
 
-				return $customer->toArray();
+        return $customer->toArray();
 
-			} else {
+      } else {
 
-				return ['no_results' => true];
+        return ['no_results' => true];
 
-			}
+      }
 
-		} else {
+    } else {
 
-			return redirect(Statamify::route('statamify.account.login'));
+      return redirect(Statamify::route('statamify.account.login'));
 
-		}
+    }
 
   }
 

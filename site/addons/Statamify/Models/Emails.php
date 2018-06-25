@@ -11,115 +11,115 @@ use Statamic\API\Storage;
 class Emails
 {
 
-	public function __construct($template, $data, $to = null)
-	{
+  public function __construct($template, $data, $to = null)
+  {
 
-		$this->template = $template;
-		$this->data = Statamify::wrapGlobals($data);
-		$this->to = !$to ? Statamify::config('owner_email') : $to;
+    $this->template = $template;
+    $this->data = Statamify::wrapGlobals($data);
+    $this->to = !$to ? Statamify::config('owner_email') : $to;
 
-	}
+  }
 
-	private function attrs()
-	{
+  private function attrs()
+  {
 
-		$attrs = [];
+    $attrs = [];
 
-		switch ($this->template) {
+    switch ($this->template) {
 
-			case 'admin-order-new':
-				
-				$attrs['subject'] = 'New Order ' . $this->data['title'] . ' has been placed'; 
+      case 'admin-order-new':
+        
+        $attrs['subject'] = 'New Order ' . $this->data['title'] . ' has been placed'; 
 
-				break;
+        break;
 
-			case 'order-new':
-				
-				$attrs['subject'] = 'Order ' . $this->data['title'] . ' confirmed'; 
+      case 'order-new':
+        
+        $attrs['subject'] = 'Order ' . $this->data['title'] . ' confirmed'; 
 
-				break;
+        break;
 
-			case 'order-status':
-				
-				$attrs['subject'] = 'Order ' . $this->data['title'] . ' is now ' . strtolower(strip_tags($this->data['listing_status'])); 
+      case 'order-status':
+        
+        $attrs['subject'] = 'Order ' . $this->data['title'] . ' is now ' . strtolower(strip_tags($this->data['listing_status'])); 
 
-				break;
+        break;
 
-			case 'order-refund':
-				
-				$attrs['subject'] = 'Order ' . $this->data['title'] . ' has been refunded'; 
+      case 'order-refund':
+        
+        $attrs['subject'] = 'Order ' . $this->data['title'] . ' has been refunded'; 
 
-				break;
-			
-			default:
+        break;
+      
+      default:
 
-				$attrs['subject'] = 'New message from the store'; 
-				
-				break;
-		}
+        $attrs['subject'] = 'New message from the store'; 
+        
+        break;
+    }
 
-		return $attrs;
+    return $attrs;
 
-	}
+  }
 
-	public function create()
-	{
+  public function create()
+  {
 
-		// Create Email entry - it will be sent later with Cron
+    // Create Email entry - it will be sent later with Cron
 
-		$email_id = date('Y-m-d_H-i-s') . '.' . $this->template;
-		$email_data = [
-			'title' => $this->template, 
-			'data' => serialize($this->data), 
-			'email' => $this->to,
-			'id' => $email_id,
-			'date' => date('Y-m-d H:i:s')
-		];
+    $email_id = date('Y-m-d_H-i-s') . '.' . $this->template;
+    $email_data = [
+      'title' => $this->template, 
+      'data' => serialize($this->data), 
+      'email' => $this->to,
+      'id' => $email_id,
+      'date' => date('Y-m-d H:i:s')
+    ];
 
-		Storage::putYAML('statamify/emails/' . $email_id, $email_data);
+    Storage::putYAML('statamify/emails/' . $email_id, $email_data);
 
-	}
+  }
 
-	public function send()
-	{
+  public function send()
+  {
 
-		$email = Email::create();
-		$attrs = $this->attrs();
+    $email = Email::create();
+    $attrs = $this->attrs();
 
-		if (File::disk('theme')->exists('emails/' . $this->template . '.html')) {
+    if (File::disk('theme')->exists('emails/' . $this->template . '.html')) {
 
-			$path = '/site/themes/' . Config::get('theming.theme') . '/emails';
+      $path = '/site/themes/' . Config::get('theming.theme') . '/emails';
 
-		} else {
+    } else {
 
-			$path = '/site/addons/Statamify/resources/emails';
+      $path = '/site/addons/Statamify/resources/emails';
 
-		}
+    }
 
-		$email
-			->to($this->to)
-			->subject($attrs['subject'])
-			->in($path)
-			->with($this->data)
-			->template($this->template);
+    $email
+      ->to($this->to)
+      ->subject($attrs['subject'])
+      ->in($path)
+      ->with($this->data)
+      ->template($this->template);
 
-		return $email->send();
+    return $email->send();
 
-	}
+  }
 
-	public function sendEmail()
-	{
+  public function sendEmail()
+  {
 
-		if (env('STATAMIFY_QUEUE_EMAILS', false)) {
+    if (env('STATAMIFY_QUEUE_EMAILS', false)) {
 
-			$this->create();
+      $this->create();
 
-		} else {
+    } else {
 
-			$this->send();
+      $this->send();
 
-		}
+    }
 
-	}
+  }
 
 }

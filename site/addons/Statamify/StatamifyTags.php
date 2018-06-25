@@ -170,7 +170,7 @@ class StatamifyTags extends Tags
   public function url()
   {
 
-  	return QueryUrl::tag($this);
+    return QueryUrl::tag($this);
 
   }
 
