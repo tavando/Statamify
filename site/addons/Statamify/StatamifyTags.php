@@ -25,6 +25,15 @@ class StatamifyTags extends Tags
     if ($get) {
       return $this->getConfig($get);
     }
+
+    if ($this->get('app')) {
+
+      $classname = '\\Statamic\\Addons\\Statamify\\Apps\\' . $this->get('app') . '\\' . $this->get('app') . 'Tags';
+      $tag = new $classname;
+
+      return $tag->{$this->get('use')}($this);
+
+    }
     
     return '';
 
